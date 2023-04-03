@@ -51,7 +51,7 @@ Kiegészítő technológiák: `WebSocket`, `PubSub`, `Reactive Gateway`.
 
 ## Komponensdiagram
 
-![diagram](uploads/58b9ca25d7ddc0f548a85c075349796f/diagram.png)
+![diagram](diagram.png)
 
 ### Diagram-magyarázat
 
