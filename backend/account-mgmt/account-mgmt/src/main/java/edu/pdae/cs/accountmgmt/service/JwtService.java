@@ -1,6 +1,5 @@
 package edu.pdae.cs.accountmgmt.service;
 
-import edu.pdae.cs.accountmgmt.model.dto.UserLoginDTO;
 import io.jsonwebtoken.Claims;
 
 import java.util.Map;
@@ -8,11 +7,11 @@ import java.util.function.Function;
 
 public interface JwtService {
 
-    String generateToken(UserLoginDTO loginDTO);
+    String generateToken(String subject);
 
-    String generateToken(Map<String, Object> extraClaims, UserLoginDTO loginDTO);
+    String generateToken(Map<String, Object> extraClaims, String subject);
 
-    boolean isTokenValid(String token, UserLoginDTO loginDTO);
+    boolean isTokenValid(String token, String potentialSubject);
 
     String extractEmail(String token);
 

@@ -1,7 +1,5 @@
 package edu.pdae.cs.accountmgmt.config;
 
-import edu.pdae.cs.accountmgmt.model.User;
-import edu.pdae.cs.accountmgmt.model.dto.UserLoginDTO;
 import edu.pdae.cs.accountmgmt.repository.UserRepository;
 import edu.pdae.cs.accountmgmt.service.JwtService;
 import jakarta.servlet.FilterChain;
@@ -38,31 +36,19 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
         if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             filterChain.doFilter(request, response);
-            return;
+            return; // only accept token based auth, reject otherwise
         }
 
-        final String jwt = authHeader.substring(7);
-        final String email = jwtService.extractEmail(jwt);
+        final String jwt = authHeader.substring(7); // extract bare JWT
+        final String email = jwtService.extractEmail(jwt); // first check, check for e-mail and auth
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            final UserDetails userDetails = userDetailsService.loadUserByUsername(email);
-            final User user = userRepository.findByEmail(email).orElseThrow();
+            final UserDetails userDetails = userDetailsService.loadUserByUsername(email); // check whether we have a user according to the subject
 
-            boolean isTokenValid = user.getTokens().stream()
-                    .map(t -> !t.isExpired() && !t.isRevoked())
-                    .filter(Boolean.TRUE::equals)
-                    .findAny().orElse(false);
-
-            if (jwtService.isTokenValid(jwt, UserLoginDTO.builder()
-                    .email(userDetails.getUsername())
-                    .password(userDetails.getPassword())
-                    .build()) && isTokenValid) {
-                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(
-                        userDetails,
-                        null,
-                        userDetails.getAuthorities()
-                );
+            // this can throw ValidationException which means the claim was falsified
+            if (jwtService.isTokenValid(jwt, userDetails.getUsername())) { // we verify with the signing key and check the expiration
+                UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                 authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                SecurityContextHolder.getContext().setAuthentication(authToken);
+                SecurityContextHolder.getContext().setAuthentication(authToken); // we set the auth context for the user
             }
         }
 

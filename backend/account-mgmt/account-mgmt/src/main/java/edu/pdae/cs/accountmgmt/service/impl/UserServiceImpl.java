@@ -18,7 +18,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
+import javax.security.auth.login.LoginException;
 
 @Service
 @RequiredArgsConstructor
@@ -34,12 +34,7 @@ public class UserServiceImpl implements UserService, LogoutHandler {
         final User reqUser = modelMapper.map(creationDTO, User.class);
         reqUser.setPassword(passwordEncoder.encode(reqUser.getPassword()));
 
-        final String jwtToken = jwtService.generateToken(modelMapper.map(reqUser, UserLoginDTO.class));
-        reqUser.setTokens(Collections.singletonList(
-                Token.builder()
-                        .data(jwtToken).expired(false).revoked(false)
-                        .build()
-        ));
+        final Token jwtToken = new Token(jwtService.generateToken(reqUser.getEmail()));
 
         userRepository.save(reqUser);
 
@@ -50,16 +45,13 @@ public class UserServiceImpl implements UserService, LogoutHandler {
     }
 
     @Override
-    public UserLoginResponseDTO login(UserLoginDTO loginDTO) {
+    public UserLoginResponseDTO login(UserLoginDTO loginDTO) throws LoginException {
         final User repoUser = userRepository.findByEmail(loginDTO.getEmail()).orElseThrow();
-        final String jwtToken = jwtService.generateToken(loginDTO);
+        if (!passwordEncoder.matches(loginDTO.getPassword(), repoUser.getPassword())) {
+            throw new LoginException("Passwords don't match");
+        }
 
-        repoUser.setTokens(Collections.singletonList(
-                Token.builder()
-                        .data(jwtToken).expired(false).revoked(false)
-                        .build()
-        ));
-        userRepository.save(repoUser);
+        final Token jwtToken = new Token(jwtService.generateToken(loginDTO.getEmail()));
 
         return UserLoginResponseDTO
                 .builder()
@@ -75,12 +67,11 @@ public class UserServiceImpl implements UserService, LogoutHandler {
             return;
         }
 
-        final String jwt = authHeader.substring(7);
-        final String email = jwtService.extractEmail(jwt);
-        final User user = userRepository.findByEmail(email).orElseThrow();
+        // I will leave aside the logout here
+        // we're not storing tokens in DB, we cannot invalidate them like this
+        // logout basically means from client-side the token is cleared
+        // however if the user keeps the same token, the logout had no effect
 
-        user.setTokens(Collections.emptyList());
-        userRepository.save(user);
         SecurityContextHolder.clearContext();
     }
 

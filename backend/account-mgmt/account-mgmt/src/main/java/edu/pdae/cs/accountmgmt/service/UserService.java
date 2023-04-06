@@ -7,11 +7,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import org.springframework.security.core.Authentication;
 
+import javax.security.auth.login.LoginException;
+
 public interface UserService {
 
     UserLoginResponseDTO register(UserCreationDTO creationDTO);
 
-    UserLoginResponseDTO login(UserLoginDTO loginDTO);
+    UserLoginResponseDTO login(UserLoginDTO loginDTO) throws LoginException;
 
     void logout(HttpServletRequest request, HttpServletResponse resp, Authentication authentication);
 

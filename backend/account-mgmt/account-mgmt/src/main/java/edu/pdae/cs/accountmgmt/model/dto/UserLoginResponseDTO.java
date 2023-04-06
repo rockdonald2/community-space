@@ -1,5 +1,6 @@
 package edu.pdae.cs.accountmgmt.model.dto;
 
+import edu.pdae.cs.accountmgmt.model.Token;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -11,6 +12,6 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 public class UserLoginResponseDTO {
 
-    private String token;
+    private Token token;
 
 }

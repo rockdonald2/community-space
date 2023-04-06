@@ -26,7 +26,6 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     public User create(@RequestBody UserCreationDTO newUser) {
         final User mappedUser = modelMapper.map(newUser, User.class);
-        mappedUser.setTokens(Collections.emptyList());
         return userRepository.save(mappedUser);
     }
 

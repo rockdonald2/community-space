@@ -11,6 +11,8 @@ import org.springframework.security.config.annotation.authentication.configurati
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import java.util.NoSuchElementException;
+
 @Configuration
 @RequiredArgsConstructor
 public class AuthenticationConfig {
@@ -19,7 +21,7 @@ public class AuthenticationConfig {
     private final UserRepository userRepository;
 
     @Bean
-    public UserDetailsService userDetailsService() {
+    public UserDetailsService userDetailsService() throws NoSuchElementException {
         return email -> userRepository.findByEmail(email).orElseThrow();
     }
 
