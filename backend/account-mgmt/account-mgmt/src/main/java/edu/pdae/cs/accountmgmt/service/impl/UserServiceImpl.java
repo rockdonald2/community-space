@@ -3,6 +3,7 @@ package edu.pdae.cs.accountmgmt.service.impl;
 import edu.pdae.cs.accountmgmt.model.Token;
 import edu.pdae.cs.accountmgmt.model.User;
 import edu.pdae.cs.accountmgmt.model.dto.UserCreationDTO;
+import edu.pdae.cs.accountmgmt.model.dto.UserCreationResponseDTO;
 import edu.pdae.cs.accountmgmt.model.dto.UserLoginDTO;
 import edu.pdae.cs.accountmgmt.model.dto.UserLoginResponseDTO;
 import edu.pdae.cs.accountmgmt.repository.UserRepository;
@@ -30,16 +31,20 @@ public class UserServiceImpl implements UserService, LogoutHandler {
     private final JwtService jwtService;
 
     @Override
-    public UserLoginResponseDTO register(UserCreationDTO creationDTO) {
+    public UserCreationResponseDTO register(UserCreationDTO creationDTO) {
         final User reqUser = modelMapper.map(creationDTO, User.class);
         reqUser.setPassword(passwordEncoder.encode(reqUser.getPassword()));
 
         final Token jwtToken = new Token(jwtService.generateToken(reqUser.getEmail()));
 
-        userRepository.save(reqUser);
+        final User createdUser = userRepository.save(reqUser);
 
-        return UserLoginResponseDTO
+        return UserCreationResponseDTO
                 .builder()
+                .email(createdUser.getEmail())
+                .id(createdUser.getId())
+                .lastName(createdUser.getLastname())
+                .firstName(createdUser.getFirstname())
                 .token(jwtToken)
                 .build();
     }
@@ -63,7 +68,7 @@ public class UserServiceImpl implements UserService, LogoutHandler {
     public void logout(HttpServletRequest request, HttpServletResponse resp, Authentication authentication) {
         final String authHeader = request.getHeader("Authorization");
 
-        if (authHeader == null ||!authHeader.startsWith("Bearer ")) {
+        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
             return;
         }
 
@@ -71,6 +76,7 @@ public class UserServiceImpl implements UserService, LogoutHandler {
         // we're not storing tokens in DB, we cannot invalidate them like this
         // logout basically means from client-side the token is cleared
         // however if the user keeps the same token, the logout had no effect
+        // ? maybe we will use this for future notifications of logouts
 
         SecurityContextHolder.clearContext();
     }
