@@ -35,7 +35,7 @@ public class UserServiceImpl implements UserService, LogoutHandler {
         final User reqUser = modelMapper.map(creationDTO, User.class);
         reqUser.setPassword(passwordEncoder.encode(reqUser.getPassword()));
 
-        final Token jwtToken = new Token(jwtService.generateToken(reqUser.getEmail()));
+        final Token jwtToken = Token.builder().data(jwtService.generateToken(reqUser.getEmail())).build();
 
         final User createdUser = userRepository.save(reqUser);
 
@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserService, LogoutHandler {
             throw new LoginException("Passwords don't match");
         }
 
-        final Token jwtToken = new Token(jwtService.generateToken(loginDTO.getEmail()));
+        final Token jwtToken = Token.builder().data(jwtService.generateToken(loginDTO.getEmail())).build();
 
         return UserLoginResponseDTO
                 .builder()

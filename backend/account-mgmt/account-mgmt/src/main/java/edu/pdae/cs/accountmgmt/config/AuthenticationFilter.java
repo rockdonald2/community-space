@@ -43,23 +43,24 @@ public class AuthenticationFilter extends OncePerRequestFilter {
             return; // only accept token based auth, reject otherwise
         }
 
-        final String jwt = authHeader.substring(7); // extract bare JWT
-        final String email = jwtService.extractEmail(jwt); // first check, check for e-mail and auth
-        if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
-            final UserDetails userDetails = userDetailsService.loadUserByUsername(email); // check whether we have a user according to the subject
+        try {
+            final String jwt = authHeader.substring(7); // extract bare JWT
+            final String email = jwtService.extractEmail(jwt); // first check, check for e-mail and auth
+            if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
+                final UserDetails userDetails = userDetailsService.loadUserByUsername(email); // check whether we have a user according to the subject
 
-            // this can throw ValidationException which means the claim was falsified
-            try {
                 if (jwtService.isTokenValid(jwt, userDetails.getUsername())) { // we verify with the signing key and check the expiration
                     UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
                     authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
                     SecurityContextHolder.getContext().setAuthentication(authToken); // we set the auth context for the user
                 }
-            } catch (ExpiredJwtException e) {
-                log.warn("Expired signature received", e);
-            } catch (SignatureException e) {
-                log.error("Possible token forgery", e);
+
+                // this can throw ValidationException which means the claim was falsified
             }
+        } catch (ExpiredJwtException e) {
+            log.warn("Expired signature received", e);
+        } catch (SignatureException e) {
+            log.error("Possible token forgery", e);
         }
 
         filterChain.doFilter(request, response);
