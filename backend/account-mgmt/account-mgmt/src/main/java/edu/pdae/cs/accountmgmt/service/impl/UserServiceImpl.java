@@ -78,6 +78,7 @@ public class UserServiceImpl implements UserService, LogoutHandler {
         // however if the user keeps the same token, the logout had no effect
         // ? maybe we will use this for future notifications of logouts
 
+        SecurityContextHolder.getContext().setAuthentication(null);
         SecurityContextHolder.clearContext();
     }
 
