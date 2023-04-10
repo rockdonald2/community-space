@@ -5,7 +5,6 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.bson.types.ObjectId;
 
 @Data
 @Builder
@@ -13,7 +12,7 @@ import org.bson.types.ObjectId;
 @AllArgsConstructor
 public class UserCreationResponseDTO {
 
-    private ObjectId id;
+    private String id;
     private String firstName;
     private String lastName;
     private String email;
