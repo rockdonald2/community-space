@@ -3,6 +3,7 @@ package edu.pdae.cs.accountmgmt.controller;
 import edu.pdae.cs.accountmgmt.model.User;
 import edu.pdae.cs.accountmgmt.model.dto.UserLoginDTO;
 import edu.pdae.cs.accountmgmt.model.dto.UserLoginResponseDTO;
+import edu.pdae.cs.accountmgmt.model.dto.UserValidationResponseDTO;
 import edu.pdae.cs.accountmgmt.repository.UserRepository;
 import edu.pdae.cs.accountmgmt.service.JwtService;
 import edu.pdae.cs.accountmgmt.service.UserService;
@@ -33,7 +34,7 @@ public class AuthenticationController {
     }
 
     @GetMapping("/{token}")
-    public ResponseEntity<?> verify(@PathVariable("token") String token) {
+    public ResponseEntity<UserValidationResponseDTO> verify(@PathVariable("token") String token) {
         final String email = jwtService.extractEmail(token); // first check, check for e-mail and auth
 
         if (email == null) {
@@ -44,7 +45,7 @@ public class AuthenticationController {
 
         // this can throw ValidationException which means the claim was falsified
         if (jwtService.isTokenValid(token, user.getEmail())) { // we verify with the signing key and check the expiration
-            return ResponseEntity.ok().build();
+            return ResponseEntity.ok().body(UserValidationResponseDTO.builder().email(user.getEmail()).build());
         }
 
         return ResponseEntity.badRequest().build();

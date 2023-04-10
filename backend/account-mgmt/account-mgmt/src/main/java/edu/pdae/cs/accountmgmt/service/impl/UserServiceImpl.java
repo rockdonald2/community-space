@@ -42,7 +42,7 @@ public class UserServiceImpl implements UserService, LogoutHandler {
         return UserCreationResponseDTO
                 .builder()
                 .email(createdUser.getEmail())
-                .id(createdUser.getId())
+                .id(createdUser.getId().toString())
                 .lastName(createdUser.getLastname())
                 .firstName(createdUser.getFirstname())
                 .token(jwtToken)

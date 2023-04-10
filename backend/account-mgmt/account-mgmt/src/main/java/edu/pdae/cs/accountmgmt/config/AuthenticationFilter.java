@@ -1,6 +1,5 @@
 package edu.pdae.cs.accountmgmt.config;
 
-import edu.pdae.cs.accountmgmt.repository.UserRepository;
 import edu.pdae.cs.accountmgmt.service.JwtService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
@@ -28,7 +27,6 @@ public class AuthenticationFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserDetailsService userDetailsService;
-    private final UserRepository userRepository;
 
     @Override
     protected void doFilterInternal(
@@ -50,17 +48,21 @@ public class AuthenticationFilter extends OncePerRequestFilter {
                 final UserDetails userDetails = userDetailsService.loadUserByUsername(email); // check whether we have a user according to the subject
 
                 if (jwtService.isTokenValid(jwt, userDetails.getUsername())) { // we verify with the signing key and check the expiration
-                    UsernamePasswordAuthenticationToken authToken = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
-                    authToken.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
-                    SecurityContextHolder.getContext().setAuthentication(authToken); // we set the auth context for the user
+                    UsernamePasswordAuthenticationToken auth = new UsernamePasswordAuthenticationToken(userDetails, null, userDetails.getAuthorities());
+                    auth.setDetails(new WebAuthenticationDetailsSource().buildDetails(request));
+                    SecurityContextHolder.getContext().setAuthentication(auth); // we set the auth context for the user
                 }
 
                 // this can throw ValidationException which means the claim was falsified
             }
         } catch (ExpiredJwtException e) {
             log.warn("Expired signature received", e);
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            return;
         } catch (SignatureException e) {
             log.error("Possible token forgery", e);
+            response.setStatus(HttpServletResponse.SC_FORBIDDEN);
+            return;
         }
 
         filterChain.doFilter(request, response);
