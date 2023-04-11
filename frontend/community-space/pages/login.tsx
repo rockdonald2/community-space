@@ -23,9 +23,6 @@ function Login() {
     const [isBadLogin, setIsBadLogin] = useState<boolean>(false);
     const { push } = useRouter();
     const { signIn } = useAuthContext();
-    const [showPassword, setShowPassword] = useState(false);
-    const handleClickShowPassword = () => setShowPassword(!showPassword);
-    const handleMouseDownPassword = () => setShowPassword(!showPassword);
 
     const handleInput = useCallback(
         (
