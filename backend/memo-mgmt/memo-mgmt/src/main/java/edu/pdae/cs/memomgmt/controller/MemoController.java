@@ -3,6 +3,7 @@ package edu.pdae.cs.memomgmt.controller;
 import edu.pdae.cs.memomgmt.model.Memo;
 import edu.pdae.cs.memomgmt.model.dto.*;
 import edu.pdae.cs.memomgmt.repository.MemoRepository;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.modelmapper.ModelMapper;
@@ -44,18 +45,18 @@ public class MemoController {
     }
 
     @PatchMapping("/{id}")
-    public MemoCreationResponseDTO update(@RequestBody MemoUpdateDTO memoUpdateDTO) {
-        final Memo memo = memoRepository.findById(memoUpdateDTO.getId()).orElseThrow();
+    public MemoCreationResponseDTO update(@PathVariable("id") ObjectId id, @Valid @RequestBody MemoUpdateDTO memoUpdateDTO) {
+        final Memo memo = memoRepository.findById(id).orElseThrow();
 
         boolean hasChanged = false;
 
-        if (memoUpdateDTO.getContent().isPresent()) {
-            memo.setContent(memoUpdateDTO.getContent().get());
+        if (memoUpdateDTO.getContent() != null) {
+            memo.setContent(memoUpdateDTO.getContent());
             hasChanged = true;
         }
 
-        if (memoUpdateDTO.getVisibility().isPresent()) {
-            memo.setVisibility(memoUpdateDTO.getVisibility().get());
+        if (memoUpdateDTO.getVisibility() != null) {
+            memo.setVisibility(memoUpdateDTO.getVisibility());
             hasChanged = true;
         }
 

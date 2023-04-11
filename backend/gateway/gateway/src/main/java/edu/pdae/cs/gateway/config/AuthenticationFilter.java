@@ -34,12 +34,12 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 
         if (GatewayRouteCategorizer.isSecured.test(request)) {
             if (isAuthMissing(request)) {
-                return onError(exchange, "Authorization header is missing in request", HttpStatus.UNAUTHORIZED);
+                return onError(exchange, HttpStatus.UNAUTHORIZED);
             }
 
             final String token = this.getAuthHeader(request).substring(7);
             if (!isTokenValid(token)) {
-                return onError(exchange, "Authorization header is invalid", HttpStatus.UNAUTHORIZED);
+                return onError(exchange, HttpStatus.UNAUTHORIZED);
             }
         }
 
@@ -51,7 +51,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
         return -1;
     }
 
-    private Mono<Void> onError(ServerWebExchange exchange, String error, HttpStatus httpStatus) { // NOSONAR
+    private Mono<Void> onError(ServerWebExchange exchange, HttpStatus httpStatus) { // NOSONAR
         final ServerHttpResponse response = exchange.getResponse();
         response.setStatusCode(httpStatus);
         return response.setComplete();
