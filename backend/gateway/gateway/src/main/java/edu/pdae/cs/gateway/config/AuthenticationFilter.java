@@ -1,13 +1,8 @@
 package edu.pdae.cs.gateway.config;
 
-import io.jsonwebtoken.ExpiredJwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.io.Decoders;
-import io.jsonwebtoken.security.Keys;
-import io.jsonwebtoken.security.SignatureException;
+import edu.pdae.cs.gateway.service.JwtService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
 import org.springframework.cloud.gateway.filter.GlobalFilter;
 import org.springframework.core.Ordered;
@@ -18,15 +13,12 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.server.ServerWebExchange;
 import reactor.core.publisher.Mono;
 
-import java.security.Key;
-
 @Component
 @RequiredArgsConstructor
 @Slf4j
 public class AuthenticationFilter implements GlobalFilter, Ordered {
 
-    @Value("${cs.auth.secret-key}")
-    private String secretKey;
+    private final JwtService jwtService;
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
@@ -38,7 +30,7 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
             }
 
             final String token = this.getAuthHeader(request).substring(7);
-            if (!isTokenValid(token)) {
+            if (!jwtService.isTokenValid(token)) {
                 return onError(exchange, HttpStatus.UNAUTHORIZED);
             }
         }
@@ -63,24 +55,6 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 
     private boolean isAuthMissing(ServerHttpRequest request) {
         return !request.getHeaders().containsKey("Authorization");
-    }
-
-    private boolean isTokenValid(String jwt) {
-        try {
-            Jwts
-                    .parserBuilder()
-                    .setSigningKey(getSigningKey())
-                    .build()
-                    .parseClaimsJws(jwt);
-            return true;
-        } catch (SignatureException | ExpiredJwtException e) {
-            return false;
-        }
-    }
-
-    private Key getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(secretKey);
-        return Keys.hmacShaKeyFor(keyBytes);
     }
 
 }
