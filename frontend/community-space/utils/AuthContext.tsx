@@ -86,7 +86,7 @@ const AuthContextProvider = ({ children }) => {
                     error: {
                         code: (
                             ((err as Error).cause as { res: Response })
-                                .res as Response
+                                .res
                         )?.status,
                         msg: (err as Error).message,
                     },
@@ -141,7 +141,7 @@ const AuthContextProvider = ({ children }) => {
                     error: {
                         code: (
                             ((err as Error).cause as { res: Response })
-                                .res as Response
+                                .res
                         )?.status,
                         msg: (err as Error).message,
                     },
