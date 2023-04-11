@@ -1,0 +1,10 @@
+.field {
+    width: 75%;
+    margin-bottom: 0.5rem !important;
+
+    &--inner {
+        &:nth-of-type(odd) {
+            margin-right: 0.5rem !important;
+        }
+    }
+}

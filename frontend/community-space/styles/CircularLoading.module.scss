@@ -1,0 +1,26 @@
+.loader {
+    width: 100%;
+
+    &--full {
+        height: 100vh;
+        position: absolute;
+        left: 0;
+        top: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        overflow: hidden;
+    }
+
+    @media (prefers-color-scheme: dark) {
+        &--full {
+            background-color: rgb(18, 18, 18);
+        }
+    }
+
+    @media (prefers-color-scheme: light) {
+        &--full {
+            background-color: white;
+        }
+    }
+}

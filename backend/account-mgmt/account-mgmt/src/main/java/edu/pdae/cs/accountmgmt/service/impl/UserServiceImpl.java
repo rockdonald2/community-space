@@ -9,14 +9,9 @@ import edu.pdae.cs.accountmgmt.model.dto.UserLoginResponseDTO;
 import edu.pdae.cs.accountmgmt.repository.UserRepository;
 import edu.pdae.cs.accountmgmt.service.JwtService;
 import edu.pdae.cs.accountmgmt.service.UserService;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import org.modelmapper.ModelMapper;
-import org.springframework.security.core.Authentication;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
-import org.springframework.security.web.authentication.logout.LogoutHandler;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.LoginException;
@@ -61,6 +56,9 @@ public class UserServiceImpl implements UserService {
         return UserLoginResponseDTO
                 .builder()
                 .token(jwtToken)
+                .email(repoUser.getEmail())
+                .firstName(repoUser.getFirstname())
+                .lastName(repoUser.getLastname())
                 .build();
     }
 
