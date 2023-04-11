@@ -33,6 +33,12 @@ public class AccountManagementRouter implements BaseRouter {
                         .and()
                         .method("POST")
                         .and()
+                        .uri(accountManagementAddress))
+                .route(r -> r
+                        .path("/api/v1/auth/**")
+                        .and()
+                        .method("GET")
+                        .and()
                         .uri(accountManagementAddress));
     }
 
@@ -40,7 +46,8 @@ public class AccountManagementRouter implements BaseRouter {
     public Map<String, List<String>> defineOpenEndpoints() {
         return Map.of(
                 "^/api/v1/auth$", List.of("POST"),
-                "^/api/v1/users$", List.of("POST")
+                "^/api/v1/users$", List.of("POST"),
+                "^/api/v1/auth/.+$", List.of("GET")
         );
     }
 

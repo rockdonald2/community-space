@@ -25,21 +25,44 @@ const AuthContextProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
 
     useEffect(() => {
+        // on every user state change, save the current state to LS
+
         if (user) {
             localStorage.setItem('user-data', JSON.stringify(user));
         }
     }, [user]);
 
-    useEffect(() => {
-        const rawUser = JSON.parse(localStorage.getItem('user-data')) as User;
-        setUser(rawUser);
-        setIsAuthenticated(rawUser !== null && rawUser.token !== null);
-    }, []);
-
     const signOut = useCallback(() => {
         setUser(null);
         setIsAuthenticated(false);
-        localStorage.setItem('user-data', null);
+        localStorage.removeItem('user-data');
+    }, []);
+
+    useEffect(() => {
+        // on component load read the user state from LS, validate it and set it if it is not yet expired
+
+        const rawUser = JSON.parse(localStorage.getItem('user-data')) as User;
+
+        // validate using the /api/v1/auth/** endpoint the found token
+
+        const handleAsync = async () => {
+            const validationRes = await fetch(
+                `${GATEWAY_URL}/api/v1/auth/${rawUser.token}`
+            );
+
+            if (validationRes.ok) {
+                setUser(rawUser);
+                setIsAuthenticated(true);
+            } else {
+                signOut();
+            }
+        };
+
+        // if there is any captured user
+        if (rawUser && rawUser.token) {
+            handleAsync();
+        }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const signIn = useCallback(
