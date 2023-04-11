@@ -16,6 +16,4 @@ public interface UserService {
 
     UserLoginResponseDTO login(UserLoginDTO loginDTO) throws LoginException;
 
-    void logout(HttpServletRequest request, HttpServletResponse resp, Authentication authentication);
-
 }

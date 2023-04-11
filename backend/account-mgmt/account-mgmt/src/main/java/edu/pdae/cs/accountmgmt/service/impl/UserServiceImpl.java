@@ -23,7 +23,7 @@ import javax.security.auth.login.LoginException;
 
 @Service
 @RequiredArgsConstructor
-public class UserServiceImpl implements UserService, LogoutHandler {
+public class UserServiceImpl implements UserService {
 
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
@@ -62,24 +62,6 @@ public class UserServiceImpl implements UserService, LogoutHandler {
                 .builder()
                 .token(jwtToken)
                 .build();
-    }
-
-    @Override
-    public void logout(HttpServletRequest request, HttpServletResponse resp, Authentication authentication) {
-        final String authHeader = request.getHeader("Authorization");
-
-        if (authHeader == null || !authHeader.startsWith("Bearer ")) {
-            return;
-        }
-
-        // I will leave aside the logout here
-        // we're not storing tokens in DB, we cannot invalidate them like this
-        // logout basically means from client-side the token is cleared
-        // however if the user keeps the same token, the logout had no effect
-        // ? maybe we will use this for future notifications of logouts
-
-        SecurityContextHolder.getContext().setAuthentication(null);
-        SecurityContextHolder.clearContext();
     }
 
 }
