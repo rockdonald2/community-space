@@ -21,7 +21,7 @@ public class GatewayRouteCategorizer {
                     .keySet().stream()
                     .noneMatch(
                             apiUri ->
-                                    request.getURI().getPath().contains(apiUri)
+                                    request.getURI().getPath().matches(apiUri)
                                             &&
                                             openEndpoints.get(apiUri).stream().anyMatch(apiMethod -> request.getMethod().matches(apiMethod)));
 

@@ -39,8 +39,8 @@ public class AccountManagementRouter implements BaseRouter {
     @Override
     public Map<String, List<String>> defineOpenEndpoints() {
         return Map.of(
-                "/api/v1/auth", List.of("POST"),
-                "/api/v1/users", List.of("POST")
+                "^/api/v1/auth$", List.of("POST"),
+                "^/api/v1/users$", List.of("POST")
         );
     }
 
