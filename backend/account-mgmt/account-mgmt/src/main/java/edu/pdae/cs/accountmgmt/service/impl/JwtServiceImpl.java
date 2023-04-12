@@ -2,6 +2,7 @@ package edu.pdae.cs.accountmgmt.service.impl;
 
 import edu.pdae.cs.accountmgmt.service.JwtService;
 import io.jsonwebtoken.Claims;
+import io.jsonwebtoken.JwtException;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
@@ -39,7 +40,7 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
-    public boolean isTokenValid(String token, String potentialSubject) {
+    public boolean isTokenValid(String token, String potentialSubject) throws JwtException {
         final String email = extractEmail(token);
         return (email.equals(potentialSubject)) && !isTokenExpired(token);
     }
@@ -49,12 +50,12 @@ public class JwtServiceImpl implements JwtService {
     }
 
     @Override
-    public String extractEmail(String token) {
+    public String extractEmail(String token) throws JwtException {
         return extractClaim(token, Claims::getSubject);
     }
 
     @Override
-    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) {
+    public <T> T extractClaim(String token, Function<Claims, T> claimsResolver) throws JwtException {
         final Claims claims = extractAllClaims(token);
         return claimsResolver.apply(claims);
     }

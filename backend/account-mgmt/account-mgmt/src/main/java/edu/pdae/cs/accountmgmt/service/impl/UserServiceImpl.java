@@ -15,6 +15,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.LoginException;
+import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -26,12 +27,11 @@ public class UserServiceImpl implements UserService {
     private final JwtService jwtService;
 
     @Override
-    public UserCreationResponseDTO register(UserCreationDTO creationDTO) {
+    public UserCreationResponseDTO register(UserCreationDTO creationDTO) throws NoSuchElementException {
         final User reqUser = modelMapper.map(creationDTO, User.class);
         reqUser.setPassword(passwordEncoder.encode(reqUser.getPassword()));
 
         final Token jwtToken = Token.builder().data(jwtService.generateToken(reqUser.getEmail())).build();
-
         final User createdUser = userRepository.save(reqUser);
 
         return UserCreationResponseDTO

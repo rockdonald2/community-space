@@ -42,7 +42,7 @@ public class AuthenticationController {
             return ResponseEntity.badRequest().build();
         }
 
-        final User user = userRepository.findByEmail(email).orElseThrow(); // check whether we have a user according to the subject
+        final User user = userRepository.findByEmail(email).orElseThrow(); // check whether we have a user according to the subject, should not occur
 
         // this can throw validation exceptions which means the claim was falsified
         if (jwtService.isTokenValid(token, user.getEmail())) { // check the expiration and subjects
@@ -53,17 +53,17 @@ public class AuthenticationController {
     }
 
     @ExceptionHandler(LoginException.class)
-    public ResponseEntity<?> loginExceptionHandler() {
+    public ResponseEntity<Void> loginExceptionHandler() {
         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<?> noElementHandler() {
+    public ResponseEntity<Void> noElementHandler() {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler({ExpiredJwtException.class, SignatureException.class})
-    public ResponseEntity<?> expiredOrBadSignatureHandler() {
+    public ResponseEntity<Void> expiredOrBadSignatureHandler() {
         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
