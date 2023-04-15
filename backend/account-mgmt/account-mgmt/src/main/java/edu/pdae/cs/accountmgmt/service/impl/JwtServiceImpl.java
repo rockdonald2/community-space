@@ -7,6 +7,7 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
@@ -17,6 +18,7 @@ import java.util.Map;
 import java.util.function.Function;
 
 @Service
+@Slf4j
 public class JwtServiceImpl implements JwtService {
 
     @Value("${cs.auth.secret-key}")
@@ -29,6 +31,8 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public String generateToken(Map<String, Object> extraClaims, String subject) {
+        log.info("Generating new token for {}", subject);
+
         return Jwts
                 .builder()
                 .setClaims(extraClaims)
@@ -41,6 +45,8 @@ public class JwtServiceImpl implements JwtService {
 
     @Override
     public boolean isTokenValid(String token, String potentialSubject) throws JwtException {
+        log.info("Validating token for potential subject {}", potentialSubject);
+
         final String email = extractEmail(token);
         return (email.equals(potentialSubject)) && !isTokenExpired(token);
     }

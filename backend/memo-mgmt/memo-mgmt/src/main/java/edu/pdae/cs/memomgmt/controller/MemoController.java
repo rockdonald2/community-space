@@ -5,6 +5,7 @@ import edu.pdae.cs.memomgmt.model.dto.*;
 import edu.pdae.cs.memomgmt.repository.MemoRepository;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -18,6 +19,7 @@ import java.util.NoSuchElementException;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/memos")
+@Slf4j
 public class MemoController {
 
     private final MemoRepository memoRepository;
@@ -26,6 +28,8 @@ public class MemoController {
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public MemoCreationResponseDTO create(@RequestBody MemoCreationDTO memoCreationDTO) {
+        log.info("Creating new memo from author {}", memoCreationDTO.getAuthor());
+
         final Memo reqMemo = modelMapper.map(memoCreationDTO, Memo.class);
         reqMemo.setCreatedOn(new Date());
 
@@ -74,7 +78,7 @@ public class MemoController {
     }
 
     @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<?> noSuchElementHandler() {
+    public ResponseEntity<Void> noSuchElementHandler() {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 

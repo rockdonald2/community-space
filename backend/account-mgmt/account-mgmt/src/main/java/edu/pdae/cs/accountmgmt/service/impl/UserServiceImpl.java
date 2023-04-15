@@ -10,6 +10,7 @@ import edu.pdae.cs.accountmgmt.repository.UserRepository;
 import edu.pdae.cs.accountmgmt.service.JwtService;
 import edu.pdae.cs.accountmgmt.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
@@ -19,6 +20,7 @@ import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
+@Slf4j
 public class UserServiceImpl implements UserService {
 
     private final ModelMapper modelMapper;
@@ -28,6 +30,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserCreationResponseDTO register(UserCreationDTO creationDTO) throws NoSuchElementException {
+        log.info("Registering new user {}", creationDTO.getEmail());
+
         final User reqUser = modelMapper.map(creationDTO, User.class);
         reqUser.setPassword(passwordEncoder.encode(reqUser.getPassword()));
 
@@ -46,6 +50,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserLoginResponseDTO login(UserLoginDTO loginDTO) throws LoginException {
+        log.info("Logging in user {}", loginDTO.getEmail());
+
         final User repoUser = userRepository.findByEmail(loginDTO.getEmail()).orElseThrow();
         if (!passwordEncoder.matches(loginDTO.getPassword(), repoUser.getPassword())) {
             throw new LoginException("Passwords don't match");
