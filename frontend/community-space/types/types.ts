@@ -60,3 +60,10 @@ export interface IPresenceContext {
 export interface ICrossContext {
     triggerReload: () => void;
 }
+
+export type ErrorResponse = {
+    error: string;
+    status: number;
+    path: string;
+    message?: string;
+};

@@ -16,3 +16,10 @@ export type Memo = {
     createdOn: Date;
     visibility: 'PUBLIC' | 'PRIVATE';
 };
+
+export type MemoShort = {
+    id?: string;
+    author: string;
+    createdOn: Date;
+    visibility: 'PUBLIC' | 'PRIVATE';
+};
