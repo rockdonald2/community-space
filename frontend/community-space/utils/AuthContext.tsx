@@ -117,7 +117,7 @@ const AuthContextProvider = ({ children }) => {
                 return {
                     user: null,
                     error: {
-                        code: ((err as Error).cause as { res: Response })?.res?.status ?? null,
+                        code: ((err as Error)?.cause as { res: Response })?.res?.status ?? null,
                         msg: (err as Error).message,
                     },
                 };
@@ -170,7 +170,7 @@ const AuthContextProvider = ({ children }) => {
                 return {
                     user: null,
                     error: {
-                        code: ((err as Error).cause as { res: Response })?.res?.status ?? null,
+                        code: ((err as Error)?.cause as { res: Response })?.res?.status ?? null,
                         msg: (err as Error).message,
                     },
                 };
