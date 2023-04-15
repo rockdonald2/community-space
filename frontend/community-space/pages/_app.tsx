@@ -6,6 +6,7 @@ import CssBaseline from '@mui/material/CssBaseline';
 import Layout from '@/components/Layout';
 import AuthContextProvider from '@/utils/AuthContext';
 import { RouteGuard } from '@/utils/RouteGuard';
+import CrossContextProvider from '@/utils/CrossContext';
 
 export default function App({ Component, pageProps }: AppProps) {
     return (
@@ -18,13 +19,15 @@ export default function App({ Component, pageProps }: AppProps) {
             </Head>
             <CssVarsProvider>
                 <CssBaseline enableColorScheme />
-                <AuthContextProvider>
-                    <RouteGuard>
-                        <Layout>
-                            <Component {...pageProps} />
-                        </Layout>
-                    </RouteGuard>
-                </AuthContextProvider>
+                <CrossContextProvider>
+                    <AuthContextProvider>
+                        <RouteGuard>
+                            <Layout>
+                                <Component {...pageProps} />
+                            </Layout>
+                        </RouteGuard>
+                    </AuthContextProvider>
+                </CrossContextProvider>
             </CssVarsProvider>
         </>
     );

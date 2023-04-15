@@ -1,6 +1,7 @@
 import { useRouter } from 'next/router';
 import { useAuthContext } from './AuthContext';
 import CircularLoading from '@/components/CircularLoading';
+import { isBrowser } from './Utility';
 
 const pathsThatRequireLogin = ['/'];
 const pathsThatRequireNoLogin = ['/login', '/register'];
@@ -12,7 +13,7 @@ export const RouteGuard = ({ children }) => {
     const currentPath = asPath.split('?')[0];
 
     if (
-        typeof window !== 'undefined' && // required to only run this code client-side
+        isBrowser && // required to only run this code client-side
         !isAuthenticated &&
         pathsThatRequireLogin.includes(currentPath)
     ) {
@@ -20,7 +21,7 @@ export const RouteGuard = ({ children }) => {
     }
 
     if (
-        typeof window !== 'undefined' &&
+        isBrowser &&
         isAuthenticated &&
         pathsThatRequireNoLogin.includes(currentPath)
     ) {

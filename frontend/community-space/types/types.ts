@@ -50,3 +50,17 @@ export type QuickActionType = {
     name: string;
     action: QuickActionActionType;
 };
+
+export type UserPresence = {
+    email: string;
+    lastSeen?: Date;
+    status?: 'ONLINE' | 'OFFLINE';
+};
+
+export interface IPresenceContext {
+    presence: UserPresence[];
+}
+
+export interface ICrossContext {
+    triggerReload: () => void;
+}

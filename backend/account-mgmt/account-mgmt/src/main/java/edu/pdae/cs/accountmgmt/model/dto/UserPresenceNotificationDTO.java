@@ -1,19 +1,23 @@
 package edu.pdae.cs.accountmgmt.model.dto;
 
+
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.util.Date;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserPresenceDTO {
+public class UserPresenceNotificationDTO {
 
     private String email;
-    private Date lastSeen;
+    private Status status;
+
+    public enum Status {
+        ONLINE,
+        OFFLINE
+    }
 
 }

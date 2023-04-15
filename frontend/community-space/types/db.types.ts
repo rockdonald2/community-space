@@ -5,6 +5,10 @@ export type User = {
     token?: string;
 };
 
+export type UserShort = {
+    email: string;
+};
+
 export type Memo = {
     id?: string;
     author: string;

@@ -1,12 +1,11 @@
 package edu.pdae.cs.accountmgmt.controller;
 
-import edu.pdae.cs.accountmgmt.model.dto.UserCreationDTO;
-import edu.pdae.cs.accountmgmt.model.dto.UserCreationResponseDTO;
-import edu.pdae.cs.accountmgmt.model.dto.UserDTO;
-import edu.pdae.cs.accountmgmt.model.dto.UserDetailsDTO;
+import edu.pdae.cs.accountmgmt.model.dto.*;
 import edu.pdae.cs.accountmgmt.repository.UserRepository;
+import edu.pdae.cs.accountmgmt.service.MessagingService;
 import edu.pdae.cs.accountmgmt.service.UserService;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.modelmapper.ModelMapper;
 import org.springframework.http.HttpStatus;
@@ -21,16 +20,22 @@ import java.util.Optional;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/v1/users")
+@Slf4j
 public class UserController {
 
     private final UserRepository userRepository;
     private final UserService userService;
     private final ModelMapper modelMapper;
+    private final MessagingService messagingService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public UserCreationResponseDTO create(@RequestBody UserCreationDTO newUser) {
-        return userService.register(newUser);
+        log.info("Incoming registration request for {}", newUser.getEmail());
+
+        final var creationResponse = userService.register(newUser);
+        messagingService.sendMessageForActiveStatus(UserPresenceNotificationDTO.builder().email(newUser.getEmail()).status(UserPresenceNotificationDTO.Status.ONLINE).build());
+        return creationResponse;
     }
 
     @GetMapping("/{id}")

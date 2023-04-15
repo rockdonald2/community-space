@@ -14,8 +14,10 @@ import {
     useMemo,
     useState,
 } from 'react';
+import { GATEWAY_URL } from './Utility';
+import { useCrossContext } from './CrossContext';
 
-const GATEWAY_URL = process.env.CS_GATEWAY_URL || 'http://localhost:8080';
+const USER_DATA_LS = 'user-data';
 
 const AuthContext = createContext(null);
 const useAuthContext = () => useContext<IUserContext>(AuthContext);
@@ -23,25 +25,41 @@ const useAuthContext = () => useContext<IUserContext>(AuthContext);
 const AuthContextProvider = ({ children }) => {
     const [user, setUser] = useState<User>(null);
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+    const { triggerReload } = useCrossContext();
 
     useEffect(() => {
         // on every user state change, save the current state to LS
 
         if (user) {
-            localStorage.setItem('user-data', JSON.stringify(user));
+            localStorage.setItem(USER_DATA_LS, JSON.stringify(user));
         }
     }, [user]);
 
     const signOut = useCallback(() => {
+        const token = user?.token ?? null;
+        const handleAsync = async () => {
+            fetch(`${GATEWAY_URL}/api/v1/auth/${token}`, {
+                method: 'DELETE',
+                headers: {
+                    Authorization: `Bearer ${token}`,
+                },
+            });
+        };
+
+        if (token) {
+            handleAsync();
+        }
+
         setUser(null);
         setIsAuthenticated(false);
-        localStorage.removeItem('user-data');
-    }, []);
+        localStorage.removeItem(USER_DATA_LS);
+        triggerReload();
+    }, [triggerReload, user?.token]);
 
     useEffect(() => {
         // on component load read the user state from LS, validate it and set it if it is not yet expired
 
-        const rawUser = JSON.parse(localStorage.getItem('user-data')) as User;
+        const rawUser = JSON.parse(localStorage.getItem(USER_DATA_LS)) as User;
 
         // validate using the /api/v1/auth/** endpoint the found token
 
@@ -99,6 +117,8 @@ const AuthContextProvider = ({ children }) => {
                 });
                 setIsAuthenticated(true);
 
+                triggerReload();
+
                 return {
                     user,
                     error: null,
@@ -114,7 +134,7 @@ const AuthContextProvider = ({ children }) => {
                 };
             }
         },
-        [user]
+        [triggerReload, user]
     );
 
     const signUp = useCallback(
@@ -153,6 +173,8 @@ const AuthContextProvider = ({ children }) => {
                 });
                 setIsAuthenticated(true);
 
+                triggerReload();
+
                 return {
                     user,
                 };
@@ -167,7 +189,7 @@ const AuthContextProvider = ({ children }) => {
                 };
             }
         },
-        [user]
+        [triggerReload, user]
     );
 
     const provided = useMemo<IUserContext>(

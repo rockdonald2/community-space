@@ -1,5 +1,6 @@
 package edu.pdae.cs.gateway.route;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
 import org.springframework.stereotype.Component;
@@ -8,6 +9,7 @@ import java.util.List;
 import java.util.Map;
 
 @Component
+@RequiredArgsConstructor
 public class AccountManagementRouter implements BaseRouter {
 
     @Value("${cs.account-mgmt.address}")
@@ -37,8 +39,13 @@ public class AccountManagementRouter implements BaseRouter {
                 .route(r -> r
                         .path("/api/v1/auth/**")
                         .and()
-                        .method("GET")
+                        .method("GET", "DELETE")
                         .and()
+                        .uri(accountManagementAddress))
+                .route(r -> r
+                        .method("GET", "POST")
+                        .and()
+                        .path("/stomp/**")
                         .uri(accountManagementAddress));
     }
 
@@ -47,7 +54,8 @@ public class AccountManagementRouter implements BaseRouter {
         return Map.of(
                 "^/api/v1/auth$", List.of("POST"),
                 "^/api/v1/users$", List.of("POST"),
-                "^/api/v1/auth/.+$", List.of("GET")
+                "^/api/v1/auth/.+$", List.of("GET"),
+                "^/stomp/.*$", List.of("GET", "POST")
         );
     }
 

@@ -1,17 +1,17 @@
 package edu.pdae.cs.accountmgmt.service;
 
-import edu.pdae.cs.accountmgmt.model.dto.UserDTO;
+import edu.pdae.cs.accountmgmt.model.dto.UserPresenceDTO;
 
 import java.util.Set;
 
 public interface StatusService {
 
-    Set<UserDTO> getAllActive();
+    Set<UserPresenceDTO> getAllActive();
 
-    void putActive(UserDTO userDTO);
+    void putActive(UserPresenceDTO userDTO);
 
-    void putAllActive(Set<UserDTO> userDTOs);
+    void removeInactive(UserPresenceDTO userDTO);
 
-    void removeActive(UserDTO userDTO);
+    void removeInactives();
 
 }

@@ -1,6 +1,6 @@
 package edu.pdae.cs.accountmgmt.config;
 
-import edu.pdae.cs.accountmgmt.model.dto.UserPresenceDTO;
+import edu.pdae.cs.accountmgmt.model.dto.UserPresenceNotificationDTO;
 import lombok.RequiredArgsConstructor;
 import org.apache.kafka.clients.admin.NewTopic;
 import org.apache.kafka.clients.producer.ProducerConfig;
@@ -9,6 +9,7 @@ import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.config.TopicBuilder;
 import org.springframework.kafka.core.*;
@@ -22,6 +23,7 @@ import java.util.Map;
 
 @Configuration
 @RequiredArgsConstructor
+@EnableKafka
 public class MessagingConfiguration {
 
     public static final String ACTIVE_STATUS_TOPIC = "cs.account-mgmt.active-status-topic";
@@ -34,7 +36,7 @@ public class MessagingConfiguration {
     }
 
     @Bean
-    public ProducerFactory<String, UserPresenceDTO> userPresenceDTOProducerFactory() {
+    public ProducerFactory<String, UserPresenceNotificationDTO> presenceProducerFactory() {
         final Map<String, Object> configs = new HashMap<>(kafkaProperties.buildProducerProperties());
 
         configs.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
@@ -44,20 +46,20 @@ public class MessagingConfiguration {
     }
 
     @Bean
-    public KafkaTemplate<String, UserPresenceDTO> userPresenceDTOKafkaTemplate() {
-        return new KafkaTemplate<>(userPresenceDTOProducerFactory());
+    public KafkaTemplate<String, UserPresenceNotificationDTO> presenceKafkaTemplate() {
+        return new KafkaTemplate<>(presenceProducerFactory());
     }
 
     @Bean
-    public ConsumerFactory<String, UserPresenceDTO> userPresenceDTOConsumerFactory() {
+    public ConsumerFactory<String, UserPresenceNotificationDTO> presenceConsumerFactory() {
         final Map<String, Object> props = new HashMap<>(kafkaProperties.buildConsumerProperties());
-        return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), new JsonDeserializer<>(UserPresenceDTO.class));
+        return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), new JsonDeserializer<>(UserPresenceNotificationDTO.class));
     }
 
     @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, UserPresenceDTO> userPresenceDTOKafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, UserPresenceDTO> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(userPresenceDTOConsumerFactory());
+    public ConcurrentKafkaListenerContainerFactory<String, UserPresenceNotificationDTO> presenceKafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, UserPresenceNotificationDTO> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(presenceConsumerFactory());
         return factory;
     }
 
