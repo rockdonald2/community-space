@@ -25,6 +25,7 @@ const CrossContextProvider = ({ children }) => {
     useEffect(() => {
         // this is invoked every time the trigger changes
         // when the trigger value is true and the we're on a different tab then the source, refresh it
+
         if (reloadTrigger && id !== reloadSource) {
             const intervalId = setInterval(() => {
                 reload();

@@ -18,26 +18,19 @@ const QuickActions = () => {
     const handleClose = () => setOpen(false);
     const { signOut } = useAuthContext();
 
-    const handleAction = useCallback(
-        async (
-            _e: React.MouseEvent<HTMLDivElement>,
-            action: QuickActionActionType
-        ) => {
-            switch (action) {
-                case 'signout': {
-                    await signOut();
-                    push('/login');
-                    break;
-                }
-                case 'backToHome': {
-                    push('/');
-                    break;
-                }
+    const handleAction = useCallback(async (_e: React.MouseEvent<HTMLDivElement>, action: QuickActionActionType) => {
+        switch (action) {
+            case 'signout': {
+                await signOut();
+                push('/login');
+                break;
             }
-        },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
-        []
-    );
+            case 'backToHome': {
+                push('/');
+                break;
+            }
+        }
+    }, []);
 
     return (
         <Box sx={{ transform: 'translateZ(0px)', flexGrow: 1 }}>
@@ -54,9 +47,7 @@ const QuickActions = () => {
                         key={action.name}
                         icon={action.icon}
                         tooltipTitle={action.name}
-                        onClick={(e: React.MouseEvent<HTMLDivElement>) =>
-                            handleAction(e, action.action)
-                        }
+                        onClick={(e: React.MouseEvent<HTMLDivElement>) => handleAction(e, action.action)}
                     />
                 ))}
             </SpeedDial>

@@ -1,19 +1,6 @@
 import { User } from '@/types/db.types';
-import {
-    IUserContext,
-    UserSignIn,
-    UserSignInResponse,
-    UserSignUp,
-    UserSignUpResponse,
-} from '@/types/types';
-import {
-    createContext,
-    useCallback,
-    useContext,
-    useEffect,
-    useMemo,
-    useState,
-} from 'react';
+import { IUserContext, UserSignIn, UserSignInResponse, UserSignUp, UserSignUpResponse } from '@/types/types';
+import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { GATEWAY_URL } from './Utility';
 import { useCrossContext } from './CrossContext';
 
@@ -38,12 +25,16 @@ const AuthContextProvider = ({ children }) => {
     const signOut = useCallback(() => {
         const token = user?.token ?? null;
         const handleAsync = async () => {
-            fetch(`${GATEWAY_URL}/api/v1/auth/${token}`, {
-                method: 'DELETE',
-                headers: {
-                    Authorization: `Bearer ${token}`,
-                },
-            });
+            try {
+                await fetch(`${GATEWAY_URL}/api/v1/auth/${token}`, {
+                    method: 'DELETE',
+                    headers: {
+                        Authorization: `Bearer ${token}`,
+                    },
+                });
+            } catch (err) {
+                console.debug('Failed to sign out user', err);
+            }
         };
 
         if (token) {
@@ -64,15 +55,17 @@ const AuthContextProvider = ({ children }) => {
         // validate using the /api/v1/auth/** endpoint the found token
 
         const handleAsync = async () => {
-            const validationRes = await fetch(
-                `${GATEWAY_URL}/api/v1/auth/${rawUser.token}`
-            );
+            try {
+                const validationRes = await fetch(`${GATEWAY_URL}/api/v1/auth/${rawUser.token}`);
 
-            if (validationRes.ok) {
-                setUser(rawUser);
-                setIsAuthenticated(true);
-            } else {
-                signOut();
+                if (validationRes.ok) {
+                    setUser(rawUser);
+                    setIsAuthenticated(true);
+                } else {
+                    signOut();
+                }
+            } catch (err) {
+                console.debug('Failed to send validation for user token', err);
             }
         };
 
@@ -80,13 +73,10 @@ const AuthContextProvider = ({ children }) => {
         if (rawUser && rawUser.token) {
             handleAsync();
         }
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const signIn = useCallback(
-        async (
-            signInUser: UserSignIn
-        ): Promise<{ user?: User; error?: { code: number; msg: string } }> => {
+        async (signInUser: UserSignIn): Promise<{ user?: User; error?: { code: number; msg: string } }> => {
             try {
                 const loginRes = await fetch(`${GATEWAY_URL}/api/v1/auth`, {
                     method: 'POST',
@@ -127,8 +117,7 @@ const AuthContextProvider = ({ children }) => {
                 return {
                     user: null,
                     error: {
-                        code: ((err as Error).cause as { res: Response }).res
-                            ?.status,
+                        code: ((err as Error).cause as { res: Response })?.res?.status ?? null,
                         msg: (err as Error).message,
                     },
                 };
@@ -138,9 +127,7 @@ const AuthContextProvider = ({ children }) => {
     );
 
     const signUp = useCallback(
-        async (
-            signUpUser: UserSignUp
-        ): Promise<{ user?: User; error?: { code: number; msg: string } }> => {
+        async (signUpUser: UserSignUp): Promise<{ user?: User; error?: { code: number; msg: string } }> => {
             try {
                 const signUpRes = await fetch(`${GATEWAY_URL}/api/v1/users`, {
                     method: 'POST',
@@ -177,13 +164,13 @@ const AuthContextProvider = ({ children }) => {
 
                 return {
                     user,
+                    error: null,
                 };
             } catch (err) {
                 return {
                     user: null,
                     error: {
-                        code: ((err as Error).cause as { res: Response }).res
-                            ?.status,
+                        code: ((err as Error).cause as { res: Response })?.res?.status ?? null,
                         msg: (err as Error).message,
                     },
                 };
@@ -203,9 +190,7 @@ const AuthContextProvider = ({ children }) => {
         [isAuthenticated, signIn, signOut, signUp, user]
     );
 
-    return (
-        <AuthContext.Provider value={provided}>{children}</AuthContext.Provider>
-    );
+    return <AuthContext.Provider value={provided}>{children}</AuthContext.Provider>;
 };
 
 export { AuthContext, useAuthContext, AuthContextProvider as default };

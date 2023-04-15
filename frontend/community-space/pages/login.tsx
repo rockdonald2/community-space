@@ -1,13 +1,5 @@
 /* eslint-disable react/no-unescaped-entities */
-import {
-    Alert,
-    AlertTitle,
-    Avatar,
-    Button,
-    Divider,
-    Stack,
-    Typography,
-} from '@mui/material';
+import { Alert, AlertTitle, Avatar, Button, Divider, Stack, Typography } from '@mui/material';
 import Head from 'next/head';
 import { useState, useCallback, SetStateAction, Dispatch } from 'react';
 import Link from 'next/link';
@@ -25,10 +17,7 @@ function Login() {
     const { signIn } = useAuthContext();
 
     const handleInput = useCallback(
-        (
-            e: React.ChangeEvent<HTMLInputElement>,
-            setState: Dispatch<SetStateAction<string>>
-        ) => {
+        (e: React.ChangeEvent<HTMLInputElement>, setState: Dispatch<SetStateAction<string>>) => {
             setState(e.target.value);
         },
         []
@@ -45,13 +34,12 @@ function Login() {
 
             if (error) {
                 setIsBadLogin(true);
-                return console.error('error', error);
+                return console.debug('Error happened while trying to log in', error);
             }
 
             setIsBadLogin(false);
             push('/');
         },
-        // eslint-disable-next-line react-hooks/exhaustive-deps
         [emailInput, passwordInput]
     );
 
@@ -63,11 +51,7 @@ function Login() {
             <Stack className={styles['avatar-wrapper']}>
                 <Avatar className={styles['avatar-wrapper__avatar']}>U</Avatar>
                 <Divider variant='middle' orientation='vertical' flexItem />
-                <Typography
-                    variant='h5'
-                    component='h5'
-                    className={styles['avatar-wrapper__msg']}
-                >
+                <Typography variant='h5' component='h5' className={styles['avatar-wrapper__msg']}>
                     Login with your account
                 </Typography>
             </Stack>
@@ -75,8 +59,7 @@ function Login() {
                 <div className={styles.alert}>
                     <Alert severity='error'>
                         <AlertTitle>Oops!</AlertTitle>
-                        There has been a problem, either wrong{' '}
-                        <strong>username</strong> or <strong>password</strong>,
+                        There has been a problem, either wrong <strong>username</strong> or <strong>password</strong>,
                         please try again!
                     </Alert>
                 </div>
@@ -86,15 +69,11 @@ function Login() {
                     <TextField
                         isError={isBadLogin}
                         label='E-mail'
-                        handleInput={(e: React.ChangeEvent<HTMLInputElement>) =>
-                            handleInput(e, setEmailInput)
-                        }
+                        handleInput={(e: React.ChangeEvent<HTMLInputElement>) => handleInput(e, setEmailInput)}
                     />
                     <PasswordField
                         isError={isBadLogin}
-                        handleInput={(e: React.ChangeEvent<HTMLInputElement>) =>
-                            handleInput(e, setPasswordInput)
-                        }
+                        handleInput={(e: React.ChangeEvent<HTMLInputElement>) => handleInput(e, setPasswordInput)}
                         label='Password'
                     />
                     <Button
@@ -109,12 +88,7 @@ function Login() {
                 </Stack>
             </form>
             <Divider flexItem className={styles['form__divider']} />
-            <Button
-                href='/register'
-                LinkComponent={Link}
-                variant='text'
-                className={styles['register__button']}
-            >
+            <Button href='/register' LinkComponent={Link} variant='text' className={styles['register__button']}>
                 You don't have an account yet? Register now!
             </Button>
         </Stack>

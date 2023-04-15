@@ -20,7 +20,7 @@ const TextField = ({
             <MaterialTextField
                 label={label}
                 type='text'
-                className={`${styles.field} ${inner ? styles['field--inner']: ''}`}
+                className={`${styles.field} ${inner ? styles['field--inner'] : ''}`}
                 onChange={handleInput}
                 helperText={helperText}
                 error={isError}

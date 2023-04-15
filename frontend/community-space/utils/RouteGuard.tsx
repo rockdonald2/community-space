@@ -20,11 +20,7 @@ export const RouteGuard = ({ children }) => {
         push('/login');
     }
 
-    if (
-        isBrowser &&
-        isAuthenticated &&
-        pathsThatRequireNoLogin.includes(currentPath)
-    ) {
+    if (isBrowser && isAuthenticated && pathsThatRequireNoLogin.includes(currentPath)) {
         push('/');
     }
 

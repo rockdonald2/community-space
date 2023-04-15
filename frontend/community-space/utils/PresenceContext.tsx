@@ -9,10 +9,9 @@ const usePresenceContext = () => useContext<IPresenceContext>(PresenceContext);
 
 const PresenceContextProvider = ({ children, user }: { children: React.ReactNode; user: User }) => {
     const [presence, setPresence] = useState<UserPresence[]>(null);
+    const stompClient = useStompClient();
 
     useSubscription('/wb/status-broadcast', (msg) => setPresence(JSON.parse(msg.body) as UserPresence[]));
-
-    const stompClient = useStompClient();
 
     const ping = useCallback(
         (status: 'ONLINE' | 'OFFLINE') => {
@@ -25,7 +24,7 @@ const PresenceContextProvider = ({ children, user }: { children: React.ReactNode
                     } as UserPresence),
                 });
             } catch (err) {
-                console.debug('error', err);
+                console.debug('Failed to publish message to status socket', err);
             }
         },
         [stompClient, user.email]
@@ -45,7 +44,6 @@ const PresenceContextProvider = ({ children, user }: { children: React.ReactNode
             pingInactive();
             clearInterval(presenceIntervalId);
         };
-        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [stompClient]);
 
     useBeforeunload(() => pingInactive());

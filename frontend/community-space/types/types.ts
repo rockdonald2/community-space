@@ -35,12 +35,8 @@ export interface IUserContext {
     user: User;
     isAuthenticated: boolean;
     signOut: () => void;
-    signUp: (
-        user: UserSignUp
-    ) => Promise<{ user?: User; error?: { code: number; msg: string } }>;
-    signIn: (
-        user: UserSignIn
-    ) => Promise<{ user?: User; error?: { code: number; msg: string } }>;
+    signUp: (user: UserSignUp) => Promise<{ user?: User; error?: { code: number; msg: string } }>;
+    signIn: (user: UserSignIn) => Promise<{ user?: User; error?: { code: number; msg: string } }>;
 }
 
 export type QuickActionActionType = 'signout' | 'backToHome';
