@@ -1,8 +1,28 @@
 import useSWR from 'swr';
-import { GATEWAY_URL, sortByCreationDate, sortByUrgency } from '@/utils/Utility';
-import CircularLoading from './CircularLoading';
-import { Alert, AlertTitle, Box, Chip, Stack, TextField } from '@mui/material';
-import { Memo as MemoType } from '@/types/db.types';
+import {
+    GATEWAY_URL,
+    boldSelectedElementStyle,
+    sortByCreationDate,
+    sortByUrgency,
+    swrFetcherWithAuth,
+} from '@/utils/Utility';
+import {
+    Alert,
+    AlertTitle,
+    Box,
+    Chip,
+    FormControl,
+    InputLabel,
+    MenuItem,
+    OutlinedInput,
+    Select,
+    SelectChangeEvent,
+    Skeleton,
+    Stack,
+    TextField,
+    useTheme,
+} from '@mui/material';
+import { Memo as MemoType, urgencies } from '@/types/db.types';
 import { useAuthContext } from '@/utils/AuthContext';
 import { ErrorResponse } from '@/types/types';
 import Memo from './Memo';
@@ -10,17 +30,11 @@ import MemoEdit from './MemoEdit';
 import SearchIcon from '@mui/icons-material/Search';
 import { ChangeEvent, useState } from 'react';
 
-const swrFetcherWithAuth = async (args: string[]) => {
-    const res = await fetch(args[0], {
-        headers: { Authorization: `Bearer ${args[1]}` },
-    });
-
-    return await res.json();
-};
-
 const Memos = () => {
-    const { user, signOut } = useAuthContext();
-    const { data, error, isLoading } = useSWR<MemoType[] | ErrorResponse>(
+    const theme = useTheme();
+
+    const { user } = useAuthContext();
+    const { data, error, isLoading } = useSWR<MemoType[] | ErrorResponse>( // TODO: refactor with typescript compatibility
         [`${GATEWAY_URL}/api/v1/memos`, user.token],
         swrFetcherWithAuth,
         {
@@ -32,9 +46,18 @@ const Memos = () => {
         }
     );
 
+    const [urgencyFilter, setUrgencyFilter] = useState<string[]>([]);
     const [titleFilter, setTitleFilter] = useState<string>('');
     const [privateFilter, setPrivateFilter] = useState<boolean>(true);
     const [publicFilter, setPublicFilter] = useState<boolean>(true);
+
+    const handleChange = (event: SelectChangeEvent<typeof urgencyFilter>) => {
+        const {
+            target: { value },
+        } = event;
+
+        setUrgencyFilter(typeof value === 'string' ? value.split(',') : value);
+    };
 
     if (error) {
         // this a client error handler
@@ -46,7 +69,14 @@ const Memos = () => {
         );
     }
 
-    if (isLoading) return <CircularLoading />;
+    if (isLoading)
+        return (
+            <>
+                <Skeleton />
+                <Skeleton />
+                <Skeleton />
+            </>
+        );
 
     if ('status' in data) {
         // if it's an error response, handle accordingly; this is coming from the server
@@ -55,14 +85,6 @@ const Memos = () => {
                 <Alert severity='error'>
                     <AlertTitle>Oops!</AlertTitle>
                     The requested content cannot be found.
-                </Alert>
-            );
-        } else if (data.status === 401) {
-            signOut();
-            return (
-                <Alert severity='error'>
-                    <AlertTitle>Oops!</AlertTitle>
-                    Unexpected error has occurred.
                 </Alert>
             );
         } else {
@@ -101,6 +123,38 @@ const Memos = () => {
                     />
                 </Stack>
             </Box>
+            <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                <Stack direction={'row'} alignItems={'center'} sx={{ width: '100%' }}>
+                    <FormControl sx={{ width: '50%' }}>
+                        <InputLabel size='small'>Urgency</InputLabel>
+                        <Select
+                            fullWidth
+                            size='small'
+                            multiple
+                            value={urgencyFilter}
+                            onChange={handleChange}
+                            input={<OutlinedInput label='Urgency' />}
+                            renderValue={(selected) => (
+                                <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
+                                    {selected.map((value) => (
+                                        <Chip key={value} label={value} sx={{ m: 0.5 }} />
+                                    ))}
+                                </Box>
+                            )}
+                        >
+                            {urgencies.map((urgency) => (
+                                <MenuItem
+                                    key={urgency}
+                                    value={urgency}
+                                    style={boldSelectedElementStyle(urgency, urgencyFilter, theme)}
+                                >
+                                    {urgency}
+                                </MenuItem>
+                            ))}
+                        </Select>
+                    </FormControl>
+                </Stack>
+            </Box>
             {data &&
                 data
                     .sort(sortByCreationDate)
@@ -111,6 +165,10 @@ const Memos = () => {
                         else if (privateFilter && memo.visibility === 'PRIVATE') return true;
                         else if (publicFilter && memo.visibility === 'PUBLIC') return true;
                         return false;
+                    })
+                    .filter((memo) => {
+                        if (urgencyFilter.length === 0) return true;
+                        return urgencyFilter.includes(memo.urgency);
                     })
                     .map((memo, idx) => <Memo memo={memo} key={idx} />)}
         </Stack>

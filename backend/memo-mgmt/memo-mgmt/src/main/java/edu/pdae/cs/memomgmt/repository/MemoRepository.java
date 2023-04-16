@@ -11,6 +11,8 @@ public interface MemoRepository extends MongoRepository<Memo, ObjectId> {
 
     List<Memo> getMemosByCreatedOnBefore(Date date);
 
+    List<Memo> getMemosByCreatedOnAfter(Date date);
+
     List<Memo> getMemosByAuthor(String author);
 
     List<Memo> getMemosByVisibility(Memo.Visibility visibility);
@@ -18,5 +20,9 @@ public interface MemoRepository extends MongoRepository<Memo, ObjectId> {
     List<Memo> getMemosByUrgency(Memo.Urgency urgency);
 
     List<Memo> getMemosByAuthorAndVisibility(String author, Memo.Visibility visibility);
+
+    List<Memo> getMemosByCreatedOnAfterAndVisibility(Date date, Memo.Visibility visibility);
+
+    List<Memo> getMemosByCreatedOnAfterAndVisibilityAndAuthor(Date date, Memo.Visibility visibility, String author);
 
 }

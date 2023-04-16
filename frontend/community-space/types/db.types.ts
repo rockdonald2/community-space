@@ -10,7 +10,10 @@ export type UserShort = {
 };
 
 export type Visibility = 'PUBLIC' | 'PRIVATE' | '';
+export const visibilities: Visibility[] = ['PRIVATE', 'PUBLIC'];
+
 export type Urgency = 'LOW' | 'MEDIUM' | 'HIGH' | 'URGENT' | '';
+export const urgencies: Urgency[] = ['URGENT', 'HIGH', 'MEDIUM', 'LOW'];
 
 export type Memo = {
     id?: string;

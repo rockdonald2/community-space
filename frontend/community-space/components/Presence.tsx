@@ -1,5 +1,5 @@
 import { usePresenceContext } from '@/utils/PresenceContext';
-import { Container, Stack, Typography } from '@mui/material';
+import { Container, Skeleton, Stack, Typography } from '@mui/material';
 import Avatar from './Avatar';
 import { useAuthContext } from '@/utils/AuthContext';
 import CircularLoading from './CircularLoading';
@@ -12,19 +12,23 @@ const Presence = () => {
     return (
         <Container>
             <Typography mb={2} color='text.secondary' variant='h6'>
-                Others online:
+                Others online
             </Typography>
             <Stack alignItems={'flex-start'} direction={'row'} flexWrap={'wrap'}>
                 {presence ? (
-                    presence
-                        .filter((present) => present.email !== user.email)
-                        .map((present, idx) => {
-                            return (
-                                <div key={idx} className={styles['avatar-wrapper']}>
-                                    <Avatar user={present} isOnline generateRandomColor />
-                                </div>
-                            );
-                        })
+                    presence.length !== 1 ? (
+                        presence
+                            .filter((present) => present.email !== user.email)
+                            .map((present, idx) => {
+                                return (
+                                    <div key={idx} className={styles['avatar-wrapper']}>
+                                        <Avatar user={present} isOnline generateRandomColor />
+                                    </div>
+                                );
+                            })
+                    ) : (
+                        <Skeleton variant='circular' width={40} height={40} />
+                    )
                 ) : (
                     <CircularLoading />
                 )}

@@ -23,17 +23,21 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
 
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
-        final ServerHttpRequest request = exchange.getRequest();
+        ServerHttpRequest request = exchange.getRequest();
 
         if (GatewayRouteCategorizer.isSecured.test(request)) {
             if (isAuthMissing(request)) {
                 return onError(exchange, HttpStatus.UNAUTHORIZED);
             }
 
-            final String token = this.getAuthHeader(request).substring(7);
+            final String token = getAuthHeader(request).substring(7);
             if (!jwtService.isTokenValid(token)) {
                 return onError(exchange, HttpStatus.UNAUTHORIZED);
             }
+
+            final String subject = jwtService.extractSubject(token);
+            request = request.mutate().header("X-AUTH-TOKEN-SUBJECT", subject).build();
+            exchange = exchange.mutate().request(request).build();
         }
 
         return chain.filter(exchange);

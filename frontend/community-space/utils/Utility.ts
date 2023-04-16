@@ -23,3 +23,25 @@ export const sortByCreationDate = (m1: MemoShort, m2: MemoShort) => {
 
     return 0;
 };
+
+/**
+ * Create bold style based on the condition that the element is present inside a list.
+ * @param elem
+ * @param container
+ * @param theme
+ * @returns bold style if the elem is present inside of the container
+ */
+export const boldSelectedElementStyle = (elem: string, container: readonly string[], theme: Theme) => {
+    return {
+        fontWeight:
+            container.indexOf(elem) === -1 ? theme.typography.fontWeightRegular : theme.typography.fontWeightBold,
+    };
+};
+
+export const swrFetcherWithAuth = async (args: readonly string[]) => {
+    const res = await fetch(args[0], {
+        headers: { Authorization: `Bearer ${args[1]}` },
+    });
+
+    return await res.json();
+};

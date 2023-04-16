@@ -36,7 +36,7 @@ public class AuthenticationController {
         log.info("Incoming login request for {}", userLoginDTO.getEmail());
 
         final var loginResponse = userService.login(userLoginDTO);
-        messagingService.sendMessageForActiveStatus(UserPresenceNotificationDTO.builder().email(userLoginDTO.getEmail()).status(UserPresenceNotificationDTO.Status.ONLINE).build());
+//        messagingService.sendMessageForActiveStatus(UserPresenceNotificationDTO.builder().email(userLoginDTO.getEmail()).status(UserPresenceNotificationDTO.Status.ONLINE).build());
         return loginResponse;
     }
 
@@ -54,7 +54,7 @@ public class AuthenticationController {
 
         // this can throw validation exceptions which means the claim was falsified
         if (jwtService.isTokenValid(token, user.getEmail())) { // check the expiration and subjects
-            messagingService.sendMessageForActiveStatus(UserPresenceNotificationDTO.builder().email(user.getEmail()).status(UserPresenceNotificationDTO.Status.ONLINE).build());
+//            messagingService.sendMessageForActiveStatus(UserPresenceNotificationDTO.builder().email(user.getEmail()).status(UserPresenceNotificationDTO.Status.ONLINE).build()); // TODO: rework this unnecessary side-effect
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 
@@ -70,7 +70,7 @@ public class AuthenticationController {
 
         log.info("Incoming logout request for {}", email);
 
-        messagingService.sendMessageForActiveStatus(UserPresenceNotificationDTO.builder().email(email).status(UserPresenceNotificationDTO.Status.OFFLINE).build());
+//        messagingService.sendMessageForActiveStatus(UserPresenceNotificationDTO.builder().email(email).status(UserPresenceNotificationDTO.Status.OFFLINE).build());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

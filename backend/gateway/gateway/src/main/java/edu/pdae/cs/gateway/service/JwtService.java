@@ -4,4 +4,6 @@ public interface JwtService {
 
     boolean isTokenValid(String jwt);
 
+    String extractSubject(String jwt);
+
 }

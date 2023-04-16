@@ -34,7 +34,7 @@ public class UserController {
         log.info("Incoming registration request for {}", newUser.getEmail());
 
         final var creationResponse = userService.register(newUser);
-        messagingService.sendMessageForActiveStatus(UserPresenceNotificationDTO.builder().email(newUser.getEmail()).status(UserPresenceNotificationDTO.Status.ONLINE).build());
+//        messagingService.sendMessageForActiveStatus(UserPresenceNotificationDTO.builder().email(newUser.getEmail()).status(UserPresenceNotificationDTO.Status.ONLINE).build());
         return creationResponse;
     }
 

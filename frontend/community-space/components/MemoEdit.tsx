@@ -150,10 +150,8 @@ const MemoEdit = ({
             <Stack direction={'row'} justifyContent={'space-between'} alignItems={'center'}>
                 <div>
                     <FormControl sx={{ mr: 1, minWidth: 120 }} size='small'>
-                        <InputLabel id='urgency-select'>Urgency</InputLabel>
+                        <InputLabel>Urgency</InputLabel>
                         <Select
-                            labelId='urgency-select'
-                            id='urgency-select'
                             value={urgency}
                             label='Urgency'
                             onChange={(e: SelectChangeEvent) => handleChange(e, setUrgency)}
@@ -166,10 +164,8 @@ const MemoEdit = ({
                         </Select>
                     </FormControl>
                     <FormControl sx={{ mr: 1, minWidth: 120 }} size='small'>
-                        <InputLabel id='visibility-select'>Visibility</InputLabel>
+                        <InputLabel>Visibility</InputLabel>
                         <Select
-                            labelId='visibility-select'
-                            id='visibility-select'
                             value={visibility}
                             label='Visibility'
                             onChange={(e: SelectChangeEvent) => handleChange(e, setVisibility)}

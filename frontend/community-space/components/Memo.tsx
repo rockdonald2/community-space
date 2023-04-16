@@ -129,22 +129,22 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                 <Grid container alignItems={'center'} justifyContent={'center'}>
                     <Grid item xs={11}>
                         <Typography
-                            variant='h5'
+                            variant='h6'
                             sx={{ mb: 1, mr: 1 }}
                             color='text.primary'
                             display='flex'
                             alignItems='center'
                         >
                             {memo.title}
-                            <Chip sx={{ ml: 3 }} label={memo.visibility.toLowerCase()} />
+                            <Chip sx={{ ml: 2 }} label={memo.visibility.toLowerCase()} />
                         </Typography>
-                        <Stack direction={'row'}>
-                            <Typography sx={{ fontSize: 14 }} color='text.secondary' gutterBottom>
+                        <Stack direction={'row'} alignItems={'center'}>
+                            <Typography sx={{ fontSize: 14, mb: 0 }} color='text.secondary' gutterBottom>
                                 Posted by&nbsp;<strong>{memo.author}</strong>&nbsp;on{' '}
                                 {dateFormatter.format(new Date(memo.createdOn))}
                             </Typography>
                             <Divider variant='middle' orientation='vertical' flexItem style={{ margin: '0 .5rem' }} />
-                            <Typography sx={{ fontSize: 14 }} color='text.secondary' gutterBottom>
+                            <Typography sx={{ fontSize: 14, mb: 0 }} color='text.secondary' gutterBottom>
                                 Urgency:&nbsp;
                                 <strong style={{ color: 'var(--mui-palette-primary-light)' }}>{memo.urgency}</strong>
                             </Typography>
@@ -174,6 +174,13 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                         </IconButton>
                     </Stack>
                 </DialogTitle>
+                <DialogContent>
+                    <Typography sx={{ mb: 0 }} color='text.secondary'>
+                        Memo posted on {dateFormatter.format(memo.createdOn)} by {memo.author}
+                    </Typography>
+                    <Chip label={memo.urgency} variant='filled' sx={{ mt: 1, mr: 1 }} />
+                    <Chip label={memo.visibility.toLowerCase()} variant='filled' sx={{ mt: 1 }} />
+                </DialogContent>
                 <DialogContent dividers>
                     {isError ? (
                         <Alert severity='error'>
@@ -196,7 +203,11 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                             }}
                         />
                     ) : memoDetails ? (
-                        <Typography gutterBottom>{memoDetails?.content}</Typography>
+                        <>
+                            <Typography sx={{ mb: 0 }} gutterBottom>
+                                {memoDetails?.content}
+                            </Typography>
+                        </>
                     ) : (
                         <CircularLoading />
                     )}
