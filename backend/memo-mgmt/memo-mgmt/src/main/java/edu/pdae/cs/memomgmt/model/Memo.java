@@ -20,14 +20,23 @@ public class Memo {
     @Field("_id")
     private ObjectId id;
 
+    private String title;
     private String author;
     private String content;
     private Date createdOn;
     private Visibility visibility;
+    private Urgency urgency;
 
     public enum Visibility {
         PUBLIC,
         PRIVATE
+    }
+
+    public enum Urgency {
+        LOW,
+        MEDIUM,
+        HIGH,
+        URGENT
     }
 
 }

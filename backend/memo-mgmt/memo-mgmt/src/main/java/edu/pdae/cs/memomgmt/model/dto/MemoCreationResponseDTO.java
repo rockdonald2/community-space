@@ -14,6 +14,7 @@ import java.util.Date;
 public class MemoCreationResponseDTO {
 
     private String id;
+    private String title;
     private String author;
     private Date createdOn;
 

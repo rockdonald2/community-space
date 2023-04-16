@@ -50,9 +50,16 @@ public class MemoController {
 
     @PatchMapping("/{id}")
     public MemoCreationResponseDTO update(@PathVariable("id") ObjectId id, @Valid @RequestBody MemoUpdateDTO memoUpdateDTO) {
+        log.info("Modifying existing memo {}", id);
+
         final Memo memo = memoRepository.findById(id).orElseThrow();
 
         boolean hasChanged = false;
+
+        if (memoUpdateDTO.getTitle() != null) {
+            memo.setTitle(memoUpdateDTO.getTitle());
+            hasChanged = true;
+        }
 
         if (memoUpdateDTO.getContent() != null) {
             memo.setContent(memoUpdateDTO.getContent());
@@ -61,6 +68,11 @@ public class MemoController {
 
         if (memoUpdateDTO.getVisibility() != null) {
             memo.setVisibility(memoUpdateDTO.getVisibility());
+            hasChanged = true;
+        }
+
+        if (memoUpdateDTO.getUrgency() != null) {
+            memo.setUrgency(memoUpdateDTO.getUrgency());
             hasChanged = true;
         }
 

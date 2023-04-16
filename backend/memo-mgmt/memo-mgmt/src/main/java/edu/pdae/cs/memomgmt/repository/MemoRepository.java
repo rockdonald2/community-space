@@ -15,6 +15,8 @@ public interface MemoRepository extends MongoRepository<Memo, ObjectId> {
 
     List<Memo> getMemosByVisibility(Memo.Visibility visibility);
 
+    List<Memo> getMemosByUrgency(Memo.Urgency urgency);
+
     List<Memo> getMemosByAuthorAndVisibility(String author, Memo.Visibility visibility);
 
 }

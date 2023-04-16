@@ -17,5 +17,9 @@ public class MemoUpdateDTO {
     private String content;
     @Nullable
     private Memo.Visibility visibility;
+    @Nullable
+    private Memo.Urgency urgency;
+    @Nullable
+    private String title;
 
 }

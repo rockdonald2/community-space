@@ -1,5 +1,6 @@
 package edu.pdae.cs.memomgmt.model.dto;
 
+import edu.pdae.cs.memomgmt.model.Memo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -13,8 +14,11 @@ import java.util.Date;
 @AllArgsConstructor
 public class MemoDTO {
 
-    private String author;
     private String id;
+    private String title;
+    private String author;
     private Date createdOn;
+    private Memo.Visibility visibility;
+    private Memo.Urgency urgency;
 
 }

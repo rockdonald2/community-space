@@ -12,7 +12,7 @@ const Presence = () => {
     return (
         <Container>
             <Typography mb={2} color='text.secondary' variant='h6'>
-                Who is here?
+                Others online:
             </Typography>
             <Stack alignItems={'flex-start'} direction={'row'} flexWrap={'wrap'}>
                 {presence ? (

@@ -14,7 +14,7 @@ const Header = () => {
                 <Divider variant='middle' orientation='vertical' flexItem style={{ margin: '0 1rem' }} />
                 <Avatar user={user} style={{ marginRight: '1rem' }} />
                 <Typography color='text.secondary'>
-                    logged in as <strong>{`${user.firstName} ${user.lastName}`}</strong>
+                    logged in as <strong>{`${user.firstName} ${user.lastName}`}</strong> ({user.email})
                 </Typography>
             </Stack>
             <Divider sx={{ marginBottom: '1rem' }} />
