@@ -3,13 +3,11 @@ import Header from './Header';
 import { useColorScheme, useMediaQuery } from '@mui/material';
 import { useEffect } from 'react';
 import QuickActions from './QuickActions';
-import PresenceContextProvider from '@/utils/PresenceContext';
-import MessagingWrapper from '@/utils/MessagingWrapper';
 
 const Layout = ({ children }) => {
     const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
-    const { mode, setMode } = useColorScheme();
-    const { user, isAuthenticated } = useAuthContext();
+    const { setMode } = useColorScheme();
+    const { isAuthenticated } = useAuthContext();
 
     useEffect(() => {
         setMode(prefersDarkMode ? 'dark' : 'light');
@@ -19,13 +17,9 @@ const Layout = ({ children }) => {
         <>
             {isAuthenticated ? (
                 <>
-                    <MessagingWrapper>
-                        <PresenceContextProvider user={user}>
-                            <Header />
-                            <>{children}</>
-                            <QuickActions />
-                        </PresenceContextProvider>
-                    </MessagingWrapper>
+                    <Header />
+                    <>{children}</>
+                    <QuickActions />
                 </>
             ) : (
                 <>{children}</>

@@ -31,31 +31,24 @@ public class AccountManagementRouter implements BaseRouter {
                         .and()
                         .uri(accountManagementAddress))
                 .route(r -> r
-                        .path("/api/v1/auth")
+                        .path("/api/v1/sessions")
                         .and()
-                        .method("POST")
-                        .and()
-                        .uri(accountManagementAddress))
-                .route(r -> r
-                        .path("/api/v1/auth/**")
-                        .and()
-                        .method("GET", "DELETE")
+                        .method("POST", "GET", "DELETE")
                         .and()
                         .uri(accountManagementAddress))
                 .route(r -> r
                         .method("GET", "POST")
                         .and()
-                        .path("/stomp/**")
+                        .path("/stomp/users/**")
                         .uri(accountManagementAddress));
     }
 
     @Override
     public Map<String, List<String>> defineOpenEndpoints() {
         return Map.of(
-                "^/api/v1/auth$", List.of("POST"),
+                "^/api/v1/sessions$", List.of("POST", "GET"),
                 "^/api/v1/users$", List.of("POST"),
-                "^/api/v1/auth/.+$", List.of("GET"),
-                "^/stomp/.*$", List.of("GET", "POST")
+                "^/stomp/users/.*$", List.of("GET", "POST")
         );
     }
 

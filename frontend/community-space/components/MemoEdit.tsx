@@ -15,7 +15,7 @@ import Item from './Item';
 import { ChangeEvent, Dispatch, SetStateAction, useCallback, useState } from 'react';
 import SendIcon from '@mui/icons-material/Send';
 import { Visibility, Urgency } from '@/types/db.types';
-import { GATEWAY_URL } from '@/utils/Utility';
+import { GATEWAY_URL } from '@/utils/Constants';
 import { useAuthContext } from '@/utils/AuthContext';
 import { useSWRConfig } from 'swr';
 
@@ -36,7 +36,7 @@ const MemoEdit = ({
     cleanupCallback?: () => void;
 }) => {
     const { user } = useAuthContext();
-    const { mutate } = useSWRConfig();
+    const { mutate } = useSWRConfig(); // get a global mutator from the SWR config
 
     const [visibility, setVisibility] = useState<Visibility>(initialState?.visibility ?? 'PRIVATE');
     const [urgency, setUrgency] = useState<Urgency>(initialState?.urgency ?? '');
@@ -102,7 +102,7 @@ const MemoEdit = ({
                     cleanupCallback();
                 }
 
-                mutate([`${GATEWAY_URL}/api/v1/memos`, user.token]); // TODO: find a more efficient way
+                mutate({ token: user.token });
                 setMsg('');
                 setTitle('');
                 setUrgency('');

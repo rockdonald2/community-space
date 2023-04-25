@@ -1,7 +1,7 @@
 import { User } from '@/types/db.types';
 import { IUserContext, UserSignIn, UserSignInResponse, UserSignUp, UserSignUpResponse } from '@/types/types';
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
-import { GATEWAY_URL } from './Utility';
+import { GATEWAY_URL } from './Constants';
 import { useCrossContext } from './CrossContext';
 
 const USER_DATA_LS = 'user-data';
@@ -16,7 +16,6 @@ const AuthContextProvider = ({ children }) => {
 
     useEffect(() => {
         // on every user state change, save the current state to LS
-
         if (user) {
             localStorage.setItem(USER_DATA_LS, JSON.stringify(user));
         }
@@ -26,7 +25,7 @@ const AuthContextProvider = ({ children }) => {
         const token = user?.token ?? null;
         const handleAsync = async () => {
             try {
-                await fetch(`${GATEWAY_URL}/api/v1/auth/${token}`, {
+                await fetch(`${GATEWAY_URL}/api/v1/sessions`, {
                     method: 'DELETE',
                     headers: {
                         Authorization: `Bearer ${token}`,
@@ -56,7 +55,11 @@ const AuthContextProvider = ({ children }) => {
 
         const handleAsync = async () => {
             try {
-                const validationRes = await fetch(`${GATEWAY_URL}/api/v1/auth/${rawUser.token}`);
+                const validationRes = await fetch(`${GATEWAY_URL}/api/v1/sessions`, {
+                    headers: {
+                        Authorization: `Bearer ${rawUser.token}`,
+                    },
+                });
 
                 if (validationRes.ok) {
                     setUser(rawUser);
@@ -78,7 +81,7 @@ const AuthContextProvider = ({ children }) => {
     const signIn = useCallback(
         async (signInUser: UserSignIn): Promise<{ user?: User; error?: { code: number; msg: string } }> => {
             try {
-                const loginRes = await fetch(`${GATEWAY_URL}/api/v1/auth`, {
+                const loginRes = await fetch(`${GATEWAY_URL}/api/v1/sessions`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',

@@ -19,7 +19,7 @@ import { Memo as MemoType, MemoShort } from '@/types/db.types';
 import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward';
 import CloseIcon from '@mui/icons-material/Close';
 import { useCallback, useEffect, useState } from 'react';
-import { GATEWAY_URL } from '@/utils/Utility';
+import { GATEWAY_URL } from '@/utils/Constants';
 import { useAuthContext } from '@/utils/AuthContext';
 import CircularLoading from './CircularLoading';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
@@ -113,7 +113,7 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                 }
 
                 setOpen(false);
-                mutate([`${GATEWAY_URL}/api/v1/memos`, user.token]); // TODO: find a more efficient way
+                mutate({ token: user.token });
             } catch (err) {
                 console.debug(err.message, err);
                 setError(true);
@@ -178,7 +178,7 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                     <Typography sx={{ mb: 0 }} color='text.secondary'>
                         Memo posted on {dateFormatter.format(memo.createdOn)} by {memo.author}
                     </Typography>
-                    <Chip label={memo.urgency} variant='filled' sx={{ mt: 1, mr: 1 }} />
+                    <Chip label={memo.urgency.toLowerCase()} variant='filled' sx={{ mt: 1, mr: 1 }} />
                     <Chip label={memo.visibility.toLowerCase()} variant='filled' sx={{ mt: 1 }} />
                 </DialogContent>
                 <DialogContent dividers>

@@ -1,10 +1,10 @@
+import SkeletonLoader from './SkeletonLoader';
 import useSWR from 'swr';
 import {
-    GATEWAY_URL,
     boldSelectedElementStyle,
     sortByCreationDate,
     sortByUrgency,
-    swrFetcherWithAuth,
+    swrRecentMemosFetcherWithAuth,
 } from '@/utils/Utility';
 import {
     Alert,
@@ -17,7 +17,6 @@ import {
     OutlinedInput,
     Select,
     SelectChangeEvent,
-    Skeleton,
     Stack,
     TextField,
     useTheme,
@@ -28,19 +27,18 @@ import { ErrorResponse } from '@/types/types';
 import Memo from './Memo';
 import MemoEdit from './MemoEdit';
 import SearchIcon from '@mui/icons-material/Search';
-import { ChangeEvent, useState } from 'react';
+import { ChangeEvent, Dispatch, SetStateAction, useState } from 'react';
 
 const Memos = () => {
     const theme = useTheme();
 
     const { user } = useAuthContext();
-    const { data, error, isLoading } = useSWR<MemoType[] | ErrorResponse>( // TODO: refactor with typescript compatibility
-        [`${GATEWAY_URL}/api/v1/memos`, user.token],
-        swrFetcherWithAuth,
+    const { data, error, isLoading, isValidating } = useSWR<MemoType[] | ErrorResponse>(
+        { token: user.token },
+        swrRecentMemosFetcherWithAuth,
         {
             revalidateOnMount: true,
             revalidateOnReconnect: true,
-            refreshInterval: 30 * 1000, // pull every 30 seconds
             refreshWhenHidden: false,
             refreshWhenOffline: false,
         }
@@ -51,12 +49,15 @@ const Memos = () => {
     const [privateFilter, setPrivateFilter] = useState<boolean>(true);
     const [publicFilter, setPublicFilter] = useState<boolean>(true);
 
-    const handleChange = (event: SelectChangeEvent<typeof urgencyFilter>) => {
+    const handleMultiSelectChange = (
+        event: SelectChangeEvent<typeof urgencyFilter>,
+        setState: Dispatch<SetStateAction<any>>
+    ) => {
         const {
             target: { value },
         } = event;
 
-        setUrgencyFilter(typeof value === 'string' ? value.split(',') : value);
+        setState(typeof value === 'string' ? value.split(',') : value);
     };
 
     if (error) {
@@ -69,14 +70,7 @@ const Memos = () => {
         );
     }
 
-    if (isLoading)
-        return (
-            <>
-                <Skeleton />
-                <Skeleton />
-                <Skeleton />
-            </>
-        );
+    if (isLoading || isValidating) return <SkeletonLoader />;
 
     if ('status' in data) {
         // if it's an error response, handle accordingly; this is coming from the server
@@ -132,7 +126,9 @@ const Memos = () => {
                             size='small'
                             multiple
                             value={urgencyFilter}
-                            onChange={handleChange}
+                            onChange={(e: SelectChangeEvent<typeof urgencyFilter>) =>
+                                handleMultiSelectChange(e, setUrgencyFilter)
+                            }
                             input={<OutlinedInput label='Urgency' />}
                             renderValue={(selected) => (
                                 <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>

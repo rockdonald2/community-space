@@ -59,7 +59,7 @@ const Avatar = ({
             }}
             variant={isOnline ? 'dot' : 'standard'}
         >
-            <Tooltip title={user.email}>
+            <Tooltip arrow title={user.email}>
                 <MaterialAvatar
                     sx={{ bgcolor: generateRandomColor ? stringToColor(user.email) : '--var(--mui-palette-grey-400)' }}
                     style={style}

@@ -1,8 +1,6 @@
 import { MemoShort } from '@/types/db.types';
-
-export const isBrowser = typeof window !== 'undefined';
-export const GATEWAY_WS = process.env.CS_GATEWAY_WS || 'http://localhost:8080/stomp';
-export const GATEWAY_URL = process.env.CS_GATEWAY_URL || 'http://localhost:8080';
+import { Theme } from '@mui/material';
+import { GATEWAY_URL } from './Constants';
 
 export const sortByUrgency = (m1: MemoShort, m2: MemoShort) => {
     if (m1.urgency === 'URGENT') return -1; // if any of them is urgent, be it first
@@ -38,9 +36,17 @@ export const boldSelectedElementStyle = (elem: string, container: readonly strin
     };
 };
 
-export const swrFetcherWithAuth = async (args: readonly string[]) => {
-    const res = await fetch(args[0], {
-        headers: { Authorization: `Bearer ${args[1]}` },
+/**
+ * Retrieve the recent memos from the repository with the given token. Recent memos are those that were created after yesterday.
+ * @param args the user's token
+ * @returns the recent memos from the repository
+ */
+export const swrRecentMemosFetcherWithAuth = async (args: { token: string }) => {
+    const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
+    const url = `${GATEWAY_URL}/api/v1/memos?createdAfter=${yesterday}`;
+
+    const res = await fetch(url, {
+        headers: { Authorization: `Bearer ${args.token}` },
     });
 
     return await res.json();

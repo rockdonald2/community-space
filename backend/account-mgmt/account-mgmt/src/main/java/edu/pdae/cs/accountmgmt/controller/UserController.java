@@ -1,6 +1,9 @@
 package edu.pdae.cs.accountmgmt.controller;
 
-import edu.pdae.cs.accountmgmt.model.dto.*;
+import edu.pdae.cs.accountmgmt.model.dto.UserCreationDTO;
+import edu.pdae.cs.accountmgmt.model.dto.UserCreationResponseDTO;
+import edu.pdae.cs.accountmgmt.model.dto.UserDTO;
+import edu.pdae.cs.accountmgmt.model.dto.UserDetailsDTO;
 import edu.pdae.cs.accountmgmt.repository.UserRepository;
 import edu.pdae.cs.accountmgmt.service.MessagingService;
 import edu.pdae.cs.accountmgmt.service.UserService;
@@ -32,10 +35,7 @@ public class UserController {
     @ResponseStatus(HttpStatus.CREATED)
     public UserCreationResponseDTO create(@RequestBody UserCreationDTO newUser) {
         log.info("Incoming registration request for {}", newUser.getEmail());
-
-        final var creationResponse = userService.register(newUser);
-//        messagingService.sendMessageForActiveStatus(UserPresenceNotificationDTO.builder().email(newUser.getEmail()).status(UserPresenceNotificationDTO.Status.ONLINE).build());
-        return creationResponse;
+        return userService.register(newUser);
     }
 
     @GetMapping("/{id}")
@@ -47,7 +47,7 @@ public class UserController {
     public List<UserDTO> gets(@RequestParam("email") Optional<String> email) {
         return email
                 .map(s -> Collections.singletonList(modelMapper.map(userRepository.findByEmail(s).orElseThrow(), UserDTO.class)))
-                .orElseGet(() -> userRepository.findAll().stream().map(user -> modelMapper.map(user, UserDTO.class)).toList());
+                .orElseGet(() -> userRepository.findAll().stream().map(user -> modelMapper.map(user, UserDTO.class)).toList()); // ! find-all anti-pattern
     }
 
     @DeleteMapping("/{id}")

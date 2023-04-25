@@ -9,6 +9,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.modelmapper.ModelMapper;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -34,7 +35,6 @@ public class MemoController {
         reqMemo.setCreatedOn(new Date());
 
         final Memo createdMemo = memoRepository.save(reqMemo);
-
         return modelMapper.map(createdMemo, MemoCreationResponseDTO.class);
     }
 
@@ -44,7 +44,7 @@ public class MemoController {
     }
 
     @GetMapping
-    public List<MemoDTO> gets(@RequestParam("createdAfter") Optional<Date> createdAfter, @RequestParam("visibility") Optional<Memo.Visibility> visibility, @RequestHeader("X-AUTH-TOKEN-SUBJECT") String user) {
+    public List<MemoDTO> gets(@RequestParam("createdAfter") @DateTimeFormat(pattern="yyyy-MM-dd") Optional<Date> createdAfter, @RequestParam("visibility") Optional<Memo.Visibility> visibility, @RequestHeader("X-AUTH-TOKEN-SUBJECT") String user) {
         Objects.requireNonNull(user);
 
         if (createdAfter.isPresent() && visibility.isPresent()) {
@@ -55,7 +55,7 @@ public class MemoController {
             return memoService.getAllByVisibility(visibility.get(), user);
         }
 
-        return memoService.getAll(user);
+        return memoService.getAll(user); // ! find-all anti-pattern
     }
 
     @PatchMapping("/{id}")

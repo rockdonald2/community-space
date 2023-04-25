@@ -3,10 +3,8 @@ package edu.pdae.cs.accountmgmt.controller;
 import edu.pdae.cs.accountmgmt.model.User;
 import edu.pdae.cs.accountmgmt.model.dto.UserLoginDTO;
 import edu.pdae.cs.accountmgmt.model.dto.UserLoginResponseDTO;
-import edu.pdae.cs.accountmgmt.model.dto.UserPresenceNotificationDTO;
 import edu.pdae.cs.accountmgmt.repository.UserRepository;
 import edu.pdae.cs.accountmgmt.service.JwtService;
-import edu.pdae.cs.accountmgmt.service.MessagingService;
 import edu.pdae.cs.accountmgmt.service.UserService;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
@@ -22,29 +20,30 @@ import java.util.Objects;
 
 @RestController
 @RequiredArgsConstructor
-@RequestMapping("/api/v1/auth")
+@RequestMapping("/api/v1/sessions")
 @Slf4j
 public class AuthenticationController {
 
     private final UserService userService;
     private final JwtService jwtService;
     private final UserRepository userRepository;
-    private final MessagingService messagingService;
 
     @PostMapping
     public UserLoginResponseDTO login(@RequestBody UserLoginDTO userLoginDTO) throws LoginException { // NOSONAR
         log.info("Incoming login request for {}", userLoginDTO.getEmail());
-
-        final var loginResponse = userService.login(userLoginDTO);
-//        messagingService.sendMessageForActiveStatus(UserPresenceNotificationDTO.builder().email(userLoginDTO.getEmail()).status(UserPresenceNotificationDTO.Status.ONLINE).build());
-        return loginResponse;
+        return userService.login(userLoginDTO);
     }
 
-    @GetMapping("/{token}")
+    @GetMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<Void> validate(@PathVariable("token") String token) {
+    public ResponseEntity<Void> validate(@RequestHeader("Authorization") String rawHeader) {
+        if (isAuthMissing(rawHeader)) {
+            throw new IllegalArgumentException("Missing Authorization token");
+        }
+
         log.info("Incoming validate request before token validation");
 
+        final String token = getAuthToken(rawHeader);
         final String email = Objects.requireNonNull(jwtService.extractEmail(token)); // first check, check for e-mail and auth, we verify the signing key here
         // can throw validation exceptions
 
@@ -54,24 +53,34 @@ public class AuthenticationController {
 
         // this can throw validation exceptions which means the claim was falsified
         if (jwtService.isTokenValid(token, user.getEmail())) { // check the expiration and subjects
-//            messagingService.sendMessageForActiveStatus(UserPresenceNotificationDTO.builder().email(user.getEmail()).status(UserPresenceNotificationDTO.Status.ONLINE).build()); // TODO: rework this unnecessary side-effect
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 
         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
-    @DeleteMapping("/{token}")
+    @DeleteMapping
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<Void> logout(@PathVariable("token") String token) {
+    public ResponseEntity<Void> logout(@RequestHeader("Authorization") String rawHeader) {
+        if (isAuthMissing(rawHeader)) {
+            throw new IllegalArgumentException("Missing Authorization token");
+        }
+
         log.info("Incoming logout request before token validation");
 
+        final String token = getAuthToken(rawHeader);
         final String email = Objects.requireNonNull(jwtService.extractEmail(token)); // can throw 400 or 401 if token is already expired or malicious, or email is missing
 
         log.info("Incoming logout request for {}", email);
-
-//        messagingService.sendMessageForActiveStatus(UserPresenceNotificationDTO.builder().email(email).status(UserPresenceNotificationDTO.Status.OFFLINE).build());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
+    }
+
+    private String getAuthToken(String rawHeaderEntry) {
+        return rawHeaderEntry.split(" ")[1].trim();
+    }
+
+    private boolean isAuthMissing(String rawHeaderEntry) {
+        return !rawHeaderEntry.startsWith("Bearer ");
     }
 
     @ExceptionHandler(NullPointerException.class)
@@ -89,7 +98,7 @@ public class AuthenticationController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler({ExpiredJwtException.class, SignatureException.class})
+    @ExceptionHandler({ExpiredJwtException.class, SignatureException.class, IllegalArgumentException.class})
     public ResponseEntity<Void> expiredOrBadSignatureHandler() {
         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }

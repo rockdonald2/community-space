@@ -1,7 +1,7 @@
 import { useRouter } from 'next/router';
 import { useAuthContext } from './AuthContext';
 import CircularLoading from '@/components/CircularLoading';
-import { isBrowser } from './Utility';
+import { isBrowser } from './Constants';
 
 const pathsThatRequireLogin = ['/'];
 const pathsThatRequireNoLogin = ['/login', '/register'];
