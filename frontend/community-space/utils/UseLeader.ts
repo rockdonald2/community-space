@@ -1,6 +1,6 @@
 import { BroadcastChannel, LeaderElector, createLeaderElection } from 'broadcast-channel';
 import { useCallback, useEffect, useMemo, useRef } from 'react';
-import { isBrowser } from './Utility';
+import { isBrowser } from './Constants';
 
 /**
  * This hook is currently unused.

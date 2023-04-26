@@ -63,6 +63,8 @@ public class StatusListener {
     public void broadcastStatus() {
         log.info("Broadcasting presence status");
 
+        // TODO: save last broadcast time and only broadcast if there are changes since last broadcast
+
         messagingService.sendMessageForActiveStatusBroadcast();
     }
 

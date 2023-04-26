@@ -18,7 +18,7 @@ import {
 import { Memo as MemoType, MemoShort } from '@/types/db.types';
 import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward';
 import CloseIcon from '@mui/icons-material/Close';
-import { useCallback, useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { GATEWAY_URL } from '@/utils/Constants';
 import { useAuthContext } from '@/utils/AuthContext';
 import CircularLoading from './CircularLoading';
@@ -26,7 +26,8 @@ import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import EditIcon from '@mui/icons-material/Edit';
 import Item from './Item';
 import MemoEdit from './MemoEdit';
-import { useSWRConfig } from 'swr';
+import useSWR, { useSWRConfig } from 'swr';
+import SkeletonLoader from './SkeletonLoader';
 
 const MemoDialog = styled(Dialog)(({ theme }) => ({
     '& .MuiPaper-root': {
@@ -50,50 +51,30 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
     const { user } = useAuthContext();
     const { mutate } = useSWRConfig();
 
-    const [isOpen, setOpen] = useState<boolean>(false);
-    const [isError, setError] = useState<boolean>(false);
-    const [isUpdating, setUpdating] = useState<boolean>(false);
-    const [memoDetails, setMemoDetails] = useState<MemoType>(null);
+    const [isMemoOpen, setMemoOpen] = useState<boolean>(false);
+    const [isMemoModificationError, setUserInputError] = useState<boolean>(false);
+    const [isUserUpdatingMemo, setUserUpdatingMemo] = useState<boolean>(false);
 
-    useEffect(() => {
-        setError(false);
+    const { data, error, isLoading, isValidating } = useSWR<MemoType>(
+        isMemoOpen ? `${GATEWAY_URL}/api/v1/memos/${memo.id}` : null,
+        async (url) => {
+            const res = await fetch(url, {
+                headers: { Authorization: `Bearer ${user.token}` },
+            });
 
-        if (!memoDetails && isOpen) {
-            const handleAsync = async () => {
-                try {
-                    const memoResponse = await fetch(`${GATEWAY_URL}/api/v1/memos/${memo.id}`, {
-                        headers: { Authorization: `Bearer ${user.token}` },
-                    });
-
-                    if (!memoResponse.ok) {
-                        throw new Error('Failed to pull memo details due to bad response', {
-                            cause: {
-                                res: memoResponse,
-                            },
-                        });
-                    }
-
-                    const memoBody = (await memoResponse.json()) as MemoType;
-                    setMemoDetails(memoBody);
-                } catch (err) {
-                    console.debug(err.message, err);
-                    setError(true);
-                }
-            };
-
-            handleAsync();
+            return await res.json();
         }
-    }, [isOpen, isUpdating]);
+    );
 
     const handleClose = useCallback(() => {
-        if (isUpdating) return setUpdating(false);
-        if (isOpen) return setOpen(false);
+        if (isUserUpdatingMemo) return setUserUpdatingMemo(false);
+        if (isMemoOpen) return setMemoOpen(false);
 
-        setOpen(true);
-    }, [isOpen, setOpen, isUpdating, setUpdating]);
+        setMemoOpen(true);
+    }, [isMemoOpen, setMemoOpen, isUserUpdatingMemo, setUserUpdatingMemo]);
 
     const handleDelete = useCallback(() => {
-        setError(false);
+        setUserInputError(false);
 
         const handleAsync = async () => {
             try {
@@ -112,11 +93,11 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                     });
                 }
 
-                setOpen(false);
+                setMemoOpen(false);
                 mutate({ token: user.token });
             } catch (err) {
                 console.debug(err.message, err);
-                setError(true);
+                setUserInputError(true);
             }
         };
 
@@ -159,7 +140,7 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                     </Grid>
                 </Grid>
             </Item>
-            <MemoDialog open={isOpen} scroll='paper'>
+            <MemoDialog open={isMemoOpen} scroll='paper'>
                 <DialogTitle sx={{ m: 0, p: 2 }}>
                     <Stack direction={'row'} alignItems={'center'} justifyContent={'space-between'}>
                         <Typography variant={'h6'}>{memo.title}</Typography>
@@ -182,43 +163,42 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                     <Chip label={memo.visibility.toLowerCase()} variant='filled' sx={{ mt: 1 }} />
                 </DialogContent>
                 <DialogContent dividers>
-                    {isError ? (
+                    {isMemoModificationError || error ? (
                         <Alert severity='error'>
                             <AlertTitle>Oops!</AlertTitle>
                             Unexpected error has occurred.
                         </Alert>
-                    ) : isUpdating ? (
+                    ) : isUserUpdatingMemo ? (
                         <MemoEdit
                             initialState={{
                                 title: memo.title,
                                 visibility: memo.visibility,
                                 urgency: memo.urgency,
-                                content: memoDetails.content,
+                                content: data.content,
                             }}
                             memoId={memo.id}
                             isUpdateMode
                             cleanupCallback={() => {
-                                setMemoDetails(null);
-                                setUpdating(false);
+                                setUserUpdatingMemo(false);
                             }}
                         />
-                    ) : memoDetails ? (
+                    ) : isLoading || isValidating ? (
+                        <SkeletonLoader />
+                    ) : (
                         <>
                             <Typography sx={{ mb: 0 }} gutterBottom>
-                                {memoDetails?.content}
+                                {data?.content}
                             </Typography>
                         </>
-                    ) : (
-                        <CircularLoading />
                     )}
                 </DialogContent>
-                {user.email === memo.author && !isUpdating && (
+                {user.email === memo.author && !isUserUpdatingMemo && (
                     <DialogActions>
                         <Button
                             variant='outlined'
                             color='warning'
                             endIcon={<EditIcon />}
-                            onClick={() => setUpdating(true)}
+                            onClick={() => setUserUpdatingMemo(true)}
                         >
                             Modify
                         </Button>

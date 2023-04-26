@@ -17,11 +17,13 @@ export const RouteGuard = ({ children }) => {
         !isAuthenticated &&
         pathsThatRequireLogin.includes(currentPath)
     ) {
-        push('/login');
+        push('/login'); // redirect to login page if not authenticated
     }
 
     if (isBrowser && isAuthenticated && pathsThatRequireNoLogin.includes(currentPath)) {
-        push('/');
+        push('/'); // redirect to the same page
+        // TODO: fix defect that it will always mess up the history when accessing protected path
+        // ? maybe by revalidating here the token?
     }
 
     if (!isAuthenticated && pathsThatRequireLogin.includes(currentPath)) {
