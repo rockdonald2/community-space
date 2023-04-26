@@ -6,4 +6,6 @@ public interface MessagingService {
 
     void sendMessageForActiveStatus(UserPresenceNotificationDTO userDTO);
 
+    void sendMessageForActiveStatusBroadcast();
+
 }

@@ -14,11 +14,18 @@ import org.springframework.stereotype.Service;
 public class MessagingServiceImpl implements MessagingService {
 
     private final KafkaTemplate<String, UserPresenceNotificationDTO> userPresenceDTOKafkaTemplate;
+    private final KafkaTemplate<String, Void> broadcastKafkaTemplate;
 
     @Override
     public void sendMessageForActiveStatus(UserPresenceNotificationDTO presenceDTO) {
         log.info("Sending active status message for {}", presenceDTO.getEmail());
         userPresenceDTOKafkaTemplate.send(MessagingConfiguration.ACTIVE_STATUS_TOPIC, presenceDTO);
+    }
+
+    @Override
+    public void sendMessageForActiveStatusBroadcast() {
+        log.info("Sending active status broadcast message");
+        broadcastKafkaTemplate.send(MessagingConfiguration.ACTIVE_STATUS_BROADCAST_TOPIC, null);
     }
 
 }
