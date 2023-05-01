@@ -15,6 +15,7 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -46,7 +47,8 @@ public class StatusListener {
     public void broadcastListener() {
         log.info("Caught internal message for presence broadcast");
 
-        messagingTemplate.convertAndSend("/wb/status-broadcast", statusService.getAllActive());
+        final Set<UserPresenceDTO> actives = statusService.getAllActive(true);
+        messagingTemplate.convertAndSend("/wb/status-broadcast", actives);
     }
 
     @MessageMapping("/status-notify") // handles messages coming to /ws/status-notify
@@ -65,7 +67,8 @@ public class StatusListener {
 
         // TODO: save last broadcast time and only broadcast if there are changes since last broadcast
 
-        messagingService.sendMessageForActiveStatusBroadcast();
+        final Set<UserPresenceDTO> actives = statusService.getAllActive(false);
+        messagingTemplate.convertAndSend("/wb/status-broadcast", actives);
     }
 
     @Scheduled(fixedDelayString = "${cs.status.cleanup.interval.minutes}", timeUnit = TimeUnit.MINUTES)
@@ -73,7 +76,7 @@ public class StatusListener {
     public void cleanupStatus() {
         log.info("Cleaning up presence status");
 
-        statusService.removeInactives();
+        statusService.removeInactives(false);
     }
 
     private void updateStatus(UserPresenceNotificationDTO presenceNotificationDTO) {

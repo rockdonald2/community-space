@@ -34,6 +34,7 @@ export type UserSignInResponse = {
 export interface IUserContext {
     user: User;
     isAuthenticated: boolean;
+    isInitialized: boolean;
     signOut: () => void;
     signUp: (user: UserSignUp) => Promise<{ user?: User; error?: { code: number; msg: string } }>;
     signIn: (user: UserSignIn) => Promise<{ user?: User; error?: { code: number; msg: string } }>;

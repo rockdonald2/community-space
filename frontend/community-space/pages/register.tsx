@@ -48,7 +48,7 @@ function Register() {
 
             if (!isPasswordOK || !isEmailOK || !doPasswordsMatch || doNamesMissing) return;
 
-            const { user, error } = await signUp({
+            const { error } = await signUp({
                 email: emailInput,
                 password: passwordInput,
                 firstName: firstNameInput,

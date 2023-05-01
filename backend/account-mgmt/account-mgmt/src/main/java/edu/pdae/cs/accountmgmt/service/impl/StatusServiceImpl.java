@@ -13,6 +13,7 @@ import org.springframework.data.redis.core.ValueOperations;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collections;
 import java.util.Date;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
@@ -33,7 +34,10 @@ public class StatusServiceImpl implements StatusService {
     private HashOperations<String, String, UserPresenceDTO> opsForHashPresence;
 
     @Value("${cs.status.cleanup.interval.minutes}")
-    private int statusIntervalMinutes;
+    private int cleanIntervalMinutes;
+
+    @Value("${cs.status.broadcast.interval.minutes}")
+    private int broadcastIntervalMinutes;
 
     @PostConstruct
     private void setup() {
@@ -43,13 +47,32 @@ public class StatusServiceImpl implements StatusService {
 
     @Override
     @Transactional(readOnly = true)
-    public Set<UserPresenceDTO> getAllActive() throws NullPointerException {
+    public Set<UserPresenceDTO> getAllActive(boolean force) throws NullPointerException {
         log.info("Getting all active users");
 
-        return opsForHashPresence.keys(STATUS_COLLECTION).stream().map(user -> UserPresenceDTO.builder().email(user).build()).collect(Collectors.toSet());
+        final Date currDate = new Date();
+
+        // TODO: put this logic outside
+        if (!force) {
+            final Date lastModified = opsForValueLastModified.get(STATUS_ACTIVE_LAST_MODIFIED);
+
+            if (lastModified != null) {
+                final long diffInMs = currDate.getTime() - lastModified.getTime();
+                if (TimeUnit.MINUTES.convert(diffInMs, TimeUnit.MILLISECONDS) < broadcastIntervalMinutes) {
+                    log.info("Skipping getting all active users as someone has done it recently");
+                    return Collections.emptySet();
+                }
+            }
+        }
+
+        final var entries = opsForHashPresence.keys(STATUS_COLLECTION).stream().map(user -> UserPresenceDTO.builder().email(user).build()).collect(Collectors.toSet());
+
+        opsForValueLastModified.set(STATUS_ACTIVE_LAST_MODIFIED, currDate);
+        return entries;
     }
 
     @Override
+    @Transactional
     public void putActive(UserPresenceDTO userDTO) {
         log.info("Putting {} as active", userDTO.getEmail());
 
@@ -58,6 +81,7 @@ public class StatusServiceImpl implements StatusService {
     }
 
     @Override
+    @Transactional
     public void removeInactive(UserPresenceDTO userDTO) {
         log.info("Putting {} as inactive", userDTO.getEmail());
 
@@ -66,17 +90,21 @@ public class StatusServiceImpl implements StatusService {
 
     @Override
     @Transactional
-    public void removeInactives() {
+    public void removeInactives(boolean force) {
         log.info("Cleaning inactive users");
 
-        final Date lastModified = opsForValueLastModified.get(STATUS_INACTIVE_LAST_MODIFIED);
         final Date currDate = new Date();
 
-        if (lastModified != null) {
-            final long diffInMs = currDate.getTime() - lastModified.getTime();
-            if (TimeUnit.MINUTES.convert(diffInMs, TimeUnit.MILLISECONDS) < statusIntervalMinutes) {
-                log.info("Skipping removing inactives as someone has updated out of schedule");
-                return;
+        // TODO: put this logic outside
+        if (!force) {
+            final Date lastModified = opsForValueLastModified.get(STATUS_INACTIVE_LAST_MODIFIED);
+
+            if (lastModified != null) {
+                final long diffInMs = currDate.getTime() - lastModified.getTime();
+                if (TimeUnit.MINUTES.convert(diffInMs, TimeUnit.MILLISECONDS) < cleanIntervalMinutes) {
+                    log.info("Skipping removing inactives as someone has updated out of schedule");
+                    return;
+                }
             }
         }
 
@@ -85,11 +113,13 @@ public class StatusServiceImpl implements StatusService {
                 final var userPresenceDTO = cursor.next().getValue();
 
                 final long diffInMs = currDate.getTime() - userPresenceDTO.getLastSeen().getTime();
-                if (TimeUnit.MINUTES.convert(diffInMs, TimeUnit.MILLISECONDS) >= statusIntervalMinutes) {
+                if (TimeUnit.MINUTES.convert(diffInMs, TimeUnit.MILLISECONDS) >= cleanIntervalMinutes) {
                     removeInactive(userPresenceDTO);
                 }
             }
         }
+
+        opsForValueLastModified.set(STATUS_INACTIVE_LAST_MODIFIED, currDate);
     }
 
 }

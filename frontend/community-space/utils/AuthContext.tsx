@@ -12,6 +12,7 @@ const useAuthContext = () => useContext<IUserContext>(AuthContext);
 const AuthContextProvider = ({ children }) => {
     const [user, setUser] = useState<User>(null);
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+    const [isInitialized, setInitialized] = useState<boolean>(false);
     const { triggerReload } = useCrossContext();
 
     useEffect(() => {
@@ -51,7 +52,7 @@ const AuthContextProvider = ({ children }) => {
 
         const rawUser = JSON.parse(localStorage.getItem(USER_DATA_LS)) as User;
 
-        // validate using the /api/v1/auth/** endpoint the found token
+        // validate using the /api/v1/sessions/** endpoint the found token
 
         const handleAsync = async () => {
             try {
@@ -69,13 +70,24 @@ const AuthContextProvider = ({ children }) => {
                 }
             } catch (err) {
                 console.debug('Failed to send validation for user token', err);
+            } finally {
+                setInitialized(true);
             }
         };
 
         // if there is any captured user
         if (rawUser && rawUser.token) {
             handleAsync();
+        } else {
+            setInitialized(true);
         }
+
+        return () => {
+            // on component unload, clear the user state
+            setUser(null);
+            setIsAuthenticated(false);
+            setInitialized(false);
+        };
     }, []);
 
     const signIn = useCallback(
@@ -186,11 +198,12 @@ const AuthContextProvider = ({ children }) => {
         () => ({
             user,
             isAuthenticated,
+            isInitialized,
             signOut,
             signIn,
             signUp,
         }),
-        [isAuthenticated, signIn, signOut, signUp, user]
+        [isAuthenticated, signIn, signOut, signUp, user, isInitialized]
     );
 
     return <AuthContext.Provider value={provided}>{children}</AuthContext.Provider>;

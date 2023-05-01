@@ -6,12 +6,12 @@ import java.util.Set;
 
 public interface StatusService {
 
-    Set<UserPresenceDTO> getAllActive();
+    Set<UserPresenceDTO> getAllActive(boolean force);
 
     void putActive(UserPresenceDTO userDTO);
 
     void removeInactive(UserPresenceDTO userDTO);
 
-    void removeInactives();
+    void removeInactives(boolean force);
 
 }
