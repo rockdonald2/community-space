@@ -23,6 +23,8 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
     public void configureMessageBroker(MessageBrokerRegistry registry) {
         registry.setApplicationDestinationPrefixes("/ws"); // prefix for controller endpoints
         registry.enableSimpleBroker("/wb"); // prefix for broker endpoints
+        registry.setPreservePublishOrder(true);
+        // TODO: integrate rabbitmq as external broker
     }
 
 }

@@ -2,52 +2,37 @@
 
 ## Alapötlet
 
-Tudásmegosztásra kihelyezett közösségi munkaplatform a vállalati/egyéb közösségen belüli gyors információmegosztásra és megőrzésre, ahol bárki könnyedén megoszthatja aktuális gondolatait/felhívásait/közléseit egy adott tematikáról, amelyekre mások reagálhatnak és visszajelzést adhatnak.
+Tudásmegosztásra kihelyezett közösségi munkaplatform a vállalati/egyéb közösségen belüli gyors információmegosztásra és megőrzésre rövid memo-k formájában, ahol bárki könnyedén megoszthatja aktuális gondolatait/felhívásait/közléseit egy adott tematikáról vagy gondolatról, amelyekre mások reagálhatnak és visszajelzést adhatnak.
 
-Kiindulási alap a következő már piacon levő open-source kezdeményezés, amely `Go`-ban került implementálásra [GitHub/usememos](https://github.com/usememos/memos). De akár hasonló valamelyest a Slack és a Teams is.
+Kiindulási alap a következő már "piacon" levő open-source kezdeményezés, amely `Go`-ban került implementálásra [GitHub/usememos](https://github.com/usememos/memos). De akár hasonló valamelyest a Slack és a Teams is.
 
 ## Funkcionalitások
 
-Az alkalmazás elvárt funkcionalitásai:
+### Kollaboratív és stratégiai megfontolások
 
-- Felhasználók képesek memo-kat megosztani különböző láthatósági szintekkel: publikus vagy privát (csak a publikáló felhasználó által megtekinthető),
-- Ezek a memo-k tartalmazhatnak tetszőleges dolgokat akár képeket, emojikat, akár `Markdown`-t, stb (jelenleg scope-n kívül esik, hogy akár fájlfeltöltést is támogassunk).
-- Aznapi vagy bármikori memo-k tetszőleges megtekintése **valós időben**,
-- Keresés memo-k között: cím, szöveg alapján és tag-elési funkcionalitás, prioritási szintek,
-- Online státusz az aktív felhasználókhoz,
-- Aktivitási hőtérkép,
-- Felhasználók reagálhatnak a memo-kra reakciókkal,
-- Értesítési mechanizmus a platformon történő eseményekre, pl. új memo, reakciók saját memo-kra, 
+Az alkalmazás elvárt alapvető funkcionalitásai:
 
-Értelemszerűen autentikációs funkcionalitások is beépítésre kerülnek.
+- Felhasználók képesek saját contókat létrehozni a platformhoz való csatlakozáshoz,
+- Felhasználók képesek közösségekhez, ún. hub-okhoz csatlakozási kéréseket leadni és adminisztrátor felhasználók ezeket elfogadni,
+- Felhasználók képesek saját hub-okat létrehozni,
+- Felhasználók képesek memo-kat megosztani különböző láthatósági szintekkel a hub-on belül: publikus vagy privát (csak a publikáló felhasználó által megtekinthető memo),
+  - Ezek a memo-k tartalmazhatnak tetszőleges dolgokat akár képeket (külső forrásból), emojikat, akár `Markdown`-t, stb. (jelenleg scope-n kívül esik, hogy akár fájlfeltöltést is támogassunk).
+- Aznapi vagy bármikori memo-k tetszőleges megtekintése **valós időben**, alapesetben a felhasználónak kilistázza az éppen aktuális memo-kat prioritásuk és publikálási dátumuk szerint rendezve,
+- Keresési funkcionalitás memo-k között: cím és tag-elési funkcionalitás, prioritási szintek,
+- Folyamatosan real-time karbantartott "online" státusz az aktív felhasználókhoz (hub-on belül és kívül (értelemszerűen a főoldalon)),
+- Aktivitási hőtérkép az aktuális hónapra vetítve informatív jelleggel,
+- Felhasználók reagálhatnak, visszajelzést adhatnak a memo-kra reakciókkal és teljesítési kitűzőkkel,
+- Értesítési mechanizmus a platformon történő eseményekre, pl. új memo, reakciók saját memo-kra, teljesítés, stb.
 
-Kiegészítő funkcionalitások:
+### Kiegészítő funkcionalitások
 
-- Alkalmazás cluster automatizált létrehozása (`Terraform`),
-- Szolgáltatás-skálázhatóság (`K8S és Helm`),
+Kiegészítő, technológiai (az alap use-case-n kívül eső) funkcionalitások:
+
+- Kubernetes kitelepítés (`K8S és Helm`),
+- Alkalmazás cluster (K8S cluster) automatizált létrehozása (`Terraform`),
 - Cloud platform kitelepítés (`DigitalOcean`),
-- `MongoDB és Redis` skálázható (és redundáns) kitelepítései,
-- *Opcionális*: biztonsági réteg.
-
-### Technológia összefoglaló
-
-Front-end összefoglaló:
-
-- Nyelv: `tsx`,
-- Keretrendszer: `Next.js`,
-- Komponenskönyvtár: `MaterialUI`.
-
-Back-end összefoglaló:
-
-- NoSQL adatbázis: `MongoDB`,
-- Cache és PubSub megoldás: `Redis`
-- Általános back-end keretrendszer: `Spring Boot` (micro-service-k implementálására, pl. Spring JPA, Spring Repository, Spring WebFlux, háromrétegű architektúra),
-- Üzenet broker (in-cluster és nem külsős): `Kafka` vagy `RabbitMQ` (nekem több tapasztalatom van az utóbbival),
-- Infrastruktúra és DevOps: `Terraform` (K8S cluster létrehozása), `K8S és Helm`.
-
-Kiegészítő technológiák: `WebSocket`, `PubSub`, `Reactive Gateway`.
-
-ℹ️ **Megjegyzés**: opcionális a `Redis`-t, amennyiben nincs szükség nagy mennyiségű cachelési kapacitásra kiválthatja a `Kafka` is funkcionalitását tekintve valamilyen üzenetsoros megoldással kiváltva, azonban egyszerűbb lenne a `Redis`.
+- `MongoDB és Apache Kafka (és/vagy RabbitMQ)` skálázható (és redundáns) kitelepítései,
+- `Redis`, mint cachelési megoldás skálázható kitelepítése.
 
 ## Komponensdiagram
 
@@ -57,38 +42,66 @@ Kiegészítő technológiák: `WebSocket`, `PubSub`, `Reactive Gateway`.
 
 1. Gateway-service
 
-> Az szolgáltatási (API) réteg egyetlen belépési pontja, minden platformbéli interakció ezen keresztül érhető el, általános `routing` szerepkör;  
-> Kiegészítő a valósidejű megvalósításhoz, hogy a különböző csatorna-routing-ot is ez a service fogja végezni (jön egy kérés egy adott `WebSocket` csatorna eléréséhez, akkor ez fogja továbbítani a releváns service-hez). Pl. egy ilyen funkcionalitás az online státusz: Redis-ben lehet tárolni az aktív felhasználókat (`Account Mgmt.` által kezelve), amint változik ez a lista (aminek minden bemenetének van egy adott aktivitási lejártja) az üzenet publikálásra kerül a releváns `WebSocket`-re ahhoz, hogy a felhasználó megjelenített aktív felhasználó listája frissüljön.
+> A szolgáltatási réteg egyetlen belépési pontja, minden platformbéli interakció ezen keresztül érhető el, általános `routing` szerepkör; közvetíti a bejövő kérést a megfelelő belső micro-service-hez, miközben a felhasználónak egyetlen külső pontot definiálunk;
+> Kiegészítő a valós idejű megvalósításhoz, hogy a különböző csatorna-routing-ot is ez a service fogja végezni (jön egy kérés egy adott `WebSocket` csatorna eléréséhez, akkor ez fogja továbbítani a releváns service-hez). Pl. egy ilyen funkcionalitás az online státusz: Redis-ben lehet tárolni az aktív felhasználókat (`Account Mgmt.` által kezelve), amint változik ez a lista (aminek minden bemenetének van egy adott aktivitási lejártja) az üzenet publikálásra kerül a releváns `WebSocket`-re ahhoz, hogy a felhasználó megjelenített aktív felhasználó listája frissüljön valós időben;  
+> További funkcionalitás a biztonsági réteg megvalósítása, hiszen ez a micro-service nem fogja a védett útvonalakra beengedni a kérést, amennyiben nem rendelkezik a megfelelő authorizációs token-nel.
 
 2. Account-Mgmt. service
 
-> Feladata felhasználók kezelése, beleértve az autentikációt és az aktív felhasználói lista kezelését.
-> Karbantartja a listát az aktív felhasználókkal, folyamatosan publish-olva üzeneteket a megfelelő csatornákra.
+> Feladata felhasználók kezelése és azok létrehozása, valamint kiállítja a megfelelő authorizációs tokeneket,  
+> Karbantartja a listát az aktív felhasználókkal, folyamatosan publish-olva üzeneteket a megfelelő csatornákra,  
+> Felhasználói jogkörök kezelése.
 
 3. Memo-Mgmt. service
 
-> Feladata a memo-k kezelése, beleértve azok létrehozását, keresését, reakciók menedzsmentjét, stb.
+> Feladata a memo-k kezelése, beleértve azok létrehozását, köztük való keresés megvalósítása, kilistázása, stb.
 
 4. Activity-Mgmt. service
 
 > Az aktivitási hőtérkép létrehozásához feladata, hogy "elfogyassza" a platformon történő interakciókat.
-> Akár feladata összevonható az `Account-Mgmt.`-el.
+> Akár feladata összevonható az `Notifications-Mgmt.`-el.
 
 5. Notifications service
 
-> Értesítések kezelése.
+> Értesítések kezelése, a platformon történő érdekes események közlése az éppen aktív felhasználóknak,  
+> Események tárolása, amennyiben a felhasználók épp nem aktívak.  
+
+6. Hub-Mgmt. service
+
+> Feladata a hub-ok kezelése, beleértve azok létrehozását, a csatlakozási kérelmek menedzsmentje, kilistázása, stb.
+
+Megtörténhet, hogy az `Activity-Mgmt.` és `Notifications` szolgáltatásait összevonom egyetlen micro-service-ben `Activity-Notifications-Mgmt.` alatt, másképp önmagukban feltételezhetően túl egyszerűek lennének.
+
+### Rövid technológia összefoglaló
+
+Front-end összefoglaló:
+
+- Nyelv: `Typescript`,
+- Keretrendszer: `Next.js`,
+- Komponenskönyvtár: `MaterialUI`.
+
+Back-end összefoglaló:
+
+- NoSQL adatbázis: `MongoDB`,
+- Cache megoldás: `Redis`
+- Általános back-end keretrendszer: `Spring Boot` (micro-service-k implementálására, pl. Spring JPA, Spring Repository, Spring WebFlux, háromrétegű architektúra),
+- Üzenet broker (in-cluster): `Kafka (és/vagy RabbitMQ)`,
+- Infrastruktúra és DevOps: `Terraform` (K8S cluster létrehozása), `K8S és Helm`.
+
+Kiegészítő egyéb technológiák: `WebSocket és STOMP`, `Spring Reactive Gateway`.
 
 ### Üzenetsor és valósidejűség
 
-Több platformbéli folyamat is van amikor előtérbe kerül a valósidejűség és az üzenetsorok alkalmazása, de elmondhatom azt, hogy egyaránt jelen lesznek szinkron és aszinkron kommunikációs flow-k.
+Több platformbéli folyamat is van amikor előtérbe kerül a valósidejűség és az üzenetsorok alkalmazása az aszinkron kommunikáció alkalmazására, de elmondhatom azt, hogy egyaránt jelen lesznek szinkron és aszinkron kommunikációs flow-k is.
 
 Tipikus szinkron folyamatok:
 
 - autentikáció, felhasználói bejelentkezések, stb., hiszen ekkor szükségünk a válaszra;
-- memo-k létrehozása, reakciók, keresés, stb.
+- memo-k létrehozása, reakciók közlése, listázás, stb.;
+- hub-k létrehozása, csatlakozási kérelmek, azok elfogadása;
 
 Aszinkron flow-k:
 
-- aktív felhasználók: `WebSocket` alapú megvalósítása, hogy minden aktív és bejelentkezett felhasználó folyamatos képet kapjon az éppen jelenlevő felhasználókról; elképzelése, hogy mivel minden platformbéli művelet keresztül megy a `Gateway`-n, ezért az akár publikált egy gyors üzenetet az üzenetsorra, amit kiolvas az `Account Mgmt.` és karbantartja az éppen aktív felhasználók listáját (értsd. tovább publish-olja a megfelelő `WebSocket`-re).
-- értesítések: minden platformbéli jelentős tevékenység értesítés formájában közlésre kerül; elképzelés, hogy az ilyen események a releváns service által közlésre kerülnek egy üzenetsorban, és mivel ezek közlése egy aszinkron folyamat ezért kiolvassa a `Notifications svc.` és ugyancsak közli a megfelelő `WebSocket`-re a felhasználóknak. Minden értesítés minden felhasználóhoz megérkezik, aki éppen nem aktív következő bejelentkezéskor kapja azt meg.
-- aktivitási hőtérkép: minden platformbéli tevékenység (memo-kkal kapcsolatos) rögzítésre kerül, hogy egy általános hőtérképet jelenítsünk meg az aktivitásról (értsd. GitLab vagy GitHub-szerűen); amikor ilyen tevékenység merül fel a releváns service közli azt az üzenetsorban, amit kiolvas az `Activity Mgmt.` és karbantartja ezt a hőtérképet (értelemszerűen ennek is meglesz a megfelelő csatornája a felhasználóknak).
+- Aktív felhasználók: `WebSocket` alapú megvalósítása, hogy minden aktív és bejelentkezett felhasználó folyamatos képet kapjon az éppen jelenlevő felhasználókról (hub-on belül és kívül).
+- Értesítések: minden platformbéli érdekes esemény értesítés formájában közlésre kerül az éppen aktív és érintett felhasználóknak; elképzelés, hogy az ilyen események a releváns service által közlésre kerülnek egy üzenetsorban, és mivel ezek közlése egy aszinkron folyamat ezért kiolvassa a `Notifications svc.` és ugyancsak közli a megfelelő `WebSocket`-re a felhasználóknak. Minden értesítés minden érintett aktív felhasználóhoz megérkezik, aki éppen nem aktív következő bejelentkezéskor kapja azt meg.
+- Aktivitási hőtérkép: minden platformbéli tevékenység (memo-kkal kapcsolatos) rögzítésre kerül, hogy egy általános hőtérképet jelenítsünk meg az aktivitásról (értsd. GitLab vagy GitHub-szerűen); amikor ilyen tevékenység merül fel a releváns service közli azt az üzenetsorban, amit kiolvas az `Activity Mgmt.` és karbantartja ezt a hőtérképet (értelemszerűen ennek is meglesz a megfelelő csatornája a felhasználóknak).
