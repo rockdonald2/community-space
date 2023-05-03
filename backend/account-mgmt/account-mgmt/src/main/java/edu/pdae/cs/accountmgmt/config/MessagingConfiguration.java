@@ -1,110 +1,33 @@
 package edu.pdae.cs.accountmgmt.config;
 
-import edu.pdae.cs.accountmgmt.model.dto.UserPresenceNotificationDTO;
 import lombok.RequiredArgsConstructor;
-import org.apache.kafka.clients.admin.NewTopic;
-import org.apache.kafka.clients.producer.ProducerConfig;
-import org.apache.kafka.common.serialization.StringDeserializer;
-import org.apache.kafka.common.serialization.StringSerializer;
-import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
+import org.springframework.amqp.rabbit.connection.ConnectionFactory;
+import org.springframework.amqp.rabbit.core.RabbitAdmin;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
+import org.springframework.amqp.support.converter.Jackson2JsonMessageConverter;
+import org.springframework.amqp.support.converter.MessageConverter;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.kafka.annotation.EnableKafka;
-import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
-import org.springframework.kafka.config.TopicBuilder;
-import org.springframework.kafka.core.*;
-import org.springframework.kafka.support.converter.ByteArrayJsonMessageConverter;
-import org.springframework.kafka.support.converter.RecordMessageConverter;
-import org.springframework.kafka.support.serializer.JsonDeserializer;
-import org.springframework.kafka.support.serializer.JsonSerializer;
-
-import java.util.HashMap;
-import java.util.Map;
 
 @Configuration
 @RequiredArgsConstructor
-@EnableKafka
 public class MessagingConfiguration {
 
-    public static final String ACTIVE_STATUS_TOPIC = "cs.account-mgmt.active-status-topic";
-    public static final String ACTIVE_STATUS_BROADCAST_TOPIC = "cs.account-mgmt.active-status-broadcast-topic";
-
-    private final KafkaProperties kafkaProperties;
-
     @Bean
-    public KafkaAdmin kafkaAdmin() {
-        final Map<String, Object> configs = new HashMap<>(kafkaProperties.buildAdminProperties());
-        return new KafkaAdmin(configs);
+    public RabbitAdmin rabbitAdmin(ConnectionFactory connectionFactory) {
+        return new RabbitAdmin(connectionFactory);
     }
 
     @Bean
-    public ProducerFactory<String, UserPresenceNotificationDTO> presenceProducerFactory() {
-        final Map<String, Object> configs = new HashMap<>(kafkaProperties.buildProducerProperties());
-
-        configs.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-        configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
-
-        return new DefaultKafkaProducerFactory<>(configs);
+    public MessageConverter jsonMessageConverter() {
+        return new Jackson2JsonMessageConverter();
     }
 
     @Bean
-    public ProducerFactory<String, Void> broadcastProducerFactory() {
-        final Map<String, Object> configs = new HashMap<>(kafkaProperties.buildProducerProperties());
-
-        configs.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
-
-        return new DefaultKafkaProducerFactory<>(configs);
-    }
-
-    @Bean
-    public KafkaTemplate<String, UserPresenceNotificationDTO> presenceKafkaTemplate() {
-        return new KafkaTemplate<>(presenceProducerFactory());
-    }
-
-    @Bean
-    public KafkaTemplate<String, Void> broadcastKafkaTemplate() {
-        return new KafkaTemplate<>(broadcastProducerFactory());
-    }
-
-    @Bean
-    public ConsumerFactory<String, UserPresenceNotificationDTO> presenceConsumerFactory() {
-        final Map<String, Object> props = new HashMap<>(kafkaProperties.buildConsumerProperties());
-        return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), new JsonDeserializer<>(UserPresenceNotificationDTO.class));
-    }
-
-    @Bean
-    public ConsumerFactory<String, Void> broadcastConsumerFactory() {
-        final Map<String, Object> props = new HashMap<>(kafkaProperties.buildConsumerProperties());
-        return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), null);
-    }
-
-    @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, UserPresenceNotificationDTO> presenceKafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, UserPresenceNotificationDTO> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(presenceConsumerFactory());
-        return factory;
-    }
-
-    @Bean
-    public ConcurrentKafkaListenerContainerFactory<String, Void> broadcastKafkaListenerContainerFactory() {
-        ConcurrentKafkaListenerContainerFactory<String, Void> factory = new ConcurrentKafkaListenerContainerFactory<>();
-        factory.setConsumerFactory(broadcastConsumerFactory());
-        return factory;
-    }
-
-    @Bean
-    public RecordMessageConverter messageConverter() {
-        return new ByteArrayJsonMessageConverter();
-    }
-
-    @Bean
-    public NewTopic activeStatusTopic() {
-        return TopicBuilder.name(ACTIVE_STATUS_TOPIC).build();
-    }
-
-    @Bean
-    public NewTopic activeStatusBroadcastTopic() {
-        return TopicBuilder.name(ACTIVE_STATUS_BROADCAST_TOPIC).build();
+    public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
+        final RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
+        rabbitTemplate.setMessageConverter(jsonMessageConverter());
+        return rabbitTemplate;
     }
 
 }

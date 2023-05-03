@@ -52,7 +52,6 @@ public class StatusServiceImpl implements StatusService {
 
         final Date currDate = new Date();
 
-        // TODO: put this logic outside
         if (!force) {
             final Date lastModified = opsForValueLastModified.get(STATUS_ACTIVE_LAST_MODIFIED);
 
@@ -95,7 +94,6 @@ public class StatusServiceImpl implements StatusService {
 
         final Date currDate = new Date();
 
-        // TODO: put this logic outside
         if (!force) {
             final Date lastModified = opsForValueLastModified.get(STATUS_INACTIVE_LAST_MODIFIED);
 

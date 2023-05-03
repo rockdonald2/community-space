@@ -39,7 +39,7 @@ public class AccountManagementRouter implements BaseRouter {
                 .route(r -> r
                         .method("GET", "POST")
                         .and()
-                        .path("/stomp/users/**")
+                        .path("/stomp/account/**")
                         .uri(accountManagementAddress));
     }
 
@@ -48,7 +48,7 @@ public class AccountManagementRouter implements BaseRouter {
         return Map.of(
                 "^/api/v1/sessions$", List.of("POST", "GET"),
                 "^/api/v1/users$", List.of("POST"),
-                "^/stomp/users/.*$", List.of("GET", "POST")
+                "^/stomp/account/.*$", List.of("GET", "POST")
         );
     }
 

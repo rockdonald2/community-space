@@ -14,17 +14,31 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
     @Value("${cs.cors.allowed-origins}")
     private String corsOrigins;
 
+    @Value("${spring.rabbitmq.host}")
+    private String relayHost;
+
+    @Value("${spring.rabbitmq.relay.port}")
+    private int relayPort;
+
+    @Value("${spring.rabbitmq.username}")
+    private String relayUser;
+
+    @Value("${spring.rabbitmq.password}")
+    private String relayPwd;
+
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/stomp/users").setAllowedOrigins(corsOrigins).withSockJS(); // this is the WS endpoint
+        registry.addEndpoint("/stomp/account").setAllowedOrigins(corsOrigins).withSockJS(); // this is the WS endpoint
     }
 
     @Override
     public void configureMessageBroker(MessageBrokerRegistry registry) {
-        registry.setApplicationDestinationPrefixes("/ws"); // prefix for controller endpoints
-        registry.enableSimpleBroker("/wb"); // prefix for broker endpoints
-        registry.setPreservePublishOrder(true);
-        // TODO: integrate rabbitmq as external broker
+        registry.setApplicationDestinationPrefixes("/exchange") // prefix for controller endpoints
+                .enableStompBrokerRelay("/topic")
+                .setRelayHost(relayHost)
+                .setRelayPort(relayPort)
+                .setClientLogin(relayUser)
+                .setClientPasscode(relayPwd);
     }
 
 }

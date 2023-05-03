@@ -47,3 +47,13 @@ services:
     restart: unless-stopped
     ports:
       - '6379:6379'
+  rabbit:
+    image: rabbitmq:3.9.7-management
+    container_name: rabbit
+    restart: unless-stopped
+    ports:
+      - 5672:5672
+      - 15672:15672
+      - 61613:61613
+    volumes:
+      - "./rabbitmq/enabled-plugins:/etc/rabbitmq/enabled_plugins"

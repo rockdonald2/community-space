@@ -11,13 +11,13 @@ const PresenceContextProvider = ({ children, user }: { children: React.ReactNode
     const [presence, setPresence] = useState<UserPresence[]>(null);
     const stompClient = useStompClient();
 
-    useSubscription('/wb/status-broadcast', (msg) => setPresence(JSON.parse(msg.body) as UserPresence[]));
+    useSubscription('/topic/status-broadcast', (msg) => setPresence(JSON.parse(msg.body) as UserPresence[]));
 
     const ping = useCallback(
         (status: 'ONLINE' | 'OFFLINE') => {
             try {
                 stompClient?.publish({
-                    destination: '/ws/status-notify',
+                    destination: '/exchange/status-notify',
                     body: JSON.stringify({
                         email: user.email,
                         status,

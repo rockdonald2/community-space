@@ -1,13 +1,10 @@
 package edu.pdae.cs.accountmgmt.listener;
 
-import edu.pdae.cs.accountmgmt.config.MessagingConfiguration;
 import edu.pdae.cs.accountmgmt.model.dto.UserPresenceDTO;
 import edu.pdae.cs.accountmgmt.model.dto.UserPresenceNotificationDTO;
-import edu.pdae.cs.accountmgmt.service.MessagingService;
 import edu.pdae.cs.accountmgmt.service.StatusService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.kafka.annotation.KafkaListener;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -15,7 +12,6 @@ import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -23,33 +19,10 @@ import java.util.concurrent.TimeUnit;
 @Controller
 public class StatusListener {
 
+    private static final String STATUS_BROADCAST = "/topic/status-broadcast";
+
     private final StatusService statusService;
     private final SimpMessagingTemplate messagingTemplate;
-    private final MessagingService messagingService;
-
-    @KafkaListener(topics = MessagingConfiguration.ACTIVE_STATUS_TOPIC,
-            groupId = "cs-account-mgmt.active-status-group",
-            autoStartup = "true",
-            containerFactory = "presenceKafkaListenerContainerFactory")
-    @Transactional
-    public void statusListener(@Payload UserPresenceNotificationDTO presenceNotificationDTO) {
-        log.info("Caught internal message for presence update for {}", presenceNotificationDTO);
-
-        updateStatus(presenceNotificationDTO);
-        messagingService.sendMessageForActiveStatusBroadcast();
-    }
-
-    @KafkaListener(topics = MessagingConfiguration.ACTIVE_STATUS_BROADCAST_TOPIC,
-            groupId = "${random.uuid}", // random as this meant to be a broadcast topic, each consumer should get it
-            autoStartup = "true",
-            containerFactory = "broadcastKafkaListenerContainerFactory")
-    @Transactional(readOnly = true)
-    public void broadcastListener() {
-        log.info("Caught internal message for presence broadcast");
-
-        final Set<UserPresenceDTO> actives = statusService.getAllActive(true);
-        messagingTemplate.convertAndSend("/wb/status-broadcast", actives);
-    }
 
     @MessageMapping("/status-notify") // handles messages coming to /ws/status-notify
     @Transactional
@@ -57,7 +30,7 @@ public class StatusListener {
         log.info("Caught external (user) message for presence update for {}", presenceNotificationDTO);
 
         updateStatus(presenceNotificationDTO);
-        messagingService.sendMessageForActiveStatusBroadcast();
+        messagingTemplate.convertAndSend(STATUS_BROADCAST, statusService.getAllActive(true));
     }
 
     @Scheduled(fixedDelayString = "${cs.status.broadcast.interval.minutes}", timeUnit = TimeUnit.MINUTES)
@@ -65,10 +38,7 @@ public class StatusListener {
     public void broadcastStatus() {
         log.info("Broadcasting presence status");
 
-        // TODO: save last broadcast time and only broadcast if there are changes since last broadcast
-
-        final Set<UserPresenceDTO> actives = statusService.getAllActive(false);
-        messagingTemplate.convertAndSend("/wb/status-broadcast", actives);
+        messagingTemplate.convertAndSend(STATUS_BROADCAST, statusService.getAllActive(false));
     }
 
     @Scheduled(fixedDelayString = "${cs.status.cleanup.interval.minutes}", timeUnit = TimeUnit.MINUTES)
@@ -77,6 +47,7 @@ public class StatusListener {
         log.info("Cleaning up presence status");
 
         statusService.removeInactives(false);
+        messagingTemplate.convertAndSend(STATUS_BROADCAST, statusService.getAllActive(false));
     }
 
     private void updateStatus(UserPresenceNotificationDTO presenceNotificationDTO) {

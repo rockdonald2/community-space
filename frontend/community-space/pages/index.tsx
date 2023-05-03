@@ -5,7 +5,7 @@ import MessagingWrapper from '@/utils/MessagingWrapper';
 import PresenceContextProvider from '@/utils/PresenceContext';
 import { Divider, Grid } from '@mui/material';
 import Head from 'next/head';
-import { GATEWAY_USERS_WS } from '@/utils/Constants';
+import { GATEWAY_ACCOUNT_WS } from '@/utils/Constants';
 import Activity from '@/components/Activity';
 
 export default function Home() {
@@ -19,7 +19,7 @@ export default function Home() {
             <main>
                 <Grid container>
                     <Grid item xs={4}>
-                        <MessagingWrapper url={GATEWAY_USERS_WS}>
+                        <MessagingWrapper url={GATEWAY_ACCOUNT_WS}>
                             <PresenceContextProvider user={user}>
                                 <Presence />
                             </PresenceContextProvider>
