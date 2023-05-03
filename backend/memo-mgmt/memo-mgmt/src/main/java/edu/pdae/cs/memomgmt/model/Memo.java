@@ -26,6 +26,7 @@ public class Memo {
     private Date createdOn;
     private Visibility visibility;
     private Urgency urgency;
+    private ObjectId hubId;
 
     public enum Visibility {
         PUBLIC,

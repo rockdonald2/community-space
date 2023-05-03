@@ -40,12 +40,14 @@ public class MemoController {
 
     @GetMapping("/{id}")
     public MemoDetailsDTO get(@PathVariable("id") ObjectId id) {
+        log.info("Getting memo {}", id);
         return modelMapper.map(memoRepository.findById(id).orElseThrow(), MemoDetailsDTO.class);
     }
 
     @GetMapping
-    public List<MemoDTO> gets(@RequestParam("createdAfter") @DateTimeFormat(pattern="yyyy-MM-dd") Optional<Date> createdAfter, @RequestParam("visibility") Optional<Memo.Visibility> visibility, @RequestHeader("X-AUTH-TOKEN-SUBJECT") String user) {
+    public List<MemoDTO> gets(@RequestParam("createdAfter") @DateTimeFormat(pattern = "yyyy-MM-dd") Optional<Date> createdAfter, @RequestParam("visibility") Optional<Memo.Visibility> visibility, @RequestHeader("X-AUTH-TOKEN-SUBJECT") String user) {
         Objects.requireNonNull(user);
+        log.info("Getting all memos");
 
         if (createdAfter.isPresent() && visibility.isPresent()) {
             return memoService.getAllAfterAndByVisibility(createdAfter.get(), visibility.get(), user);
@@ -95,8 +97,10 @@ public class MemoController {
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable("id") ObjectId id) {
+    public ResponseEntity<Void> delete(@PathVariable("id") ObjectId id) {
+        log.info("Deleting memo {}", id);
         memoRepository.deleteById(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @ExceptionHandler(NullPointerException.class)

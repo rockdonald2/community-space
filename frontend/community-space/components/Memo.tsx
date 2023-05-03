@@ -196,7 +196,7 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                     <DialogActions>
                         <Button
                             variant='outlined'
-                            color='warning'
+                            color='primary'
                             endIcon={<EditIcon />}
                             onClick={() => setUserUpdatingMemo(true)}
                         >

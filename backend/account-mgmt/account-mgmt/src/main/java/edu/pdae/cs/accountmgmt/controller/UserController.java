@@ -5,7 +5,6 @@ import edu.pdae.cs.accountmgmt.model.dto.UserCreationResponseDTO;
 import edu.pdae.cs.accountmgmt.model.dto.UserDTO;
 import edu.pdae.cs.accountmgmt.model.dto.UserDetailsDTO;
 import edu.pdae.cs.accountmgmt.repository.UserRepository;
-import edu.pdae.cs.accountmgmt.service.MessagingService;
 import edu.pdae.cs.accountmgmt.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -29,7 +28,6 @@ public class UserController {
     private final UserRepository userRepository;
     private final UserService userService;
     private final ModelMapper modelMapper;
-    private final MessagingService messagingService;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
@@ -40,20 +38,24 @@ public class UserController {
 
     @GetMapping("/{id}")
     public UserDetailsDTO get(@PathVariable("id") ObjectId id) {
+        log.info("Getting user {}", id);
         return modelMapper.map(userRepository.findById(id).orElseThrow(), UserDetailsDTO.class);
     }
 
     @GetMapping
     public List<UserDTO> gets(@RequestParam("email") Optional<String> email) {
+        log.info("Getting all users");
         return email
                 .map(s -> Collections.singletonList(modelMapper.map(userRepository.findByEmail(s).orElseThrow(), UserDTO.class)))
-                .orElseGet(() -> userRepository.findAll().stream().map(user -> modelMapper.map(user, UserDTO.class)).toList()); // ! find-all anti-pattern
+                .orElseGet(() -> userRepository.findAll().stream().map(user -> modelMapper.map(user, UserDTO.class)).toList());
     }
 
     @DeleteMapping("/{id}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void delete(@PathVariable("id") ObjectId id) {
+    public ResponseEntity<Void> delete(@PathVariable("id") ObjectId id) {
+        log.info("Deleting user {}", id);
         userRepository.deleteById(id);
+        return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
     @ExceptionHandler(NoSuchElementException.class)
