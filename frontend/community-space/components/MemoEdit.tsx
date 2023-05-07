@@ -105,7 +105,7 @@ const MemoEdit = ({
                     cleanupCallback();
                 }
 
-                mutate({ key: 'memos', token: user.token, hubId: memo.hubId });
+                mutate({ key: 'memos', token: user.token, hubId: hubId });
                 setMsg('');
                 setTitle('');
                 setUrgency('');
