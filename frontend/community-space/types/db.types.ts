@@ -1,5 +1,3 @@
-import { type } from 'os';
-
 export type User = {
     email: string;
     firstName: string;
@@ -25,6 +23,7 @@ export type Memo = {
     createdOn: Date;
     visibility: Visibility;
     urgency: Urgency;
+    hubId: string;
 };
 
 export type MemoShort = {
@@ -34,6 +33,7 @@ export type MemoShort = {
     createdOn: Date;
     visibility: Visibility;
     urgency: Urgency;
+    hubId: string;
 };
 
 export type Hub = {

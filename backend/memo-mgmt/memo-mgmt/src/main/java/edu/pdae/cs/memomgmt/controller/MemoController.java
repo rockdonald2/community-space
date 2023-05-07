@@ -33,6 +33,7 @@ public class MemoController {
 
         final Memo reqMemo = modelMapper.map(memoCreationDTO, Memo.class);
         reqMemo.setCreatedOn(new Date());
+        reqMemo.setId(null); // TODO: fix this
 
         final Memo createdMemo = memoRepository.save(reqMemo);
         return modelMapper.map(createdMemo, MemoCreationResponseDTO.class);
@@ -45,16 +46,24 @@ public class MemoController {
     }
 
     @GetMapping
-    public List<MemoDTO> gets(@RequestParam("createdAfter") @DateTimeFormat(pattern = "yyyy-MM-dd") Optional<Date> createdAfter, @RequestParam("visibility") Optional<Memo.Visibility> visibility, @RequestHeader("X-AUTH-TOKEN-SUBJECT") String user) {
+    public List<MemoDTO> gets(@RequestParam("createdAfter") @DateTimeFormat(pattern = "yyyy-MM-dd") Optional<Date> createdAfter, @RequestParam("visibility") Optional<Memo.Visibility> visibility, @RequestParam("hubId") Optional<ObjectId> hubId, @RequestHeader("X-AUTH-TOKEN-SUBJECT") String user) {
         Objects.requireNonNull(user);
         log.info("Getting all memos");
 
-        if (createdAfter.isPresent() && visibility.isPresent()) {
+        if (createdAfter.isPresent() && visibility.isPresent() && hubId.isPresent()) {
+            return memoService.getAllAfterByHubIdAndByVisibility(createdAfter.get(), visibility.get(), hubId.get(), user);
+        } else if (createdAfter.isPresent() && hubId.isPresent()) {
+            return memoService.getAllAfterByHubId(createdAfter.get(), hubId.get(), user);
+        } else if (visibility.isPresent() && hubId.isPresent()) {
+            return memoService.getAllByHubIdAndByVisibility(hubId.get(), visibility.get(), user);
+        } else if (createdAfter.isPresent() && visibility.isPresent()) {
             return memoService.getAllAfterAndByVisibility(createdAfter.get(), visibility.get(), user);
         } else if (createdAfter.isPresent()) {
             return memoService.getAllAfter(createdAfter.get(), user);
         } else if (visibility.isPresent()) {
             return memoService.getAllByVisibility(visibility.get(), user);
+        } else if (hubId.isPresent()) {
+            return memoService.getAllByHubId(hubId.get(), user);
         }
 
         return memoService.getAll(user); // ! find-all anti-pattern

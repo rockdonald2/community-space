@@ -36,7 +36,7 @@ public class StatusServiceImpl implements StatusService {
     @Value("${cs.status.cleanup.interval.minutes}")
     private int cleanIntervalMinutes;
 
-    @Value("${cs.status.broadcast.interval.minutes}")
+    @Value("${cs.status.broadcast.interval.minutes:1}")
     private int broadcastIntervalMinutes;
 
     @PostConstruct

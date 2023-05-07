@@ -5,6 +5,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import org.bson.types.ObjectId;
 
 @Data
 @Builder
@@ -17,5 +18,6 @@ public class MemoCreationDTO {
     private String content;
     private Memo.Visibility visibility;
     private Memo.Urgency urgency;
+    private ObjectId hubId;
 
 }

@@ -23,6 +23,7 @@ const MemoEdit = ({
     initialState,
     isUpdateMode = false,
     memoId = '',
+    hubId,
     cleanupCallback,
 }: {
     initialState?: {
@@ -33,6 +34,7 @@ const MemoEdit = ({
     };
     isUpdateMode?: boolean;
     memoId?: string;
+    hubId: string;
     cleanupCallback?: () => void;
 }) => {
     const { user } = useAuthContext();
@@ -80,6 +82,7 @@ const MemoEdit = ({
                         title,
                         visibility,
                         urgency,
+                        hubId,
                     };
                     url = `${GATEWAY_URL}/api/v1/memos`;
                 }
@@ -102,7 +105,7 @@ const MemoEdit = ({
                     cleanupCallback();
                 }
 
-                mutate({ token: user.token });
+                mutate({ key: 'memos', token: user.token, hubId: memo.hubId });
                 setMsg('');
                 setTitle('');
                 setUrgency('');
@@ -115,7 +118,7 @@ const MemoEdit = ({
         };
 
         handleAsync();
-    }, [user?.token, user.email, visibility, urgency, msg, title, isError]);
+    }, [title, msg, urgency, isUpdateMode, user.token, user.email, cleanupCallback, visibility, memoId, hubId]);
 
     return (
         <Item>

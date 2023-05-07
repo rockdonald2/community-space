@@ -15,7 +15,7 @@ const Hub = () => {
     const { user } = useAuthContext();
 
     const { data, error, isLoading, isValidating } = useSWR<HubType | ErrorResponse>(
-        { token: user.token, hubId: hubId },
+        { key: 'hub', token: user.token, hubId: hubId },
         swrHubFetcherWithAuth,
         {
             revalidateOnMount: true,
@@ -80,7 +80,7 @@ const Hub = () => {
                         </Typography>
                     </Container>
                     <Divider sx={{ mb: 1.5 }} />
-                    <Memos />
+                    <Memos hubId={hubId} />
                 </Grid>
             </Grid>
         </>

@@ -25,4 +25,12 @@ public interface MemoRepository extends MongoRepository<Memo, ObjectId> {
 
     List<Memo> getMemosByCreatedOnAfterAndVisibilityAndAuthor(Date date, Memo.Visibility visibility, String author);
 
+    List<Memo> getMemosByHubId(ObjectId hubId);
+
+    List<Memo> getMemosByHubIdAndVisibility(ObjectId hubId, Memo.Visibility visibility);
+
+    List<Memo> getMemosByCreatedOnAfterAndHubId(Date date, ObjectId hubId);
+
+    List<Memo> getMemosByCreatedOnAfterAndHubIdAndVisibility(Date date, ObjectId hubId, Memo.Visibility visibility);
+
 }

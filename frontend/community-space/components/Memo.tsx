@@ -94,7 +94,7 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                 }
 
                 setMemoOpen(false);
-                mutate({ token: user.token });
+                mutate({ key: 'memos', token: user.token, hubId: memo.hubId });
             } catch (err) {
                 console.debug(err.message, err);
                 setUserInputError(true);
@@ -102,7 +102,7 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
         };
 
         handleAsync();
-    }, [user?.token, memo?.id]);
+    }, [memo.id, user.token]);
 
     return (
         <>
@@ -177,6 +177,7 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                                 content: data.content,
                             }}
                             memoId={memo.id}
+                            hubId={memo.hubId}
                             isUpdateMode
                             cleanupCallback={() => {
                                 setUserUpdatingMemo(false);

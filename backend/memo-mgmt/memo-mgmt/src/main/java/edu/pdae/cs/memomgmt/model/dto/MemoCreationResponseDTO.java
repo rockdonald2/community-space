@@ -17,5 +17,6 @@ public class MemoCreationResponseDTO {
     private String title;
     private String author;
     private Date createdOn;
+    private String hubId;
 
 }

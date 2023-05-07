@@ -20,5 +20,6 @@ public class MemoDTO {
     private Date createdOn;
     private Memo.Visibility visibility;
     private Memo.Urgency urgency;
+    private String hubId;
 
 }

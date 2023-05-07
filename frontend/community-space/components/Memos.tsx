@@ -29,12 +29,12 @@ import MemoEdit from './MemoEdit';
 import SearchIcon from '@mui/icons-material/Search';
 import { ChangeEvent, Dispatch, SetStateAction, useState } from 'react';
 
-const Memos = () => {
+const Memos = ({ hubId }: { hubId?: string }) => {
     const theme = useTheme();
 
     const { user } = useAuthContext();
     const { data, error, isLoading, isValidating } = useSWR<MemoType[] | ErrorResponse>(
-        { token: user.token },
+        { key: 'memos', token: user.token, hubId: hubId },
         swrRecentMemosFetcherWithAuth,
         {
             revalidateOnMount: true,
@@ -93,7 +93,7 @@ const Memos = () => {
 
     return (
         <Stack spacing={2}>
-            <MemoEdit />
+            <MemoEdit hubId={hubId} />
             <Box sx={{ display: 'flex', alignItems: 'flex-end' }}>
                 <SearchIcon sx={{ mr: 1, my: 0.5 }} />
                 <TextField

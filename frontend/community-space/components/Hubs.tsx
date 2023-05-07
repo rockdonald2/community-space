@@ -10,7 +10,7 @@ import HubCard from './HubCard';
 const Hubs = () => {
     const { user } = useAuthContext();
     const { data, error, isLoading, isValidating } = useSWR<Hub[] | ErrorResponse>(
-        { token: user.token },
+        { key: 'hubs', token: user.token },
         swrHubsFetcherWithAuth,
         {
             revalidateOnMount: true,

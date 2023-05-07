@@ -41,9 +41,13 @@ export const boldSelectedElementStyle = (elem: string, container: readonly strin
  * @param args the user's token
  * @returns the recent memos from the repository
  */
-export const swrRecentMemosFetcherWithAuth = async (args: { token: string }) => {
+export const swrRecentMemosFetcherWithAuth = async (args: { key: string; token: string; hubId?: string }) => {
     const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-    const url = `${GATEWAY_URL}/api/v1/memos?createdAfter=${yesterday}`;
+    let url = `${GATEWAY_URL}/api/v1/memos?createdAfter=${yesterday}`;
+
+    if (args.hubId) {
+        url = url.concat(`&hubId=${args.hubId}`);
+    }
 
     const res = await fetch(url, {
         headers: { Authorization: `Bearer ${args.token}` },
@@ -57,7 +61,7 @@ export const swrRecentMemosFetcherWithAuth = async (args: { token: string }) => 
  * @param args the user's token
  * @returns the hubs from the repository
  */
-export const swrHubsFetcherWithAuth = async (args: { token: string }) => {
+export const swrHubsFetcherWithAuth = async (args: { key: string; token: string }) => {
     const url = `${GATEWAY_URL}/api/v1/hubs`;
 
     const res = await fetch(url, {
@@ -72,7 +76,7 @@ export const swrHubsFetcherWithAuth = async (args: { token: string }) => {
  * @param args the user's token and the hub's id
  * @returns the hub from the repository
  */
-export const swrHubFetcherWithAuth = async (args: { token: string; hubId: string }) => {
+export const swrHubFetcherWithAuth = async (args: { key: string; token: string; hubId: string }) => {
     const url = `${GATEWAY_URL}/api/v1/hubs/${args.hubId}`;
 
     const res = await fetch(url, {
