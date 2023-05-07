@@ -1,4 +1,3 @@
-import Memos from '@/components/Memos';
 import Presence from '@/components/Presence';
 import { useAuthContext } from '@/utils/AuthContext';
 import MessagingWrapper from '@/utils/MessagingWrapper';
@@ -7,6 +6,7 @@ import { Divider, Grid } from '@mui/material';
 import Head from 'next/head';
 import { GATEWAY_ACCOUNT_WS } from '@/utils/Constants';
 import Activity from '@/components/Activity';
+import Hubs from '@/components/Hubs';
 
 export default function Home() {
     const { user } = useAuthContext();
@@ -28,7 +28,7 @@ export default function Home() {
                         <Activity />
                     </Grid>
                     <Grid item xs={8}>
-                        <Memos />
+                        <Hubs />
                     </Grid>
                 </Grid>
             </main>

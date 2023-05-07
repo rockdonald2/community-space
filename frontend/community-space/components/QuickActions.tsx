@@ -1,5 +1,6 @@
 import LogoutIcon from '@mui/icons-material/Logout';
 import HomeIcon from '@mui/icons-material/Home';
+import GroupIcon from '@mui/icons-material/Group';
 import { Box, SpeedDial, SpeedDialAction, SpeedDialIcon } from '@mui/material';
 import { useRouter } from 'next/router';
 import { useState, useCallback } from 'react';
@@ -9,6 +10,7 @@ import { useAuthContext } from '@/utils/AuthContext';
 const quickActions: QuickActionType[] = [
     { icon: <LogoutIcon />, name: 'Logout', action: 'signout' },
     { icon: <HomeIcon />, name: 'Back to home', action: 'backToHome' },
+    { icon: <GroupIcon />, name: 'Create Hub', action: 'createHub' },
 ];
 
 const QuickActions = () => {
@@ -21,12 +23,16 @@ const QuickActions = () => {
     const handleAction = useCallback(async (_e: React.MouseEvent<HTMLDivElement>, action: QuickActionActionType) => {
         switch (action) {
             case 'signout': {
-                await signOut();
+                signOut();
                 push('/login');
                 break;
             }
             case 'backToHome': {
                 push('/');
+                break;
+            }
+            case 'createHub': {
+                push('/hub/create');
                 break;
             }
         }

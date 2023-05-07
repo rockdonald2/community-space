@@ -1,3 +1,5 @@
+import { type } from 'os';
+
 export type User = {
     email: string;
     firstName: string;
@@ -32,4 +34,23 @@ export type MemoShort = {
     createdOn: Date;
     visibility: Visibility;
     urgency: Urgency;
+};
+
+export type Hub = {
+    id?: string;
+    name: string;
+    description: string;
+    createdOn: Date;
+    owner: string;
+    members?: string[];
+    waiters?: string[];
+    role?: 'OWNER' | 'MEMBER' | 'WAITER' | 'NONE';
+};
+
+export type HubShort = {
+    id?: string;
+    name: string;
+    description: string;
+    createdOn: Date;
+    owner: string;
 };

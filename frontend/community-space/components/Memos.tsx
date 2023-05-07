@@ -60,6 +60,8 @@ const Memos = () => {
         setState(typeof value === 'string' ? value.split(',') : value);
     };
 
+    if (isLoading || isValidating) return <SkeletonLoader />;
+
     if (error) {
         // this a client error handler
         return (
@@ -69,8 +71,6 @@ const Memos = () => {
             </Alert>
         );
     }
-
-    if (isLoading || isValidating) return <SkeletonLoader />;
 
     if ('status' in data) {
         // if it's an error response, handle accordingly; this is coming from the server

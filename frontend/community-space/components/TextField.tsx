@@ -3,17 +3,19 @@ import React from 'react';
 import styles from '@/styles/TextField.module.scss';
 
 const TextField = ({
-    isError,
+    isError = false,
     helperText,
     handleInput,
     label,
     inner = false,
+    multiline = false,
 }: {
-    isError: boolean;
+    isError?: boolean;
     helperText?: string;
     handleInput: (e: React.ChangeEvent<HTMLInputElement>) => any;
     label: string;
     inner?: boolean;
+    multiline?: boolean;
 }) => {
     return (
         <>
@@ -24,6 +26,8 @@ const TextField = ({
                 onChange={handleInput}
                 helperText={helperText}
                 error={isError}
+                multiline={multiline}
+                rows={multiline ? 4 : 1}
             />
         </>
     );

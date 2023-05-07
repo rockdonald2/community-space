@@ -1,8 +1,12 @@
 package edu.pdae.cs.gateway.route;
 
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.cloud.gateway.route.builder.RouteLocatorBuilder;
+import org.springframework.stereotype.Component;
 
+@Component
+@RequiredArgsConstructor
 public class HubManagementRouter implements BaseRouter {
 
     @Value("${cs.hub-mgmt.address}")
@@ -25,13 +29,13 @@ public class HubManagementRouter implements BaseRouter {
                         .uri(hubManagementAddress)
                 )
                 .route(r -> r
-                        .path("/api/v1/hubs/**/members")
+                        .path("/api/v1/hubs/*/members")
                         .and()
                         .method("GET", "POST")
                         .and()
                         .uri(hubManagementAddress))
                 .route(r -> r
-                        .path("/api/v1/hubs/**/members/**")
+                        .path("/api/v1/hubs/*/members/**")
                         .and()
                         .method("GET", "DELETE")
                         .and()

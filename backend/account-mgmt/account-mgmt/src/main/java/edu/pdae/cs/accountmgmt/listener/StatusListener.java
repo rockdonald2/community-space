@@ -33,14 +33,6 @@ public class StatusListener {
         messagingTemplate.convertAndSend(STATUS_BROADCAST, statusService.getAllActive(true));
     }
 
-    @Scheduled(fixedDelayString = "${cs.status.broadcast.interval.minutes}", timeUnit = TimeUnit.MINUTES)
-    @Transactional
-    public void broadcastStatus() {
-        log.info("Broadcasting presence status");
-
-        messagingTemplate.convertAndSend(STATUS_BROADCAST, statusService.getAllActive(false));
-    }
-
     @Scheduled(fixedDelayString = "${cs.status.cleanup.interval.minutes}", timeUnit = TimeUnit.MINUTES)
     @Transactional
     public void cleanupStatus() {

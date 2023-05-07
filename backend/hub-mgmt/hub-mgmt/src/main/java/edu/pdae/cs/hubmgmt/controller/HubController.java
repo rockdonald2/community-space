@@ -34,6 +34,10 @@ public class HubController {
         Objects.requireNonNull(user);
         log.info("Creating new hub {}", hubCreationDTO.getName());
 
+        if (hubCreationDTO.getName() == null || hubCreationDTO.getName().length() < 3) {
+            throw new IllegalArgumentException("Hub name must be at least 3 characters long");
+        }
+
         final Hub reqHub = modelMapper.map(hubCreationDTO, Hub.class);
         reqHub.setCreatedOn(new Date());
         reqHub.setOwner(user);
@@ -49,9 +53,23 @@ public class HubController {
     }
 
     @GetMapping
-    public List<HubDTO> gets() {
+    public List<HubDTO> gets(@RequestHeader("X-AUTH-TOKEN-SUBJECT") String user) {
         log.info("Getting all hubs");
-        return hubRepository.findAll().stream().map(hub -> modelMapper.map(hub, HubDTO.class)).toList();
+        return hubRepository.findAll().stream().map(hub -> {
+            final HubDTO hubDTO = modelMapper.map(hub, HubDTO.class);
+
+            if (hub.getOwner().equals(user)) {
+                hubDTO.setRole(HubDTO.Role.OWNER);
+            } else if (hub.getMembers().contains(user)) {
+                hubDTO.setRole(HubDTO.Role.MEMBER);
+            } else if (hub.getWaiting().contains(user)) {
+                hubDTO.setRole(HubDTO.Role.WAITING);
+            } else {
+                hubDTO.setRole(HubDTO.Role.NONE);
+            }
+
+            return hubDTO;
+        }).toList();
     }
 
     @PatchMapping("/{id}")
@@ -183,7 +201,7 @@ public class HubController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
-    @ExceptionHandler(NullPointerException.class)
+    @ExceptionHandler({NullPointerException.class, IllegalArgumentException.class})
     public ResponseEntity<Void> nullHandler() {
         return ResponseEntity.badRequest().build();
     }

@@ -40,7 +40,7 @@ export interface IUserContext {
     signIn: (user: UserSignIn) => Promise<{ user?: User; error?: { code: number; msg: string } }>;
 }
 
-export type QuickActionActionType = 'signout' | 'backToHome';
+export type QuickActionActionType = 'signout' | 'backToHome' | 'createHub';
 
 export type QuickActionType = {
     icon: any;

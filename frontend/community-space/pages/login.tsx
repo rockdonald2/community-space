@@ -88,7 +88,7 @@ function Login() {
                 </Stack>
             </form>
             <Divider flexItem className={styles['form__divider']} />
-            <Button href='/register' LinkComponent={Link} variant='text' className={styles['register__button']}>
+            <Button href='/register' LinkComponent={Link} variant='text' className={styles['login__button']}>
                 You don't have an account yet? Register now!
             </Button>
         </Stack>
