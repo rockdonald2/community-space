@@ -29,7 +29,7 @@ import MemoEdit from './MemoEdit';
 import SearchIcon from '@mui/icons-material/Search';
 import { ChangeEvent, Dispatch, SetStateAction, useState } from 'react';
 
-const Memos = ({ hubId }: { hubId?: string }) => {
+const Memos = ({ hubId }: { hubId?: string | string[] }) => {
     const theme = useTheme();
 
     const { user } = useAuthContext();

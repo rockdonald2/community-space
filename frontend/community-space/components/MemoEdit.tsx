@@ -34,7 +34,7 @@ const MemoEdit = ({
     };
     isUpdateMode?: boolean;
     memoId?: string;
-    hubId: string;
+    hubId: string | string[];
     cleanupCallback?: () => void;
 }) => {
     const { user } = useAuthContext();
