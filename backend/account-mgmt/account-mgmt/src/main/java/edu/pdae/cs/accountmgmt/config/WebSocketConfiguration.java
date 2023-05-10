@@ -3,11 +3,14 @@ package edu.pdae.cs.accountmgmt.config;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.messaging.simp.config.MessageBrokerRegistry;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.web.socket.config.annotation.EnableWebSocket;
 import org.springframework.web.socket.config.annotation.EnableWebSocketMessageBroker;
 import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
 @Configuration
+@EnableWebSocket
 @EnableWebSocketMessageBroker
 public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer {
 
@@ -28,7 +31,8 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
 
     @Override
     public void registerStompEndpoints(StompEndpointRegistry registry) {
-        registry.addEndpoint("/stomp/account").setAllowedOrigins(corsOrigins).withSockJS(); // this is the WS endpoint
+        registry.addEndpoint("/stomp/account").setAllowedOrigins(corsOrigins);
+        registry.addEndpoint("/stomp/account").setAllowedOrigins(corsOrigins).withSockJS();
     }
 
     @Override
@@ -38,7 +42,8 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
                 .setRelayHost(relayHost)
                 .setRelayPort(relayPort)
                 .setClientLogin(relayUser)
-                .setClientPasscode(relayPwd);
+                .setClientPasscode(relayPwd)
+                .setAutoStartup(true);
     }
 
 }
