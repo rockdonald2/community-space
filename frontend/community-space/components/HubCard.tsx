@@ -1,7 +1,8 @@
 import { Hub as HubType } from '@/types/db.types';
 import { mediumDateWithNoTimeFormatter } from '@/utils/Utility';
-import { Avatar, Box, Button, Card, CardContent, Divider, Link, Typography } from '@mui/material';
+import { Avatar, Box, Button, Card, CardContent, Divider, Typography } from '@mui/material';
 import { teal } from '@mui/material/colors';
+import Link from 'next/link';
 
 const HubCard = ({ hub }: { hub: HubType }) => {
     return (

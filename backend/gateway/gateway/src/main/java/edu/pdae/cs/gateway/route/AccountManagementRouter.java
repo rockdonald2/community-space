@@ -48,7 +48,7 @@ public class AccountManagementRouter implements BaseRouter {
         return Map.of(
                 "^/api/v1/sessions$", List.of("POST", "GET"),
                 "^/api/v1/users$", List.of("POST"),
-                "^/stomp/account.*$", List.of("GET", "POST")
+                "^/stomp/account.*$", List.of("GET", "POST") // TODO: remove this, and put header
         );
     }
 
