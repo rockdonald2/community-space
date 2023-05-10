@@ -85,10 +85,12 @@ Back-end összefoglaló:
 - NoSQL adatbázis: `MongoDB`,
 - Cache megoldás: `Redis`
 - Általános back-end keretrendszer: `Spring Boot` (micro-service-k implementálására, pl. Spring JPA, Spring Repository, Spring WebFlux, háromrétegű architektúra),
-- Üzenet broker (in-cluster): `Kafka (és/vagy RabbitMQ)`,
+- Üzenet/STOMP broker (in-cluster): `Kafka (és/vagy RabbitMQ)`,
 - Infrastruktúra és DevOps: `Terraform` (K8S cluster létrehozása), `K8S és Helm`.
 
-Kiegészítő egyéb technológiák: `WebSocket és STOMP`, `Spring Reactive Gateway`.
+Kiegészítő egyéb technológiák: `WebSocket és STOMP`, `Spring Gateway`.
+
+Bizonyos tantárgybéli követelmények miatt máshonnan kötelező a `Kafka` használata és valójában a `RabbitMQ`-ra a `WebSocket` stateful-problémájának megoldására van szükség, ezért lehet eliminálni az összefüggésből a `RabbitMQ`-t és csak `Kafka`-t használni, valamint szerverek között `WebSocket` kapcsolatokat fenntartani, így megoldva a problémát.
 
 ### Üzenetsor és valósidejűség
 
