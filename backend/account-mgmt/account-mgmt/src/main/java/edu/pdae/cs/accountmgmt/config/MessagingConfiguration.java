@@ -29,7 +29,6 @@ public class MessagingConfiguration {
     public RabbitTemplate rabbitTemplate(ConnectionFactory connectionFactory) {
         final RabbitTemplate rabbitTemplate = new RabbitTemplate(connectionFactory);
         rabbitTemplate.setMessageConverter(jsonMessageConverter());
-        rabbitTemplate.setChannelTransacted(true);
         return rabbitTemplate;
     }
 

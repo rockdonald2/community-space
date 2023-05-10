@@ -10,7 +10,6 @@ import org.springframework.messaging.handler.annotation.Payload;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.concurrent.TimeUnit;
 
@@ -25,7 +24,7 @@ public class StatusListener {
     private final SimpMessagingTemplate messagingTemplate;
 
     @MessageMapping("/status-notify") // handles messages coming to /ws/status-notify
-    @Transactional
+    // @Transactional // olyan performance bottlenecket bevezet, hogy az valami elkepeszto
     public void broadcastStatus(@Payload UserPresenceNotificationDTO presenceNotificationDTO) {
         log.info("Caught external (user) message for presence update for {}", presenceNotificationDTO);
 
@@ -34,7 +33,7 @@ public class StatusListener {
     }
 
     @Scheduled(fixedDelayString = "${cs.status.cleanup.interval.minutes}", timeUnit = TimeUnit.MINUTES)
-    @Transactional
+    // @Transactional
     public void cleanupStatus() {
         log.info("Cleaning up presence status");
 
