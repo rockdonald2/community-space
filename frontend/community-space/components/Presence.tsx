@@ -1,5 +1,5 @@
 import { usePresenceContext } from '@/utils/PresenceContext';
-import { Container, Skeleton, Stack, Typography } from '@mui/material';
+import { Container, Skeleton, Stack, Tooltip, Typography } from '@mui/material';
 import Avatar from './Avatar';
 import { useAuthContext } from '@/utils/AuthContext';
 import CircularLoading from './CircularLoading';
@@ -14,7 +14,7 @@ const Presence = () => {
             <Typography mb={2} color='text.secondary' variant='h6'>
                 Others online
             </Typography>
-            <Stack alignItems={'flex-start'} direction={'row'} flexWrap={'wrap'}>
+            <Stack alignItems={'flex-start'} direction={'row'} flexWrap={'wrap'} sx={{ mb: 2 }}>
                 {presence ? (
                     presence.length !== 1 ? (
                         presence
@@ -27,12 +27,17 @@ const Presence = () => {
                                 );
                             })
                     ) : (
-                        <Skeleton variant='circular' width={40} height={40} />
+                        <Tooltip title={'Looks like none is here'} arrow>
+                            <Skeleton variant='circular' width={42} height={42} />
+                        </Tooltip>
                     )
                 ) : (
                     <CircularLoading />
                 )}
             </Stack>
+            <Typography color='text.secondary' variant='caption'>
+                Join a Hub and start interacting with them
+            </Typography>
         </Container>
     );
 };

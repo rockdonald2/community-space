@@ -18,10 +18,9 @@ import {
 import { Memo as MemoType, MemoShort } from '@/types/db.types';
 import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward';
 import CloseIcon from '@mui/icons-material/Close';
-import { useCallback, useState } from 'react';
+import { useCallback, useState, useEffect } from 'react';
 import { GATEWAY_URL } from '@/utils/Constants';
 import { useAuthContext } from '@/utils/AuthContext';
-import CircularLoading from './CircularLoading';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import EditIcon from '@mui/icons-material/Edit';
 import Item from './Item';
@@ -31,7 +30,7 @@ import SkeletonLoader from './SkeletonLoader';
 
 const MemoDialog = styled(Dialog)(({ theme }) => ({
     '& .MuiPaper-root': {
-        backgroundColor: theme.palette.mode === 'dark' ? '#1A2027' : '#fff',
+        backgroundColor: theme.palette.background.default,
     },
     '& .MuiDialogContent-root': {
         padding: theme.spacing(2),
@@ -55,16 +54,28 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
     const [isMemoModificationError, setUserInputError] = useState<boolean>(false);
     const [isUserUpdatingMemo, setUserUpdatingMemo] = useState<boolean>(false);
 
-    const { data, error, isLoading, isValidating } = useSWR<MemoType>(
-        isMemoOpen ? `${GATEWAY_URL}/api/v1/memos/${memo.id}` : null,
-        async (url) => {
-            const res = await fetch(url, {
-                headers: { Authorization: `Bearer ${user.token}` },
-            });
+    const [prevMemoData, setPrevMemoData] = useState<MemoType>(null);
 
-            return await res.json();
+    // ? Because that we don't fetch the data before opening the memo, on closing it will disregard the data and will collapse the inner body of the dialog
+    const {
+        data: memoData,
+        error,
+        isLoading,
+        isValidating,
+    } = useSWR<MemoType>(isMemoOpen ? `${GATEWAY_URL}/api/v1/memos/${memo.id}` : null, async (url) => {
+        const res = await fetch(url, {
+            headers: { Authorization: `Bearer ${user.token}` },
+        });
+
+        return await res.json();
+    });
+
+    useEffect(() => {
+        // * possible solution for the above issue
+        if (memoData) {
+            setPrevMemoData(memoData);
         }
-    );
+    }, [memoData]);
 
     const handleClose = useCallback(() => {
         if (isUserUpdatingMemo) return setUserUpdatingMemo(false);
@@ -102,7 +113,7 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
         };
 
         handleAsync();
-    }, [memo.id, user.token]);
+    }, [memo.id, user.token, memo.hubId]);
 
     return (
         <>
@@ -174,7 +185,7 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                                 title: memo.title,
                                 visibility: memo.visibility,
                                 urgency: memo.urgency,
-                                content: data.content,
+                                content: memoData?.content,
                             }}
                             memoId={memo.id}
                             hubId={memo.hubId}
@@ -188,7 +199,7 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                     ) : (
                         <>
                             <Typography sx={{ mb: 0 }} gutterBottom>
-                                {data?.content}
+                                {memoData?.content || prevMemoData?.content}
                             </Typography>
                         </>
                     )}

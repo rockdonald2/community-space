@@ -41,7 +41,8 @@ const PresenceContextProvider = ({ children, user }: { children: React.ReactNode
         }, 1000 * 15); // every 15 seconds
 
         return () => {
-            // pingInactive(); // this won't work as the client is already unmounted here
+            // TODO: check if this is needed
+            // ! pingInactive(); // this won't work as the client is already unmounted here
             // try putting it on onWebSocketClose() callback
             clearInterval(presenceIntervalId);
         };

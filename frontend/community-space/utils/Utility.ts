@@ -90,3 +90,12 @@ export const mediumDateWithNoTimeFormatter = new Intl.DateTimeFormat('en-gb', {
     formatMatcher: 'best fit',
     dateStyle: 'medium',
 });
+
+/**
+ * Checks if a returned payload is of type ErrorResponse
+ * @param data 
+ * @returns 
+ */
+export const checkIfError = (data: any): boolean => {
+    return data === undefined || (data && typeof data === 'object' && 'status' in data);
+};

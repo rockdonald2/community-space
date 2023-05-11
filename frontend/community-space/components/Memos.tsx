@@ -1,14 +1,12 @@
-import SkeletonLoader from './SkeletonLoader';
 import useSWR from 'swr';
 import {
     boldSelectedElementStyle,
+    checkIfError,
     sortByCreationDate,
     sortByUrgency,
     swrRecentMemosFetcherWithAuth,
 } from '@/utils/Utility';
 import {
-    Alert,
-    AlertTitle,
     Box,
     Chip,
     FormControl,
@@ -28,12 +26,18 @@ import Memo from './Memo';
 import MemoEdit from './MemoEdit';
 import SearchIcon from '@mui/icons-material/Search';
 import { ChangeEvent, Dispatch, SetStateAction, useState } from 'react';
+import Alerter from './Alerter';
 
 const Memos = ({ hubId }: { hubId?: string | string[] }) => {
     const theme = useTheme();
 
     const { user } = useAuthContext();
-    const { data, error, isLoading, isValidating } = useSWR<MemoType[] | ErrorResponse>(
+    const {
+        data: memos,
+        error,
+        isLoading,
+        isValidating,
+    } = useSWR<MemoType[] | ErrorResponse>(
         { key: 'memos', token: user.token, hubId: hubId },
         swrRecentMemosFetcherWithAuth,
         {
@@ -59,37 +63,6 @@ const Memos = ({ hubId }: { hubId?: string | string[] }) => {
 
         setState(typeof value === 'string' ? value.split(',') : value);
     };
-
-    if (isLoading || isValidating) return <SkeletonLoader />;
-
-    if (error) {
-        // this a client error handler
-        return (
-            <Alert severity='error'>
-                <AlertTitle>Oops!</AlertTitle>
-                Unexpected error has occurred.
-            </Alert>
-        );
-    }
-
-    if ('status' in data) {
-        // if it's an error response, handle accordingly; this is coming from the server
-        if (data.status === 404) {
-            return (
-                <Alert severity='error'>
-                    <AlertTitle>Oops!</AlertTitle>
-                    The requested content cannot be found.
-                </Alert>
-            );
-        } else {
-            return (
-                <Alert severity='error'>
-                    <AlertTitle>Oops!</AlertTitle>
-                    Unexpected error has occurred.
-                </Alert>
-            );
-        }
-    }
 
     return (
         <Stack spacing={2}>
@@ -151,8 +124,11 @@ const Memos = ({ hubId }: { hubId?: string | string[] }) => {
                     </FormControl>
                 </Stack>
             </Box>
-            {data &&
-                data
+            <Alerter isValidating={isValidating} isLoading={isLoading} data={memos} error={error} />
+            {!isLoading &&
+                !isValidating &&
+                !checkIfError(memos) &&
+                (memos as MemoType[])
                     .sort(sortByCreationDate)
                     .sort(sortByUrgency)
                     .filter((memo) => memo.title.toLowerCase().includes(titleFilter.toLowerCase()))
