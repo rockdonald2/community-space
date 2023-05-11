@@ -7,6 +7,7 @@ import Layout from '@/components/Layout';
 import AuthContextProvider from '@/utils/AuthContext';
 import { RouteGuard } from '@/utils/RouteGuard';
 import CrossContextProvider from '@/utils/CrossContext';
+import { CookiesProvider } from 'react-cookie';
 
 export default function App({ Component, pageProps }: AppProps) {
     return (
@@ -16,15 +17,17 @@ export default function App({ Component, pageProps }: AppProps) {
             </Head>
             <CssVarsProvider>
                 <CssBaseline enableColorScheme />
-                <CrossContextProvider>
-                    <AuthContextProvider>
-                        <RouteGuard>
-                            <Layout>
-                                <Component {...pageProps} />
-                            </Layout>
-                        </RouteGuard>
-                    </AuthContextProvider>
-                </CrossContextProvider>
+                <CookiesProvider>
+                    <CrossContextProvider>
+                        <AuthContextProvider>
+                            <RouteGuard>
+                                <Layout>
+                                    <Component {...pageProps} />
+                                </Layout>
+                            </RouteGuard>
+                        </AuthContextProvider>
+                    </CrossContextProvider>
+                </CookiesProvider>
             </CssVarsProvider>
         </>
     );

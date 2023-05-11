@@ -32,7 +32,7 @@ const QuickActions = () => {
                 break;
             }
             case 'createHub': {
-                push('/hub/create');
+                push('/hubs/create');
                 break;
             }
         }

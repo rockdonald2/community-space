@@ -3,6 +3,7 @@ import { IUserContext, UserSignIn, UserSignInResponse, UserSignUp, UserSignUpRes
 import { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import { GATEWAY_URL } from './Constants';
 import { useCrossContext } from './CrossContext';
+import { useCookies } from 'react-cookie';
 
 const USER_DATA_LS = 'user-data';
 
@@ -14,11 +15,16 @@ const AuthContextProvider = ({ children }) => {
     const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
     const [isInitialized, setInitialized] = useState<boolean>(false);
     const { triggerReload } = useCrossContext();
+    const [cookies, setCookie, removeCookie] = useCookies([USER_DATA_LS]);
 
     useEffect(() => {
         // on every user state change, save the current state to LS
         if (user) {
-            localStorage.setItem(USER_DATA_LS, JSON.stringify(user));
+            setCookie(USER_DATA_LS, JSON.stringify(user), {
+                path: '/',
+                maxAge: 1440,
+                sameSite: 'lax',
+            });
         }
     }, [user]);
 
@@ -43,14 +49,20 @@ const AuthContextProvider = ({ children }) => {
 
         setUser(null);
         setIsAuthenticated(false);
-        localStorage.removeItem(USER_DATA_LS);
+        removeCookie(USER_DATA_LS);
         triggerReload();
     }, [triggerReload, user?.token]);
 
     useEffect(() => {
         // on component load read the user state from LS, validate it and set it if it is not yet expired
+        const rawCookie = cookies[USER_DATA_LS] || null;
+        let rawUser = null;
 
-        const rawUser = JSON.parse(localStorage.getItem(USER_DATA_LS)) as User;
+        if (typeof rawCookie === 'string') {
+            rawUser = JSON.parse(cookies[USER_DATA_LS] || null) as User;
+        } else if (typeof rawCookie === 'object') {
+            rawUser = rawCookie as User;
+        }
 
         // validate using the /api/v1/sessions/** endpoint the found token
 
