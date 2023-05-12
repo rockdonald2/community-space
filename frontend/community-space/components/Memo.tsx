@@ -195,7 +195,7 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                             }}
                         />
                     ) : isLoading || isValidating ? (
-                        <SkeletonLoader />
+                        <SkeletonLoader nrOfLayers={1} />
                     ) : (
                         <>
                             <Typography sx={{ mb: 0 }} gutterBottom>

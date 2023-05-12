@@ -1,11 +1,13 @@
 import { Skeleton } from '@mui/material';
 
-const SkeletonLoader = () => {
+const SkeletonLoader = ({ nrOfLayers = 4 }: { nrOfLayers?: number }) => {
     return (
         <>
-            <Skeleton />
-            <Skeleton />
-            <Skeleton />
+            {Array(nrOfLayers)
+                .fill(0)
+                .map((_, idx) => (
+                    <Skeleton key={idx} />
+                ))}
         </>
     );
 };
