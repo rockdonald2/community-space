@@ -1,6 +1,7 @@
 package edu.pdae.cs.accountmgmt.config;
 
 import edu.pdae.cs.accountmgmt.service.JwtService;
+import io.jsonwebtoken.JwtException;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -67,14 +68,19 @@ public class WebSocketConfiguration implements WebSocketMessageBrokerConfigurer 
         registration.interceptors(new ChannelInterceptor() {
             @Override
             public Message<?> preSend(Message<?> message, MessageChannel channel) {
-                StompHeaderAccessor accessor =
-                        MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
+                StompHeaderAccessor accessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
                 if (StompCommand.CONNECT.equals(accessor.getCommand())) {
+                    log.info("Validating JWT token for WS connection");
                     final var headers = message.getHeaders();
                     if (headers.containsKey("nativeHeaders")) {
                         final var nativeHeaders = (java.util.Map<String, java.util.List<String>>) headers.get("nativeHeaders");
                         final var token = nativeHeaders.get("Authorization").get(0).substring(7);
-                        jwtService.extractEmail(token); // if not valid, will throw and end the flow with an error
+                        try {
+                            final var email = jwtService.extractEmail(token); // if not valid, will throw and end the flow with an error
+                            log.info("Valid JWT token for WS connection: {}", email);
+                        } catch (JwtException e) {
+                            log.warn("Invalid JWT token for WS connection");
+                        }
                     }
                 }
                 return message;

@@ -33,7 +33,6 @@ public class StatusListener {
     }
 
     @Scheduled(fixedDelayString = "${cs.status.cleanup.interval.minutes}", timeUnit = TimeUnit.MINUTES)
-    // @Transactional
     public void cleanupStatus() {
         log.info("Cleaning up presence status");
 
