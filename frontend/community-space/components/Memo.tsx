@@ -27,6 +27,8 @@ import Item from './Item';
 import MemoEdit from './MemoEdit';
 import useSWR, { useSWRConfig } from 'swr';
 import SkeletonLoader from './SkeletonLoader';
+import { ReactMarkdown } from 'react-markdown/lib/react-markdown';
+import remarkGfm from 'remark-gfm';
 
 const MemoDialog = styled(Dialog)(({ theme }) => ({
     '& .MuiPaper-root': {
@@ -62,13 +64,21 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
         error,
         isLoading,
         isValidating,
-    } = useSWR<MemoType>(isMemoOpen ? `${GATEWAY_URL}/api/v1/memos/${memo.id}` : null, async (url) => {
-        const res = await fetch(url, {
-            headers: { Authorization: `Bearer ${user.token}` },
-        });
+    } = useSWR<MemoType>(
+        isMemoOpen ? `${GATEWAY_URL}/api/v1/memos/${memo.id}` : null,
+        async (url) => {
+            const res = await fetch(url, {
+                headers: { Authorization: `Bearer ${user.token}` },
+            });
 
-        return await res.json();
-    });
+            return await res.json();
+        },
+        {
+            revalidateOnFocus: false,
+            refreshWhenHidden: false,
+            refreshWhenOffline: false,
+        }
+    );
 
     useEffect(() => {
         // * possible solution for the above issue
@@ -77,7 +87,7 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
         }
     }, [memoData]);
 
-    const handleClose = useCallback(() => {
+    const handleCloseTrigger = useCallback(() => {
         if (isUserUpdatingMemo) return setUserUpdatingMemo(false);
         if (isMemoOpen) return setMemoOpen(false);
 
@@ -144,7 +154,7 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                     </Grid>
                     <Grid item xs={1} justifySelf={'flex-end'}>
                         <Tooltip title='See more'>
-                            <IconButton onClick={handleClose}>
+                            <IconButton onClick={handleCloseTrigger}>
                                 <ArrowOutwardIcon />
                             </IconButton>
                         </Tooltip>
@@ -157,7 +167,7 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                         <Typography variant={'h6'}>{memo.title}</Typography>
                         <IconButton
                             aria-label='close'
-                            onClick={handleClose}
+                            onClick={handleCloseTrigger}
                             sx={{
                                 color: (theme) => theme.palette.grey[500],
                             }}
@@ -198,8 +208,10 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                         <SkeletonLoader nrOfLayers={1} />
                     ) : (
                         <>
-                            <Typography sx={{ mb: 0 }} gutterBottom>
-                                {memoData?.content || prevMemoData?.content}
+                            <Typography sx={{ mb: 0 }} gutterBottom component='div'>
+                                <ReactMarkdown remarkPlugins={[[remarkGfm, { singleTilde: false }]]}>
+                                    {memoData?.content || prevMemoData?.content}
+                                </ReactMarkdown>
                             </Typography>
                         </>
                     )}

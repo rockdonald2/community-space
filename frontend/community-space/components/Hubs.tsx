@@ -14,7 +14,11 @@ const Hubs = () => {
         error,
         isLoading,
         isValidating,
-    } = useSWR<Hub[] | ErrorResponse>({ key: 'hubs', token: user.token }, swrHubsFetcherWithAuth);
+    } = useSWR<Hub[] | ErrorResponse>({ key: 'hubs', token: user.token }, swrHubsFetcherWithAuth, {
+        revalidateOnFocus: false,
+        refreshWhenHidden: false,
+        refreshWhenOffline: false,
+    });
 
     return (
         <>

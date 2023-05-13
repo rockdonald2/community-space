@@ -32,7 +32,11 @@ const Hub = () => {
         error: hubError,
         isLoading: hubIsLoading,
         isValidating: hubIsValidating,
-    } = useSWR<HubType | ErrorResponse>({ key: 'hub', token: user.token, hubId: hubId }, swrHubFetcherWithAuth);
+    } = useSWR<HubType | ErrorResponse>({ key: 'hub', token: user.token, hubId: hubId }, swrHubFetcherWithAuth, {
+        revalidateOnFocus: false,
+        refreshWhenHidden: false,
+        refreshWhenOffline: false,
+    });
 
     const {
         data: hubPendings,
@@ -41,7 +45,8 @@ const Hub = () => {
         isValidating: hubPendingsIsValidating,
     } = useSWR<UserShort[] | ErrorResponse>(
         (hub as HubType)?.role === 'OWNER' ? { key: 'pendings', token: user.token, hubId: hubId } : null,
-        swrWaitersFetcherWithAuth
+        swrWaitersFetcherWithAuth,
+        { revalidateOnFocus: false, refreshWhenHidden: false, refreshWhenOffline: false }
     );
 
     const {
@@ -51,7 +56,8 @@ const Hub = () => {
         isValidating: hubMembersIsValidating,
     } = useSWR<UserShort[] | ErrorResponse>(
         { key: 'members', token: user.token, hubId: hubId },
-        swrMembersFetcherWithAuth
+        swrMembersFetcherWithAuth,
+        { revalidateOnFocus: false, refreshWhenHidden: false, refreshWhenOffline: false }
     );
 
     const handleJoinHub = useCallback(
