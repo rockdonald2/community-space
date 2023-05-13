@@ -16,7 +16,7 @@ const Presence = () => {
             </Typography>
             <Stack alignItems={'flex-start'} direction={'row'} flexWrap={'wrap'} sx={{ mb: 2 }}>
                 {presence ? (
-                    presence.length !== 1 ? (
+                    presence.length > 1 ? (
                         presence
                             .filter((present) => present.email !== user.email)
                             .map((present, idx) => {
@@ -28,7 +28,7 @@ const Presence = () => {
                             })
                     ) : (
                         <Tooltip title={'Looks like none is here'} arrow>
-                            <Skeleton variant='circular' width={42} height={42} />
+                            <Skeleton variant='circular' width={43} height={43} />
                         </Tooltip>
                     )
                 ) : (

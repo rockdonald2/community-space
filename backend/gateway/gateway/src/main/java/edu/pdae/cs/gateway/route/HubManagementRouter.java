@@ -39,6 +39,18 @@ public class HubManagementRouter implements BaseRouter {
                         .and()
                         .method("GET", "DELETE")
                         .and()
+                        .uri(hubManagementAddress))
+                .route(r -> r
+                        .path("/api/v1/hubs/*/waiters")
+                        .and()
+                        .method("GET", "POST")
+                        .and()
+                        .uri(hubManagementAddress))
+                .route(r -> r
+                        .path("/api/v1/hubs/*/waiters/**")
+                        .and()
+                        .method("GET", "DELETE")
+                        .and()
                         .uri(hubManagementAddress));
     }
 

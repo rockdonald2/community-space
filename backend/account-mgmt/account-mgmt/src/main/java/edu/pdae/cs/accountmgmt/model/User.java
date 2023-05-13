@@ -1,5 +1,8 @@
 package edu.pdae.cs.accountmgmt.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,10 +18,12 @@ import org.springframework.data.mongodb.core.mapping.Field;
 @NoArgsConstructor
 @AllArgsConstructor
 @Document(collection = "users")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class User {
 
     @Id
     @Field("_id")
+    @JsonSerialize(using = ToStringSerializer.class)
     private ObjectId id;
 
     private String firstname;

@@ -1,5 +1,6 @@
 import { UserShort } from '@/types/db.types';
 import { Badge, Avatar as MaterialAvatar, Tooltip, styled } from '@mui/material';
+import { useState } from 'react';
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
     '& .MuiBadge-badge': {
@@ -39,17 +40,28 @@ function stringToColor(string: string) {
     return color;
 }
 
+const defaultColor = 'var(--mui-palette-grey-600)';
+
 const Avatar = ({
     user,
     isOnline = false,
     generateRandomColor = false,
     style,
+    cursor = 'default',
+    onClick = null,
+    hoverText = null,
 }: {
     user: UserShort;
     isOnline?: boolean;
     generateRandomColor?: boolean;
     style?: React.CSSProperties;
+    cursor?: 'pointer' | 'default';
+    hoverText?: string | JSX.Element;
+    onClick?: () => void;
 }) => {
+    const [innerText, setInnerText] = useState<string | JSX.Element>(user.email?.substring(0, 2).toUpperCase());
+    const [bgColor, setBgColor] = useState<string>(generateRandomColor ? stringToColor(user.email) : defaultColor);
+
     return (
         <StyledBadge
             overlap='circular'
@@ -58,13 +70,24 @@ const Avatar = ({
                 horizontal: 'right',
             }}
             variant={isOnline ? 'dot' : 'standard'}
+            style={{ cursor: cursor }}
+            onClick={onClick}
+            onMouseOver={() => {
+                if (hoverText == null) return;
+
+                setInnerText(hoverText);
+                setBgColor(defaultColor);
+            }}
+            onMouseOut={() => {
+                if (hoverText == null) return;
+
+                setInnerText(user.email?.substring(0, 2).toUpperCase());
+                setBgColor(generateRandomColor ? stringToColor(user.email) : defaultColor);
+            }}
         >
             <Tooltip arrow title={user.email}>
-                <MaterialAvatar
-                    sx={{ bgcolor: generateRandomColor ? stringToColor(user.email) : '--var(--mui-palette-grey-400)' }}
-                    style={style}
-                >
-                    {user.email?.substring(0, 2).toUpperCase()}
+                <MaterialAvatar sx={{ bgcolor: bgColor, transition: '0.15s ease-in-out all' }} style={style}>
+                    {innerText}
                 </MaterialAvatar>
             </Tooltip>
         </StyledBadge>

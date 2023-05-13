@@ -1,10 +1,40 @@
 import { Hub as HubType } from '@/types/db.types';
+import { useAuthContext } from '@/utils/AuthContext';
+import { GATEWAY_URL } from '@/utils/Constants';
 import { mediumDateWithNoTimeFormatter } from '@/utils/Utility';
 import { Avatar, Box, Button, Card, CardContent, Divider, Typography } from '@mui/material';
 import { teal } from '@mui/material/colors';
 import Link from 'next/link';
+import { useCallback } from 'react';
 
 const HubCard = ({ hub }: { hub: HubType }) => {
+    const { user } = useAuthContext();
+
+    const handleJoinHub = useCallback(async () => {
+        try {
+            const resp = await fetch(`${GATEWAY_URL}/api/v1/hubs/${hub.id}/waiters`, {
+                method: 'POST',
+                body: JSON.stringify({ email: user.email }),
+                headers: {
+                    'Content-Type': 'application/json',
+                    Authorization: `Bearer ${user.token}`,
+                },
+            });
+
+            if (resp.ok) {
+                hub.role = 'PENDING';
+            } else {
+                throw new Error('Failed to add user to waiters list', {
+                    cause: {
+                        res: resp,
+                    },
+                });
+            }
+        } catch (err) {
+            console.debug('error', err);
+        }
+    }, [hub, user.email, user.token]);
+
     return (
         <Card variant='elevation' elevation={1}>
             <>
@@ -41,11 +71,12 @@ const HubCard = ({ hub }: { hub: HubType }) => {
                     fullWidth
                     type='button'
                     variant='text'
-                    href={`/hubs/${hub.id}`}
+                    href={hub.role !== 'NONE' && hub.role !== 'PENDING' ? `/hubs/${hub.id}` : null}
                     LinkComponent={Link}
-                    disabled={hub.role === 'WAITER' ? true : false}
+                    disabled={hub.role === 'PENDING' ? true : false}
+                    onClick={hub.role !== 'NONE' ? null : handleJoinHub}
                 >
-                    {hub.role === 'WAITER' ? 'Waiting...' : hub.role !== 'NONE' ? 'Enter' : 'Join'}
+                    {hub.role === 'PENDING' ? 'Waiting...' : hub.role !== 'NONE' ? 'Enter' : 'Join'}
                 </Button>
             </>
         </Card>

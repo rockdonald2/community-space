@@ -14,7 +14,6 @@ import org.bson.types.ObjectId;
 public class MemoCreationDTO {
 
     private String title;
-    private String author;
     private String content;
     private Memo.Visibility visibility;
     private Memo.Urgency urgency;

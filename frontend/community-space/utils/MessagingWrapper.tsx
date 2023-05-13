@@ -1,7 +1,8 @@
 import { StompSessionProvider } from 'react-stomp-hooks';
 import { useAuthContext } from './AuthContext';
+import PresenceContextProvider from './PresenceContext';
 
-const MessagingWrapper = ({
+const PresenceMessagingWrapper = ({
     children,
     url,
     onCloseCallback,
@@ -18,9 +19,9 @@ const MessagingWrapper = ({
             onWebSocketClose={onCloseCallback}
             connectHeaders={{ Authorization: `Bearer ${user.token}` }}
         >
-            {children}
+            <PresenceContextProvider user={user}>{children}</PresenceContextProvider>
         </StompSessionProvider>
     );
 };
 
-export { MessagingWrapper as default };
+export { PresenceMessagingWrapper as default };

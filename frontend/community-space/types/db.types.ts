@@ -44,7 +44,7 @@ export type Hub = {
     owner: string;
     members?: string[];
     waiters?: string[];
-    role?: 'OWNER' | 'MEMBER' | 'WAITER' | 'NONE';
+    role?: 'OWNER' | 'MEMBER' | 'PENDING' | 'NONE';
 };
 
 export type HubShort = {

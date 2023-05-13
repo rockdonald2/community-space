@@ -3,10 +3,12 @@ package edu.pdae.cs.memomgmt.repository;
 import edu.pdae.cs.memomgmt.model.Memo;
 import org.bson.types.ObjectId;
 import org.springframework.data.mongodb.repository.MongoRepository;
+import org.springframework.stereotype.Repository;
 
 import java.util.Date;
 import java.util.List;
 
+@Repository
 public interface MemoRepository extends MongoRepository<Memo, ObjectId> {
 
     List<Memo> getMemosByCreatedOnBefore(Date date);

@@ -77,7 +77,6 @@ const MemoEdit = ({
                     url = `${GATEWAY_URL}/api/v1/memos/${memoId}`;
                 } else {
                     requestBody = {
-                        author: user.email,
                         content: msg,
                         title,
                         visibility,
@@ -118,7 +117,7 @@ const MemoEdit = ({
         };
 
         handleAsync();
-    }, [title, msg, urgency, isUpdateMode, user.token, user.email, cleanupCallback, visibility, memoId, hubId]);
+    }, [title, msg, urgency, isUpdateMode, user.token, cleanupCallback, mutate, hubId, visibility, memoId]);
 
     return (
         <Item>

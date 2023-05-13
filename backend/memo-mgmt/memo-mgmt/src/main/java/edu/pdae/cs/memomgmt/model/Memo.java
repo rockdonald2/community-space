@@ -1,5 +1,8 @@
 package edu.pdae.cs.memomgmt.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -14,10 +17,12 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Memo {
 
     @Id
     @Field("_id")
+    @JsonSerialize(using = ToStringSerializer.class)
     private ObjectId id;
 
     private String title;
@@ -26,6 +31,8 @@ public class Memo {
     private Date createdOn;
     private Visibility visibility;
     private Urgency urgency;
+
+    @JsonSerialize(using = ToStringSerializer.class)
     private ObjectId hubId;
 
     public enum Visibility {

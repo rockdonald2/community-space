@@ -1,5 +1,8 @@
 package edu.pdae.cs.hubmgmt.model;
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import com.fasterxml.jackson.databind.annotation.JsonSerialize;
+import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -19,10 +22,12 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @Document(collection = "hubs")
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class Hub {
 
     @Id
     @Field("_id")
+    @JsonSerialize(using = ToStringSerializer.class)
     private ObjectId id;
 
     @Indexed(unique = true)

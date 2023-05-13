@@ -1,13 +1,21 @@
 package edu.pdae.cs.memomgmt.service;
 
 import edu.pdae.cs.memomgmt.model.Memo;
-import edu.pdae.cs.memomgmt.model.dto.MemoDTO;
+import edu.pdae.cs.memomgmt.model.dto.*;
 import org.bson.types.ObjectId;
 
 import java.util.Date;
 import java.util.List;
 
 public interface MemoService {
+
+    MemoCreationResponseDTO create(MemoCreationDTO memoCreationDTO, String asUser);
+
+    MemoCreationResponseDTO update(ObjectId id, MemoUpdateDTO memoUpdateDTO, String asUser);
+
+    void delete(ObjectId id, String asUser);
+
+    MemoDetailsDTO getById(ObjectId id, String asUser);
 
     List<MemoDTO> getAllByVisibility(Memo.Visibility visibility, String asUser);
 

@@ -46,7 +46,7 @@ const PresenceContextProvider = ({ children, user }: { children: React.ReactNode
             // try putting it on onWebSocketClose() callback
             clearInterval(presenceIntervalId);
         };
-    }, [stompClient]);
+    }, [pingActive, stompClient]);
 
     useBeforeunload(() => pingInactive());
 

@@ -113,7 +113,7 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
         };
 
         handleAsync();
-    }, [memo.id, user.token, memo.hubId]);
+    }, [memo.id, memo.hubId, user.token, mutate]);
 
     return (
         <>

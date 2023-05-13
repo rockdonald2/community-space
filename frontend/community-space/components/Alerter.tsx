@@ -6,15 +6,17 @@ const Alerter = ({
     isValidating,
     error,
     data,
+    nrOfLayersInSkeleton = 2,
 }: {
     isLoading: boolean;
     isValidating: boolean;
     error: any;
     data: any;
+    nrOfLayersInSkeleton?: number;
 }) => {
     return (
         <>
-            {(isLoading || isValidating) && <SkeletonLoader />}
+            {(isLoading || isValidating) && <SkeletonLoader nrOfLayers={nrOfLayersInSkeleton} />}
             {error && (
                 <Alert severity='error'>
                     <AlertTitle>Oops!</AlertTitle>

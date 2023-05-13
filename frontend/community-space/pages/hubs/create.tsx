@@ -57,7 +57,7 @@ function CreateHub() {
             console.debug('Failed to create hub', err);
             setError({ msg: err.message });
         }
-    }, []);
+    }, [description, name, push, user?.token]);
 
     return (
         <Stack className={styles.wrapper}>

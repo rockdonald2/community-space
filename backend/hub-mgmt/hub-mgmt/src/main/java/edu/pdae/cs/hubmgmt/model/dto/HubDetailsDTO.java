@@ -18,6 +18,6 @@ public class HubDetailsDTO {
     private String description;
     private Date createdOn;
     private String owner;
-    private String[] members;
+    private Role role;
 
 }

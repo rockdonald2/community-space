@@ -19,11 +19,4 @@ public class HubDTO {
     private String owner;
     private Role role;
 
-    public enum Role {
-        OWNER,
-        MEMBER,
-        WAITING,
-        NONE
-    }
-
 }

@@ -86,6 +86,36 @@ export const swrHubFetcherWithAuth = async (args: { key: string; token: string; 
     return await res.json();
 };
 
+/**
+ * Retrieves the pending members of a hub.
+ * @param args the user's token and the hub's id
+ * @returns the pending members of a hub
+ */
+export const swrWaitersFetcherWithAuth = async (args: { key: string; token: string; hubId: string }) => {
+    const url = `${GATEWAY_URL}/api/v1/hubs/${args.hubId}/waiters`;
+
+    const res = await fetch(url, {
+        headers: { Authorization: `Bearer ${args.token}` },
+    });
+
+    return await res.json();
+};
+
+/**
+ * Retrieves the members of a hub.
+ * @param args the user's token and the hub's id
+ * @returns the members of a hub
+ */
+export const swrMembersFetcherWithAuth = async (args: { key: string; token: string; hubId: string }) => {
+    const url = `${GATEWAY_URL}/api/v1/hubs/${args.hubId}/members`;
+
+    const res = await fetch(url, {
+        headers: { Authorization: `Bearer ${args.token}` },
+    });
+
+    return await res.json();
+};
+
 export const mediumDateWithNoTimeFormatter = new Intl.DateTimeFormat('en-gb', {
     formatMatcher: 'best fit',
     dateStyle: 'medium',
@@ -93,8 +123,8 @@ export const mediumDateWithNoTimeFormatter = new Intl.DateTimeFormat('en-gb', {
 
 /**
  * Checks if a returned payload is of type ErrorResponse
- * @param data 
- * @returns 
+ * @param data
+ * @returns
  */
 export const checkIfError = (data: any): boolean => {
     return data === undefined || (data && typeof data === 'object' && 'status' in data);

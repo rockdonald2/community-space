@@ -2,20 +2,19 @@ package edu.pdae.cs.accountmgmt.service.impl;
 
 import edu.pdae.cs.accountmgmt.model.Token;
 import edu.pdae.cs.accountmgmt.model.User;
-import edu.pdae.cs.accountmgmt.model.dto.UserCreationDTO;
-import edu.pdae.cs.accountmgmt.model.dto.UserCreationResponseDTO;
-import edu.pdae.cs.accountmgmt.model.dto.UserLoginDTO;
-import edu.pdae.cs.accountmgmt.model.dto.UserLoginResponseDTO;
+import edu.pdae.cs.accountmgmt.model.dto.*;
 import edu.pdae.cs.accountmgmt.repository.UserRepository;
 import edu.pdae.cs.accountmgmt.service.JwtService;
 import edu.pdae.cs.accountmgmt.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.bson.types.ObjectId;
 import org.modelmapper.ModelMapper;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.LoginException;
+import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
@@ -66,6 +65,26 @@ public class UserServiceImpl implements UserService {
                 .firstName(repoUser.getFirstname())
                 .lastName(repoUser.getLastname())
                 .build();
+    }
+
+    @Override
+    public UserDetailsDTO findById(ObjectId id) throws NullPointerException {
+        return modelMapper.map(userRepository.findById(id).orElseThrow(), UserDetailsDTO.class);
+    }
+
+    @Override
+    public UserDTO findByEmail(String email) {
+        return modelMapper.map(userRepository.findByEmail(email).orElseThrow(), UserDTO.class);
+    }
+
+    @Override
+    public List<UserDTO> findAll() {
+        return userRepository.findAll().stream().map(user -> modelMapper.map(user, UserDTO.class)).toList();
+    }
+
+    @Override
+    public void deleteById(ObjectId id) {
+        userRepository.deleteById(id);
     }
 
 }
