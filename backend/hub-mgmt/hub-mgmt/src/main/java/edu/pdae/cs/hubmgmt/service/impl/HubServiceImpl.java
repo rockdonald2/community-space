@@ -170,13 +170,23 @@ public class HubServiceImpl implements HubService {
     }
 
     @Override
-    @CacheEvict(value = {"waiters", "members", "member", "hubs", "hub"}, allEntries = true)
+    @CacheEvict(value = {"members", "member", "hubs", "hub"}, allEntries = true)
     public void deleteMember(ObjectId hubId, String email, String asUser) throws ForbiddenOperationException {
         final Hub hub = hubRepository.findById(hubId).orElseThrow();
 
         if (!hub.getOwner().equals(asUser)) {
             log.warn("User {} is not the owner of hub {}", asUser, hubId);
             throw new ForbiddenOperationException("You are not the owner of this hub");
+        }
+
+        if (!hub.getMembers().contains(email)) {
+            log.warn("User {} is not a member of hub {}", email, hubId);
+            throw new ConflictingOperationException("This user is not a member of this hub");
+        }
+
+        if (hub.getOwner().equals(email)) {
+            log.warn("User {} is the owner of hub {}", email, hubId);
+            throw new ConflictingOperationException("You cannot remove the owner of this hub");
         }
 
         hub.getMembers().remove(email);
@@ -207,6 +217,11 @@ public class HubServiceImpl implements HubService {
             throw new ConflictingOperationException("This user is already waiting for this hub");
         }
 
+        if (hub.getMembers().contains(memberDTO.getEmail())) {
+            log.warn("User {} is already a member of hub {}", memberDTO.getEmail(), hubId);
+            throw new ConflictingOperationException("This user is already a member of this hub");
+        }
+
         hub.getWaiting().add(memberDTO.getEmail());
 
         hubRepository.save(hub);
@@ -220,6 +235,11 @@ public class HubServiceImpl implements HubService {
         if (!hub.getOwner().equals(asUser)) {
             log.warn("User {} is not the owner of hub {}", asUser, hubId);
             throw new ForbiddenOperationException("You are not the owner of this hub");
+        }
+
+        if (!hub.getWaiting().contains(email)) {
+            log.warn("User {} is not waiting for hub {}", email, hubId);
+            throw new ConflictingOperationException("This user is not waiting for this hub");
         }
 
         hub.getWaiting().remove(email);

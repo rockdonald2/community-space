@@ -4,26 +4,28 @@ import { UserShort } from '@/types/db.types';
 import { checkIfError, swrWaitersFetcherWithAuth } from '@/utils/Utility';
 import Avatar from './Avatar';
 import useSWR, { useSWRConfig } from 'swr';
-import { useCallback, useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useAuthContext } from '@/utils/AuthContext';
 import { ErrorResponse } from '@/types/types';
 import { GATEWAY_URL } from '@/utils/Constants';
 import SkeletonLoader from './SkeletonLoader';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
+import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
 
 const Pendings = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBER' | 'PENDING' | 'NONE' }) => {
     const { user, signOut } = useAuthContext();
     const { mutate } = useSWRConfig();
 
     const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
-    const open = Boolean(menuAnchorEl);
+    const open = useMemo(() => Boolean(menuAnchorEl), [menuAnchorEl]);
 
-    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    const handleClick = useCallback((event: React.MouseEvent<HTMLElement>) => {
         setMenuAnchorEl(event.currentTarget);
-    };
-    const handleClose = () => {
+    }, []);
+
+    const handleClose = useCallback(() => {
         setMenuAnchorEl(null);
-    };
+    }, []);
 
     const {
         data: hubPendings,
@@ -79,6 +81,40 @@ const Pendings = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBE
                             signOut();
                         } else {
                             alert('Failed to delete user from waiters list or add user to members list');
+                        }
+                    }
+                }
+            }
+        },
+        [hubId, mutate, signOut, user.token]
+    );
+
+    const handleDecline = useCallback(
+        async ({ pendingMember }: { pendingMember: UserShort }) => {
+            try {
+                const res = await fetch(`${GATEWAY_URL}/api/v1/hubs/${hubId}/waiters/${pendingMember.email}`, {
+                    method: 'DELETE',
+                    headers: {
+                        Authorization: `Bearer ${user.token}`,
+                    },
+                });
+
+                if (!res.ok) {
+                    throw new Error('Failed to delete user from waiters list', {
+                        cause: res,
+                    });
+                }
+
+                mutate({ key: 'pendings', token: user.token, hubId: hubId });
+            } catch (err) {
+                console.debug('Failed to delete user from waiters list', err);
+                if (err instanceof Error) {
+                    if ('res' in (err.cause as any)) {
+                        const res = (err.cause as any).res;
+                        if (res.status === 401) {
+                            signOut();
+                        } else {
+                            alert('Failed to delete user from waiters list');
                         }
                     }
                 }
@@ -153,17 +189,30 @@ const Pendings = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBE
                 </Typography>
                 <Divider sx={{ mb: 0.5 }} />
                 {menuAnchorEl?.dataset.user && menuAnchorEl?.dataset.user !== user.email && hubRole === 'OWNER' ? (
-                    <MenuItem
-                        onClick={() => {
-                            handleClose();
-                            handleJoinHub({ pendingMember: { email: menuAnchorEl?.dataset.user } });
-                        }}
-                    >
-                        <ListItemIcon>
-                            <PersonAddIcon fontSize='small' />
-                        </ListItemIcon>
-                        Accept member
-                    </MenuItem>
+                    <div>
+                        <MenuItem
+                            onClick={() => {
+                                handleClose();
+                                handleJoinHub({ pendingMember: { email: menuAnchorEl?.dataset.user } });
+                            }}
+                        >
+                            <ListItemIcon>
+                                <PersonAddIcon fontSize='small' />
+                            </ListItemIcon>
+                            <Typography variant='body2'>Accept member</Typography>
+                        </MenuItem>
+                        <MenuItem
+                            onClick={() => {
+                                handleClose();
+                                handleDecline({ pendingMember: { email: menuAnchorEl?.dataset.user } });
+                            }}
+                        >
+                            <ListItemIcon>
+                                <PersonRemoveIcon fontSize='small' />
+                            </ListItemIcon>
+                            <Typography variant='body2'>Decline member</Typography>
+                        </MenuItem>
+                    </div>
                 ) : (
                     <Typography sx={{ padding: 1, textAlign: 'left', mb: 0.5 }} variant='body2' color='text.secondary'>
                         No available actions

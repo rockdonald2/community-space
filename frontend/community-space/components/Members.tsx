@@ -5,15 +5,17 @@ import Alerter from './Alerter';
 import SkeletonLoader from './SkeletonLoader';
 import Avatar from './Avatar';
 import { ErrorResponse } from '@/types/types';
-import { useState } from 'react';
+import { useCallback, useMemo, useState } from 'react';
 import { useAuthContext } from '@/utils/AuthContext';
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
 import { usePresenceContext } from '@/utils/PresenceContext';
-import useSWR from 'swr';
+import useSWR, { useSWRConfig } from 'swr';
+import { GATEWAY_URL } from '@/utils/Constants';
 
 const Members = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBER' | 'PENDING' | 'NONE' }) => {
     const { presence } = usePresenceContext();
-    const { user } = useAuthContext();
+    const { user, signOut } = useAuthContext();
+    const { mutate } = useSWRConfig();
 
     const {
         data: hubMembers,
@@ -27,14 +29,47 @@ const Members = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBER
     );
 
     const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
-    const open = Boolean(menuAnchorEl);
+    const open = useMemo(() => Boolean(menuAnchorEl), [menuAnchorEl]);
 
-    const handleClick = (event: React.MouseEvent<HTMLElement>) => {
+    const handleClick = useCallback((event: React.MouseEvent<HTMLElement>) => {
         setMenuAnchorEl(event.currentTarget);
-    };
-    const handleClose = () => {
+    }, []);
+
+    const handleClose = useCallback(() => {
         setMenuAnchorEl(null);
-    };
+    }, []);
+
+    const handleRemoveMember = useCallback(
+        async (memberUser: UserShort) => {
+            try {
+                const res = await fetch(`${GATEWAY_URL}/api/v1/hubs/${hubId}/members/${memberUser.email}`, {
+                    method: 'DELETE',
+                    headers: {
+                        Authorization: `Bearer ${user.token}`,
+                    },
+                });
+
+                if (!res.ok) {
+                    throw new Error('Failed to delete member', { cause: res });
+                }
+
+                mutate({ key: 'members', token: user.token, hubId: hubId });
+            } catch (err) {
+                console.debug('Failed to delete member', err);
+                if (err instanceof Error) {
+                    if ('res' in (err.cause as any)) {
+                        const res = (err.cause as any).res;
+                        if (res.status === 401) {
+                            signOut();
+                        } else {
+                            alert('Failed to delete member');
+                        }
+                    }
+                }
+            }
+        },
+        [hubId, mutate, signOut, user.token]
+    );
 
     return (
         <>
@@ -102,11 +137,16 @@ const Members = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBER
                     </Typography>
                     <Divider sx={{ mb: 0.5 }} />
                     {menuAnchorEl?.dataset.user && menuAnchorEl?.dataset.user !== user.email && hubRole === 'OWNER' ? (
-                        <MenuItem onClick={handleClose}>
+                        <MenuItem
+                            onClick={() => {
+                                handleClose();
+                                handleRemoveMember({ email: menuAnchorEl?.dataset.user });
+                            }}
+                        >
                             <ListItemIcon>
                                 <PersonRemoveIcon fontSize='small' />
                             </ListItemIcon>
-                            Remove from hub
+                            <Typography variant='body2'>Remove member</Typography>
                         </MenuItem>
                     ) : (
                         <Typography
