@@ -3,7 +3,7 @@ import Header from './Header';
 import { useColorScheme, useMediaQuery } from '@mui/material';
 import { useEffect } from 'react';
 import QuickActions from './QuickActions';
-import PresenceMessagingWrapper from '@/utils/MessagingWrapper';
+import PresenceMessagingWrapper from '@/utils/PresenceMessagingWrapper';
 import { GATEWAY_ACCOUNT_WS } from '@/utils/Constants';
 import Blob from './Blob';
 import { SWRConfig } from 'swr';
