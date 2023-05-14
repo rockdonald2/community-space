@@ -10,14 +10,24 @@ import {
     Button,
     Stack,
     SelectChangeEvent,
+    ButtonGroup,
+    Tooltip,
 } from '@mui/material';
 import Item from './Item';
-import { ChangeEvent, Dispatch, SetStateAction, useCallback, useState } from 'react';
+import { ChangeEvent, Dispatch, SetStateAction, useCallback, useMemo, useState } from 'react';
 import SendIcon from '@mui/icons-material/Send';
 import { Visibility, Urgency } from '@/types/db.types';
 import { GATEWAY_URL } from '@/utils/Constants';
 import { useAuthContext } from '@/utils/AuthContext';
 import { useSWRConfig } from 'swr';
+import FormatBoldIcon from '@mui/icons-material/FormatBold';
+import FormatItalicIcon from '@mui/icons-material/FormatItalic';
+import FormatStrikethroughIcon from '@mui/icons-material/FormatStrikethrough';
+import CodeIcon from '@mui/icons-material/Code';
+import PermMediaIcon from '@mui/icons-material/PermMedia';
+import Filter1Icon from '@mui/icons-material/Filter1';
+import Filter2Icon from '@mui/icons-material/Filter2';
+import Filter3Icon from '@mui/icons-material/Filter3';
 
 const MemoEdit = ({
     initialState,
@@ -46,6 +56,108 @@ const MemoEdit = ({
     const [msg, setMsg] = useState<string>(initialState?.content ?? '');
     const [isError, setError] = useState<boolean>(false);
     const [errMsg, setErrMsg] = useState<string>('');
+
+    const editorButtons: JSX.Element[] = useMemo(
+        () => [
+            <Button
+                key='h1'
+                sx={{ color: 'text.secondary' }}
+                variant='text'
+                onClick={() => {
+                    setMsg(msg + '\n#');
+                }}
+            >
+                <Tooltip title='Heading 1'>
+                    <Filter1Icon />
+                </Tooltip>
+            </Button>,
+            <Button
+                key='h2'
+                sx={{ color: 'text.secondary' }}
+                variant='text'
+                onClick={() => {
+                    setMsg(msg + '\n##');
+                }}
+            >
+                <Tooltip title='Heading 2'>
+                    <Filter2Icon />
+                </Tooltip>
+            </Button>,
+            <Button
+                key='h3'
+                sx={{ color: 'text.secondary' }}
+                variant='text'
+                onClick={() => {
+                    setMsg(msg + '\n###');
+                }}
+            >
+                <Tooltip title='Heading 3'>
+                    <Filter3Icon />
+                </Tooltip>
+            </Button>,
+            <Button
+                key='bold'
+                sx={{ color: 'text.secondary' }}
+                variant='text'
+                onClick={() => {
+                    setMsg(msg + '**bold**');
+                }}
+            >
+                <Tooltip title='Bold'>
+                    <FormatBoldIcon />
+                </Tooltip>
+            </Button>,
+            <Button
+                key='italic'
+                sx={{ color: 'text.secondary' }}
+                variant='text'
+                onClick={() => {
+                    setMsg(msg + '*italic*');
+                }}
+            >
+                <Tooltip title='Italic'>
+                    <FormatItalicIcon />
+                </Tooltip>
+            </Button>,
+            <Button
+                key='strike'
+                sx={{ color: 'text.secondary' }}
+                variant='text'
+                onClick={() => {
+                    setMsg(msg + '~~strikethrough~~');
+                }}
+            >
+                <Tooltip title='Strikethrough'>
+                    <FormatStrikethroughIcon />
+                </Tooltip>
+            </Button>,
+            <Button
+                key='code'
+                sx={{ color: 'text.secondary' }}
+                variant='text'
+                onClick={() => {
+                    setMsg(msg + '\n```\n\n```\n');
+                }}
+            >
+                <Tooltip title='Code'>
+                    <CodeIcon />
+                </Tooltip>
+            </Button>,
+            <Button
+                key='media'
+                sx={{ color: 'text.secondary' }}
+                variant='text'
+                onClick={() => {
+                    setMsg(msg + '\n![text](url)');
+                }}
+            >
+                <Tooltip title='Media'>
+                    <PermMediaIcon />
+                </Tooltip>
+            </Button>,
+        ],
+        [msg]
+    );
 
     const handleChange = useCallback(
         (e: ChangeEvent<HTMLInputElement> | SelectChangeEvent, setState: Dispatch<SetStateAction<any>>) =>
@@ -157,6 +269,11 @@ const MemoEdit = ({
                     value={msg}
                     onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange(e, setMsg)}
                 />
+                {msg && (
+                    <ButtonGroup color={'inherit'} sx={{ mb: 1 }} size='small' aria-label='editor button group'>
+                        {editorButtons}
+                    </ButtonGroup>
+                )}
             </div>
             <Divider sx={{ mb: 2 }} />
             <Stack direction={'row'} justifyContent={'space-between'} alignItems={'center'}>

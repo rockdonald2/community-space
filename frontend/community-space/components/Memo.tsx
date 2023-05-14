@@ -156,7 +156,7 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                     </Grid>
                 </Grid>
             </Item>
-            <MemoDialog open={isMemoOpen} scroll='paper'>
+            <MemoDialog open={isMemoOpen} scroll='paper' maxWidth='xl'>
                 <DialogTitle sx={{ m: 0, p: 2 }}>
                     <Stack direction={'row'} alignItems={'center'} justifyContent={'space-between'}>
                         <Typography variant={'h6'}>{memo.title}</Typography>
