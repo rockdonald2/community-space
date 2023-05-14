@@ -37,7 +37,7 @@ const MemoEdit = ({
     hubId: string | string[];
     cleanupCallback?: () => void;
 }) => {
-    const { user } = useAuthContext();
+    const { user, signOut } = useAuthContext();
     const { mutate } = useSWRConfig(); // get a global mutator from the SWR config
 
     const [visibility, setVisibility] = useState<Visibility>(initialState?.visibility ?? 'PRIVATE');
@@ -113,11 +113,21 @@ const MemoEdit = ({
                 console.debug(err.message, err);
                 setError(true);
                 setErrMsg(err.message);
+                if (err instanceof Error) {
+                    if ('res' in (err.cause as any)) {
+                        const res = (err.cause as any).res;
+                        if (res.status === 401) {
+                            signOut();
+                        } else {
+                            alert('Failed to submit memo due to bad response');
+                        }
+                    }
+                }
             }
         };
 
         handleAsync();
-    }, [title, msg, urgency, isUpdateMode, user.token, cleanupCallback, mutate, hubId, visibility, memoId]);
+    }, [title, msg, urgency, isUpdateMode, user.token, cleanupCallback, mutate, hubId, visibility, memoId, signOut]);
 
     return (
         <Item>

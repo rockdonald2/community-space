@@ -8,7 +8,7 @@ import Link from 'next/link';
 import { useCallback } from 'react';
 
 const HubCard = ({ hub }: { hub: HubType }) => {
-    const { user } = useAuthContext();
+    const { user, signOut } = useAuthContext();
 
     const handleJoinHub = useCallback(async () => {
         try {
@@ -31,9 +31,21 @@ const HubCard = ({ hub }: { hub: HubType }) => {
                 });
             }
         } catch (err) {
-            console.debug('error', err);
+            console.debug('Failed to add user to waiters list', err);
+            if (err instanceof Error) {
+                if ('res' in (err.cause as any)) {
+                    const res = (err.cause as any).res;
+                    if (res.status === 409) {
+                        alert('You are already in the waiters list');
+                    } else if (res.status === 401) {
+                        signOut();
+                    } else {
+                        alert('Failed to add you to the waiters list');
+                    }
+                }
+            }
         }
-    }, [hub, user.email, user.token]);
+    }, [hub, signOut, user.email, user.token]);
 
     return (
         <Card variant='elevation' elevation={1}>

@@ -1,6 +1,7 @@
 import { MemoShort } from '@/types/db.types';
 import { Theme } from '@mui/material';
 import { GATEWAY_URL } from './Constants';
+import { ErrorResponse } from '@/types/types';
 
 export const sortByUrgency = (m1: MemoShort, m2: MemoShort) => {
     if (m1.urgency === 'URGENT') return -1; // if any of them is urgent, be it first
@@ -53,6 +54,15 @@ export const swrRecentMemosFetcherWithAuth = async (args: { key: string; token: 
         headers: { Authorization: `Bearer ${args.token}` },
     });
 
+    if (!res.ok) {
+        throw {
+            status: res.status,
+            path: res.url,
+            message: res.statusText,
+            error: 'error',
+        } satisfies ErrorResponse;
+    }
+
     return await res.json();
 };
 
@@ -67,6 +77,15 @@ export const swrHubsFetcherWithAuth = async (args: { key: string; token: string 
     const res = await fetch(url, {
         headers: { Authorization: `Bearer ${args.token}` },
     });
+
+    if (!res.ok) {
+        throw {
+            status: res.status,
+            path: res.url,
+            message: res.statusText,
+            error: 'error',
+        } satisfies ErrorResponse;
+    }
 
     return await res.json();
 };
@@ -83,6 +102,15 @@ export const swrHubFetcherWithAuth = async (args: { key: string; token: string; 
         headers: { Authorization: `Bearer ${args.token}` },
     });
 
+    if (!res.ok) {
+        throw {
+            status: res.status,
+            path: res.url,
+            message: res.statusText,
+            error: 'error',
+        } satisfies ErrorResponse;
+    }
+
     return await res.json();
 };
 
@@ -98,6 +126,15 @@ export const swrWaitersFetcherWithAuth = async (args: { key: string; token: stri
         headers: { Authorization: `Bearer ${args.token}` },
     });
 
+    if (!res.ok) {
+        throw {
+            status: res.status,
+            path: res.url,
+            message: res.statusText,
+            error: 'error',
+        } satisfies ErrorResponse;
+    }
+
     return await res.json();
 };
 
@@ -112,6 +149,38 @@ export const swrMembersFetcherWithAuth = async (args: { key: string; token: stri
     const res = await fetch(url, {
         headers: { Authorization: `Bearer ${args.token}` },
     });
+
+    if (!res.ok) {
+        throw {
+            status: res.status,
+            path: res.url,
+            message: res.statusText,
+            error: 'error',
+        } satisfies ErrorResponse;
+    }
+
+    return await res.json();
+};
+
+/**
+ * Retrieves a memo of a hub.
+ * @param args the user's token and the memo's id
+ * @returns the memo of a hub
+ * @throws ErrorResponse if the request fails
+ */
+export const swrMemoFetcherWithAuth = async (args: { key: string; token: string; memoId: string }) => {
+    const res = await fetch(`${GATEWAY_URL}/api/v1/memos/${args.memoId}`, {
+        headers: { Authorization: `Bearer ${args.token}` },
+    });
+
+    if (!res.ok) {
+        throw {
+            status: res.status,
+            path: res.url,
+            message: res.statusText,
+            error: 'error',
+        } satisfies ErrorResponse;
+    }
 
     return await res.json();
 };

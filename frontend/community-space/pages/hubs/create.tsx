@@ -8,7 +8,7 @@ import { useAuthContext } from '@/utils/AuthContext';
 import { useRouter } from 'next/router';
 
 function CreateHub() {
-    const { user } = useAuthContext();
+    const { user, signOut } = useAuthContext();
     const { push } = useRouter();
 
     const [name, setNameInput] = useState<string>(null);
@@ -23,41 +23,56 @@ function CreateHub() {
         []
     );
 
-    const handleSubmit = useCallback(async (e: React.FormEvent<HTMLFormElement>) => {
-        e.preventDefault();
+    const handleSubmit = useCallback(
+        async (e: React.FormEvent<HTMLFormElement>) => {
+            e.preventDefault();
 
-        try {
-            if (name == null || name?.length < 3) {
-                throw new Error('Name must be at least 3 characters long');
-            }
+            try {
+                if (name == null || name?.length < 3) {
+                    throw new Error('Name must be at least 3 characters long');
+                }
 
-            const res = await fetch(`${GATEWAY_URL}/api/v1/hubs`, {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    Authorization: `Bearer ${user?.token}`,
-                },
-                body: JSON.stringify({
-                    name: name,
-                    description: description,
-                }),
-            });
-
-            if (!res.ok) {
-                throw new Error('Failed to create hub due to bad response', {
-                    cause: {
-                        res,
+                const res = await fetch(`${GATEWAY_URL}/api/v1/hubs`, {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        Authorization: `Bearer ${user?.token}`,
                     },
+                    body: JSON.stringify({
+                        name: name,
+                        description: description,
+                    }),
                 });
-            }
 
-            setError(null);
-            push('/');
-        } catch (err) {
-            console.debug('Failed to create hub', err);
-            setError({ msg: err.message });
-        }
-    }, [description, name, push, user?.token]);
+                if (!res.ok) {
+                    throw new Error('Failed to create hub due to bad response', {
+                        cause: {
+                            res,
+                        },
+                    });
+                }
+
+                setError(null);
+                push('/');
+            } catch (err) {
+                setError({ msg: err.message });
+                console.debug('Failed to create hub', err);
+                if (err instanceof Error) {
+                    if ('res' in (err.cause as any)) {
+                        const res = (err.cause as any).res;
+                        if (res.status === 409) {
+                            alert('Hub with the same name already exists');
+                        } else if (res.status === 401) {
+                            signOut();
+                        } else {
+                            alert('Failed to create hub');
+                        }
+                    }
+                }
+            }
+        },
+        [description, name, push, signOut, user?.token]
+    );
 
     return (
         <Stack className={styles.wrapper}>

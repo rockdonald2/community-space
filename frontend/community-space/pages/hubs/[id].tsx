@@ -24,7 +24,7 @@ const Hub = () => {
     const { id: hubId } = query;
     const { mutate } = useSWRConfig();
 
-    const { user } = useAuthContext();
+    const { user, signOut } = useAuthContext();
     const { presence } = usePresenceContext();
 
     const {
@@ -95,10 +95,20 @@ const Hub = () => {
                 mutate({ key: 'pendings', token: user.token, hubId: hubId });
                 mutate({ key: 'members', token: user.token, hubId: hubId });
             } catch (err) {
-                console.debug('error', err);
+                console.debug('Failed to delete user from waiters list or add user to members list', err);
+                if (err instanceof Error) {
+                    if ('res' in (err.cause as any)) {
+                        const res = (err.cause as any).res;
+                        if (res.status === 401) {
+                            signOut();
+                        } else {
+                            alert('Failed to delete user from waiters list or add user to members list');
+                        }
+                    }
+                }
             }
         },
-        [hubId, mutate, user.token]
+        [hubId, mutate, signOut, user.token]
     );
 
     return (

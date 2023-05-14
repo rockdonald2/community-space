@@ -1,5 +1,6 @@
 package edu.pdae.cs.hubmgmt.service.impl;
 
+import edu.pdae.cs.hubmgmt.controller.exception.ConflictingOperationException;
 import edu.pdae.cs.hubmgmt.controller.exception.ForbiddenOperationException;
 import edu.pdae.cs.hubmgmt.model.Hub;
 import edu.pdae.cs.hubmgmt.model.dto.*;
@@ -145,7 +146,7 @@ public class HubServiceImpl implements HubService {
     }
 
     @Override
-    @CacheEvict(value = {"members", "member"}, allEntries = true)
+    @CacheEvict(value = {"waiters", "members", "member", "hubs", "hub"}, allEntries = true)
     public void addMember(ObjectId hubId, MemberDTO memberDTO, String asUser) throws ForbiddenOperationException {
         final Hub hub = hubRepository.findById(hubId).orElseThrow();
 
@@ -154,12 +155,17 @@ public class HubServiceImpl implements HubService {
             throw new ForbiddenOperationException("You are not the owner of this hub");
         }
 
+        if (hub.getMembers().contains(memberDTO.getEmail())) {
+            log.warn("User {} is already a member of hub {}", memberDTO.getEmail(), hubId);
+            throw new ConflictingOperationException("This user is already a member of this hub");
+        }
+
         hub.getMembers().add(memberDTO.getEmail());
         hubRepository.save(hub);
     }
 
     @Override
-    @CacheEvict(value = {"members", "member"}, allEntries = true)
+    @CacheEvict(value = {"waiters", "members", "member", "hubs", "hub"}, allEntries = true)
     public void deleteMember(ObjectId hubId, String email, String asUser) throws ForbiddenOperationException {
         final Hub hub = hubRepository.findById(hubId).orElseThrow();
 
@@ -186,15 +192,22 @@ public class HubServiceImpl implements HubService {
     }
 
     @Override
-    @CacheEvict(value = "waiters", allEntries = true)
+    @CacheEvict(value = {"waiters", "hubs", "hub"}, allEntries = true)
     public void addWaiter(ObjectId hubId, MemberDTO memberDTO) {
         final Hub hub = hubRepository.findById(hubId).orElseThrow();
+
+        if (hub.getWaiting().contains(memberDTO.getEmail())) {
+            log.warn("User {} is already waiting for hub {}", memberDTO.getEmail(), hubId);
+            throw new ConflictingOperationException("This user is already waiting for this hub");
+        }
+
         hub.getWaiting().add(memberDTO.getEmail());
+
         hubRepository.save(hub);
     }
 
     @Override
-    @CacheEvict(value = "waiters", allEntries = true)
+    @CacheEvict(value = {"waiters", "hubs", "hub"}, allEntries = true)
     public void deleteWaiter(ObjectId hubId, String email, String asUser) throws ForbiddenOperationException {
         final Hub hub = hubRepository.findById(hubId).orElseThrow();
 

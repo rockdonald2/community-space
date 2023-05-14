@@ -1,6 +1,7 @@
 package edu.pdae.cs.hubmgmt.controller;
 
 import com.mongodb.MongoWriteException;
+import edu.pdae.cs.hubmgmt.controller.exception.ConflictingOperationException;
 import edu.pdae.cs.hubmgmt.controller.exception.ForbiddenOperationException;
 import edu.pdae.cs.hubmgmt.model.dto.*;
 import edu.pdae.cs.hubmgmt.service.HubService;
@@ -118,8 +119,8 @@ public class HubController {
         return new ResponseEntity<>(HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler(MongoWriteException.class)
-    public ResponseEntity<Void> mongoWriteHandler() {
+    @ExceptionHandler({MongoWriteException.class, ConflictingOperationException.class})
+    public ResponseEntity<Void> conflictHandler() {
         return new ResponseEntity<>(HttpStatus.CONFLICT);
     }
 

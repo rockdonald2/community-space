@@ -5,11 +5,13 @@ import { useEffect } from 'react';
 import QuickActions from './QuickActions';
 import PresenceMessagingWrapper from '@/utils/MessagingWrapper';
 import { GATEWAY_ACCOUNT_WS } from '@/utils/Constants';
+import { SWRConfig } from 'swr/_internal';
+import Blob from './Blob';
 
 const Layout = ({ children }) => {
     const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
     const { setMode } = useColorScheme();
-    const { isAuthenticated } = useAuthContext();
+    const { isAuthenticated, signOut } = useAuthContext();
 
     useEffect(() => {
         setMode(prefersDarkMode ? 'dark' : 'light');
@@ -17,13 +19,24 @@ const Layout = ({ children }) => {
 
     return (
         <>
+            <Blob />
             {isAuthenticated ? (
                 <>
-                    <PresenceMessagingWrapper url={GATEWAY_ACCOUNT_WS}>
-                        <Header />
-                        <>{children}</>
-                        <QuickActions />
-                    </PresenceMessagingWrapper>
+                    <SWRConfig
+                        value={{
+                            onError: (error, key) => {
+                                if (error?.status === 401) {
+                                    signOut();
+                                }
+                            },
+                        }}
+                    >
+                        <PresenceMessagingWrapper url={GATEWAY_ACCOUNT_WS}>
+                            <Header />
+                            <>{children}</>
+                            <QuickActions />
+                        </PresenceMessagingWrapper>
+                    </SWRConfig>
                 </>
             ) : (
                 <>{children}</>

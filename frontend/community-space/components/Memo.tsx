@@ -29,6 +29,7 @@ import useSWR, { useSWRConfig } from 'swr';
 import SkeletonLoader from './SkeletonLoader';
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown';
 import remarkGfm from 'remark-gfm';
+import { swrMemoFetcherWithAuth } from '@/utils/Utility';
 
 const MemoDialog = styled(Dialog)(({ theme }) => ({
     '& .MuiPaper-root': {
@@ -65,14 +66,8 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
         isLoading,
         isValidating,
     } = useSWR<MemoType>(
-        isMemoOpen ? `${GATEWAY_URL}/api/v1/memos/${memo.id}` : null,
-        async (url) => {
-            const res = await fetch(url, {
-                headers: { Authorization: `Bearer ${user.token}` },
-            });
-
-            return await res.json();
-        },
+        isMemoOpen ? { key: 'memo', token: user.token, memoId: memo.id } : null,
+        swrMemoFetcherWithAuth,
         {
             revalidateOnFocus: false,
             refreshWhenHidden: false,
@@ -208,11 +203,9 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                         <SkeletonLoader nrOfLayers={1} />
                     ) : (
                         <>
-                            <Typography sx={{ mb: 0 }} gutterBottom component='div'>
-                                <ReactMarkdown remarkPlugins={[[remarkGfm, { singleTilde: false }]]}>
-                                    {memoData?.content || prevMemoData?.content}
-                                </ReactMarkdown>
-                            </Typography>
+                            <ReactMarkdown remarkPlugins={[[remarkGfm, { singleTilde: false }]]}>
+                                {memoData?.content || prevMemoData?.content}
+                            </ReactMarkdown>
                         </>
                     )}
                 </DialogContent>

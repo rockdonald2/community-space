@@ -40,7 +40,7 @@ function Login() {
             setIsBadLogin(false);
             push('/');
         },
-        [emailInput, passwordInput]
+        [emailInput, passwordInput, push, signIn]
     );
 
     return (
