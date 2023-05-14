@@ -53,8 +53,9 @@ const PresenceContextProvider = ({ children, user }: { children: React.ReactNode
     const provided = useMemo<IPresenceContext>(
         () => ({
             presence,
+            pingInactive
         }),
-        [presence]
+        [presence, pingInactive]
     );
 
     return <PresenceContext.Provider value={provided}>{children}</PresenceContext.Provider>;

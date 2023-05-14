@@ -6,16 +6,19 @@ const PresenceMessagingWrapper = ({
     children,
     url,
     onCloseCallback,
+    onDisconnectCallback,
 }: {
     children: React.ReactNode;
     url: string;
     onCloseCallback?: (event: any) => void;
+    onDisconnectCallback?: (event: any) => void;
 }) => {
     const { user } = useAuthContext();
 
     return (
         <StompSessionProvider
             url={url}
+            onDisconnect={onDisconnectCallback}
             onWebSocketClose={onCloseCallback}
             connectHeaders={{ Authorization: `Bearer ${user.token}` }}
         >
