@@ -33,7 +33,7 @@ import { swrMemoFetcherWithAuth } from '@/utils/Utility';
 
 const MemoDialog = styled(Dialog)(({ theme }) => ({
     '& .MuiPaper-root': {
-        backgroundColor: theme.palette.background.default,
+        backgroundColor: theme.palette.background.paper,
     },
     '& .MuiDialogContent-root': {
         padding: theme.spacing(2),
@@ -171,7 +171,7 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                         </IconButton>
                     </Stack>
                 </DialogTitle>
-                <DialogContent>
+                <DialogContent sx={{ overflow: 'initial' }}>
                     <Typography sx={{ mb: 0 }} color='text.secondary'>
                         Memo posted on {dateFormatter.format(memo.createdOn)} by {memo.author}
                     </Typography>

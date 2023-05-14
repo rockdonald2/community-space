@@ -56,6 +56,10 @@ public class HubServiceImpl implements HubService {
             hubDetailsDTO.setRole(Role.NONE);
         }
 
+        if (hubDetailsDTO.getRole().equals(Role.PENDING) || hubDetailsDTO.getRole().equals(Role.NONE)) {
+            throw new ForbiddenOperationException("You are not a member of this hub");
+        }
+
         return hubDetailsDTO;
     }
 
@@ -148,6 +152,7 @@ public class HubServiceImpl implements HubService {
     @Override
     @CacheEvict(value = {"waiters", "members", "member", "hubs", "hub"}, allEntries = true)
     public void addMember(ObjectId hubId, MemberDTO memberDTO, String asUser) throws ForbiddenOperationException {
+        Objects.requireNonNull(memberDTO.getEmail(), "Email must not be null");
         final Hub hub = hubRepository.findById(hubId).orElseThrow();
 
         if (!hub.getOwner().equals(asUser)) {
@@ -194,6 +199,7 @@ public class HubServiceImpl implements HubService {
     @Override
     @CacheEvict(value = {"waiters", "hubs", "hub"}, allEntries = true)
     public void addWaiter(ObjectId hubId, MemberDTO memberDTO) {
+        Objects.requireNonNull(memberDTO.getEmail(), "Email must not be null");
         final Hub hub = hubRepository.findById(hubId).orElseThrow();
 
         if (hub.getWaiting().contains(memberDTO.getEmail())) {

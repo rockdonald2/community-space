@@ -96,6 +96,10 @@ export const swrHubsFetcherWithAuth = async (args: { key: string; token: string 
  * @returns the hub from the repository
  */
 export const swrHubFetcherWithAuth = async (args: { key: string; token: string; hubId: string }) => {
+    if (!args.hubId) {
+        return {};
+    }
+
     const url = `${GATEWAY_URL}/api/v1/hubs/${args.hubId}`;
 
     const res = await fetch(url, {
@@ -120,6 +124,10 @@ export const swrHubFetcherWithAuth = async (args: { key: string; token: string; 
  * @returns the pending members of a hub
  */
 export const swrWaitersFetcherWithAuth = async (args: { key: string; token: string; hubId: string }) => {
+    if (!args.hubId) {
+        return [];
+    }
+
     const url = `${GATEWAY_URL}/api/v1/hubs/${args.hubId}/waiters`;
 
     const res = await fetch(url, {
@@ -144,6 +152,10 @@ export const swrWaitersFetcherWithAuth = async (args: { key: string; token: stri
  * @returns the members of a hub
  */
 export const swrMembersFetcherWithAuth = async (args: { key: string; token: string; hubId: string }) => {
+    if (!args.hubId) {
+        return [];
+    }
+
     const url = `${GATEWAY_URL}/api/v1/hubs/${args.hubId}/members`;
 
     const res = await fetch(url, {
@@ -169,6 +181,10 @@ export const swrMembersFetcherWithAuth = async (args: { key: string; token: stri
  * @throws ErrorResponse if the request fails
  */
 export const swrMemoFetcherWithAuth = async (args: { key: string; token: string; memoId: string }) => {
+    if (!args.memoId) {
+        return {};
+    }
+
     const res = await fetch(`${GATEWAY_URL}/api/v1/memos/${args.memoId}`, {
         headers: { Authorization: `Bearer ${args.token}` },
     });

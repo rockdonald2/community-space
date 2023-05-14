@@ -27,7 +27,7 @@ public class MemoServiceImpl implements MemoService {
     public MemoCreationResponseDTO create(MemoCreationDTO memoCreationDTO, String asUser) throws ForbiddenOperationException {
         final Memo reqMemo = modelMapper.map(memoCreationDTO, Memo.class);
         reqMemo.setCreatedOn(new Date());
-        reqMemo.setId(null); // TODO: fix this
+        reqMemo.setId(null);
         reqMemo.setAuthor(asUser);
 
         final Memo createdMemo = memoRepository.save(reqMemo);

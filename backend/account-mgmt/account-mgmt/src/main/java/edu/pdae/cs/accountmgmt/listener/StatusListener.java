@@ -37,7 +37,7 @@ public class StatusListener {
         log.info("Cleaning up presence status");
 
         statusService.removeInactives(false);
-        messagingTemplate.convertAndSend(STATUS_BROADCAST, statusService.getAllActive(false));
+        messagingTemplate.convertAndSend(STATUS_BROADCAST, statusService.getAllActive(true));
     }
 
     private void updateStatus(UserPresenceNotificationDTO presenceNotificationDTO) {
