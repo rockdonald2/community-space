@@ -6,6 +6,7 @@ import useSWR from 'swr';
 import { Grid } from '@mui/material';
 import HubCard from './HubCard';
 import Alerter from './Alerter';
+import { useCallback } from 'react';
 
 const Hubs = () => {
     const { user } = useAuthContext();
@@ -14,11 +15,19 @@ const Hubs = () => {
         error,
         isLoading,
         isValidating,
+        mutate,
     } = useSWR<Hub[] | ErrorResponse>({ key: 'hubs', token: user.token }, swrHubsFetcherWithAuth, {
         revalidateOnFocus: false,
-        refreshWhenHidden: false,
-        refreshWhenOffline: false,
     });
+
+    const mutateCallback = useCallback(
+        (hub: Hub) => {
+            let newHubs = [...(hubs as Hub[])];
+            newHubs[(newHubs as Hub[]).findIndex((h) => h.id === hub.id)] = hub;
+            mutate([...(newHubs as Hub[])], false);
+        },
+        [hubs, mutate]
+    );
 
     return (
         <>
@@ -29,7 +38,7 @@ const Hubs = () => {
                     !checkIfError(hubs) &&
                     (hubs as Hub[]).map((hub: Hub) => (
                         <Grid item key={hub.id} xs={12} sm={8} md={6}>
-                            <HubCard hub={hub} />
+                            <HubCard hub={hub} mutateCallback={mutateCallback} />
                         </Grid>
                     ))}
             </Grid>

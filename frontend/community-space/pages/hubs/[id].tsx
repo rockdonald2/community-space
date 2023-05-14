@@ -173,7 +173,7 @@ const Hub = () => {
                                         <Avatar
                                             user={user}
                                             generateRandomColor
-                                            isOnline={presence.filter((p) => p.email === user.email).length > 0}
+                                            isOnline={presence?.filter((p) => p.email === user.email).length > 0}
                                         />
                                     </div>
                                 ))}

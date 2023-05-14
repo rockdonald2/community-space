@@ -1,4 +1,4 @@
-import { Hub as HubType } from '@/types/db.types';
+import { Hub, Hub as HubType } from '@/types/db.types';
 import { useAuthContext } from '@/utils/AuthContext';
 import { GATEWAY_URL } from '@/utils/Constants';
 import { mediumDateWithNoTimeFormatter } from '@/utils/Utility';
@@ -7,7 +7,7 @@ import { teal } from '@mui/material/colors';
 import Link from 'next/link';
 import { useCallback } from 'react';
 
-const HubCard = ({ hub }: { hub: HubType }) => {
+const HubCard = ({ hub, mutateCallback }: { hub: HubType; mutateCallback: (hub: Hub) => void }) => {
     const { user, signOut } = useAuthContext();
 
     const handleJoinHub = useCallback(async () => {
@@ -22,7 +22,7 @@ const HubCard = ({ hub }: { hub: HubType }) => {
             });
 
             if (resp.ok) {
-                hub.role = 'PENDING';
+                mutateCallback({ ...hub, role: 'PENDING' });
             } else {
                 throw new Error('Failed to add user to waiters list', {
                     cause: {
@@ -45,7 +45,7 @@ const HubCard = ({ hub }: { hub: HubType }) => {
                 }
             }
         }
-    }, [hub, signOut, user.email, user.token]);
+    }, [hub, mutateCallback, signOut, user.email, user.token]);
 
     return (
         <Card variant='elevation' elevation={1}>
