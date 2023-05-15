@@ -30,12 +30,12 @@ public class StatusServiceImpl implements StatusService {
 
     private final RedisTemplate<String, UserPresenceDTO> redisTemplatePresence;
     private final RedisTemplate<String, Date> redisTemplateLastModified;
+
     private ValueOperations<String, Date> opsForValueLastModified;
     private HashOperations<String, String, UserPresenceDTO> opsForHashPresence;
 
     @Value("${cs.status.cleanup.interval.minutes}")
     private int cleanIntervalMinutes;
-
     @Value("${cs.status.broadcast.interval.minutes:1}")
     private int broadcastIntervalMinutes;
 

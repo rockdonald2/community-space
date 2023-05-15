@@ -7,6 +7,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.messaging.handler.annotation.Payload;
+import org.springframework.messaging.simp.SimpMessageType;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
@@ -18,18 +19,25 @@ import java.util.concurrent.TimeUnit;
 @Controller
 public class StatusListener {
 
-    private static final String STATUS_BROADCAST = "/topic/status-broadcast";
+    public static final String STATUS_BROADCAST = "/topic/status-broadcast";
+    public static final String STATUS_EXCHANGE = "/status-notify";
 
     private final StatusService statusService;
     private final SimpMessagingTemplate messagingTemplate;
 
-    @MessageMapping("/status-notify") // handles messages coming to /ws/status-notify
-    // @Transactional // olyan performance bottlenecket bevezet, hogy az valami elkepeszto
-    public void broadcastStatus(@Payload UserPresenceNotificationDTO presenceNotificationDTO) {
+    @MessageMapping(STATUS_EXCHANGE) // handles messages coming to /ws/status-notify
+    public void handleStatus(@Payload UserPresenceNotificationDTO presenceNotificationDTO) {
         log.info("Caught external (user) message for presence update for {}", presenceNotificationDTO);
 
         updateStatus(presenceNotificationDTO);
-        messagingTemplate.convertAndSend(STATUS_BROADCAST, statusService.getAllActive(true));
+        broadcast();
+    }
+
+    @Scheduled(fixedDelayString = "${cs.status.broadcast.interval.seconds}", timeUnit = TimeUnit.SECONDS)
+    public void broadcastStatus() {
+        log.info("Broadcasting presence status");
+
+        broadcast();
     }
 
     @Scheduled(fixedDelayString = "${cs.status.cleanup.interval.minutes}", timeUnit = TimeUnit.MINUTES)
@@ -37,7 +45,7 @@ public class StatusListener {
         log.info("Cleaning up presence status");
 
         statusService.removeInactives(false);
-        messagingTemplate.convertAndSend(STATUS_BROADCAST, statusService.getAllActive(true));
+        broadcast();
     }
 
     private void updateStatus(UserPresenceNotificationDTO presenceNotificationDTO) {
@@ -47,6 +55,10 @@ public class StatusListener {
             case ONLINE -> statusService.putActive(userPresenceDTO);
             case OFFLINE -> statusService.removeInactive(userPresenceDTO);
         }
+    }
+
+    private void broadcast() {
+        messagingTemplate.convertAndSend(STATUS_BROADCAST, statusService.getAllActive(true));
     }
 
 }

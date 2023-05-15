@@ -26,6 +26,7 @@ const AuthContextProvider = ({ children }) => {
                 sameSite: 'lax',
             });
         }
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [user]);
 
     const signOut = useCallback(() => {
@@ -51,6 +52,7 @@ const AuthContextProvider = ({ children }) => {
         setIsAuthenticated(false);
         removeCookie(USER_DATA_LS);
         triggerReload();
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [triggerReload, user?.token]);
 
     useEffect(() => {
@@ -100,6 +102,7 @@ const AuthContextProvider = ({ children }) => {
             setIsAuthenticated(false);
             setInitialized(false);
         };
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, []);
 
     const signIn = useCallback(

@@ -13,6 +13,8 @@ public interface JwtService {
 
     boolean isTokenValid(String token, String potentialSubject);
 
+    boolean isTokenValid(String token);
+
     String extractEmail(String token);
 
     <T> T extractClaim(String token, Function<Claims, T> claimsResolver);

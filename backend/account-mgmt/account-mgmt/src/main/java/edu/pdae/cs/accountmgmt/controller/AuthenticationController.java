@@ -45,7 +45,7 @@ public class AuthenticationController {
 
         final String token = getAuthToken(rawHeader);
         final String email = Objects.requireNonNull(jwtService.extractEmail(token)); // first check, check for e-mail and auth, we verify the signing key here
-        // can throw validation exceptions
+        // can throw validation exceptions, but will let through if it is expired
 
         log.info("Incoming validation request for {}", email);
 
@@ -53,9 +53,12 @@ public class AuthenticationController {
 
         // this can throw validation exceptions which means the claim was falsified
         if (jwtService.isTokenValid(token, user.getEmail())) { // check the expiration and subjects
+            log.info("Incoming validation request for {} is valid", email);
             return new ResponseEntity<>(HttpStatus.NO_CONTENT);
         }
 
+        log.info("Incoming validation request for {} is invalid", email);
+        // we know the token was valid here, but it is expired
         return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
     }
 
@@ -69,7 +72,7 @@ public class AuthenticationController {
         log.info("Incoming logout request before token validation");
 
         final String token = getAuthToken(rawHeader);
-        final String email = Objects.requireNonNull(jwtService.extractEmail(token)); // can throw 400 or 401 if token is already expired or malicious, or email is missing
+        final String email = Objects.requireNonNull(jwtService.extractEmail(token)); // can throw 400 or 401 if token is malicious, or email is missing
 
         log.info("Incoming logout request for {}", email);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

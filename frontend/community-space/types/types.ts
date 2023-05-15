@@ -56,6 +56,8 @@ export type UserPresence = {
 
 export interface IPresenceContext {
     presence: UserPresence[];
+    pingInactive: () => void;
+    pingActive: () => void;
 }
 
 export interface ICrossContext {

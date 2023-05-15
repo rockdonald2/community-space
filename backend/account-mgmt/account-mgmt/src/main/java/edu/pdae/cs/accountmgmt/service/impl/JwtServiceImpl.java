@@ -1,10 +1,7 @@
 package edu.pdae.cs.accountmgmt.service.impl;
 
 import edu.pdae.cs.accountmgmt.service.JwtService;
-import io.jsonwebtoken.Claims;
-import io.jsonwebtoken.JwtException;
-import io.jsonwebtoken.Jwts;
-import io.jsonwebtoken.SignatureAlgorithm;
+import io.jsonwebtoken.*;
 import io.jsonwebtoken.io.Decoders;
 import io.jsonwebtoken.security.Keys;
 import lombok.extern.slf4j.Slf4j;
@@ -48,7 +45,14 @@ public class JwtServiceImpl implements JwtService {
         log.info("Validating token for potential subject {}", potentialSubject);
 
         final String email = extractEmail(token);
-        return (email.equals(potentialSubject)) && !isTokenExpired(token);
+        return (email.equals(potentialSubject)) && !isTokenExpired(token); // will only throw if the token was falsified
+    }
+
+    @Override
+    public boolean isTokenValid(String token) throws JwtException {
+        log.info("Validating token");
+
+        return !isTokenExpired(token); // will only throw if the token was falsified
     }
 
     private boolean isTokenExpired(String token) {
@@ -71,12 +75,16 @@ public class JwtServiceImpl implements JwtService {
     }
 
     private Claims extractAllClaims(String token) {
-        return Jwts
-                .parserBuilder()
-                .setSigningKey(getSigningKey())
-                .build()
-                .parseClaimsJws(token)
-                .getBody();
+        try {
+            return Jwts
+                    .parserBuilder()
+                    .setSigningKey(getSigningKey())
+                    .build()
+                    .parseClaimsJws(token)
+                    .getBody();
+        } catch (ExpiredJwtException e) {
+            return e.getClaims();
+        } // let any other JwtException flow through this block
     }
 
     private Key getSigningKey() {

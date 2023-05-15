@@ -34,16 +34,11 @@ const PresenceContextProvider = ({ children, user }: { children: React.ReactNode
     const pingInactive = useCallback(() => ping('OFFLINE'), [ping]);
 
     useEffect(() => {
-        pingActive();
-
         const presenceIntervalId = setInterval(() => {
             pingActive();
         }, 1000 * 15); // every 15 seconds
 
         return () => {
-            // TODO: check if this is needed
-            // ! pingInactive(); // this won't work as the client is already unmounted here
-            // try putting it on onWebSocketClose() callback
             clearInterval(presenceIntervalId);
         };
     }, [pingActive, stompClient]);
@@ -53,9 +48,10 @@ const PresenceContextProvider = ({ children, user }: { children: React.ReactNode
     const provided = useMemo<IPresenceContext>(
         () => ({
             presence,
-            pingInactive
+            pingInactive,
+            pingActive,
         }),
-        [presence, pingInactive]
+        [presence, pingInactive, pingActive]
     );
 
     return <PresenceContext.Provider value={provided}>{children}</PresenceContext.Provider>;

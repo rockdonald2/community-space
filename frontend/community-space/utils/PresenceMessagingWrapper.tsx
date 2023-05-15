@@ -2,25 +2,18 @@ import { StompSessionProvider } from 'react-stomp-hooks';
 import { useAuthContext } from './AuthContext';
 import PresenceContextProvider from './PresenceContext';
 
-const PresenceMessagingWrapper = ({
-    children,
-    url,
-    onCloseCallback,
-    onDisconnectCallback,
-}: {
-    children: React.ReactNode;
-    url: string;
-    onCloseCallback?: (event: any) => void;
-    onDisconnectCallback?: (event: any) => void;
-}) => {
+const PresenceMessagingWrapper = ({ children, url }: { children: React.ReactNode; url: string }) => {
     const { user } = useAuthContext();
+
+    if (!user) {
+        return <>{children}</>;
+    }
 
     return (
         <StompSessionProvider
             url={url}
-            onDisconnect={onDisconnectCallback}
-            onWebSocketClose={onCloseCallback}
             connectHeaders={{ Authorization: `Bearer ${user.token}` }}
+            disconnectHeaders={{ Authorization: `Bearer ${user.token}` }}
         >
             <PresenceContextProvider user={user}>{children}</PresenceContextProvider>
         </StompSessionProvider>

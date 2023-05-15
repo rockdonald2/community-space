@@ -8,6 +8,8 @@ import AuthContextProvider from '@/utils/AuthContext';
 import { RouteGuard } from '@/utils/RouteGuard';
 import CrossContextProvider from '@/utils/CrossContext';
 import { CookiesProvider } from 'react-cookie';
+import PresenceMessagingWrapper from '@/utils/PresenceMessagingWrapper';
+import { GATEWAY_ACCOUNT_WS } from '@/utils/Constants';
 
 export default function App({ Component, pageProps }: AppProps) {
     return (
@@ -21,9 +23,11 @@ export default function App({ Component, pageProps }: AppProps) {
                     <CrossContextProvider>
                         <AuthContextProvider>
                             <RouteGuard>
-                                <Layout>
-                                    <Component {...pageProps} />
-                                </Layout>
+                                <PresenceMessagingWrapper url={GATEWAY_ACCOUNT_WS}>
+                                    <Layout>
+                                        <Component {...pageProps} />
+                                    </Layout>
+                                </PresenceMessagingWrapper>
                             </RouteGuard>
                         </AuthContextProvider>
                     </CrossContextProvider>
