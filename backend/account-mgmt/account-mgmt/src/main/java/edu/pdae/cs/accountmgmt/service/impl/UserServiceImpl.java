@@ -51,7 +51,7 @@ public class UserServiceImpl implements UserService {
     public UserLoginResponseDTO login(UserLoginDTO loginDTO) throws LoginException {
         log.info("Logging in user {}", loginDTO.getEmail());
 
-        final User repoUser = userRepository.findByEmail(loginDTO.getEmail()).orElseThrow();
+        final User repoUser = userRepository.findByEmail(loginDTO.getEmail()).orElseThrow(() -> new LoginException("User not found"));
         if (!passwordEncoder.matches(loginDTO.getPassword(), repoUser.getPassword())) {
             throw new LoginException("Passwords don't match");
         }

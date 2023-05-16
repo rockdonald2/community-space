@@ -2,13 +2,15 @@ import { Hub, Hub as HubType } from '@/types/db.types';
 import { useAuthContext } from '@/utils/AuthContext';
 import { GATEWAY_URL } from '@/utils/Constants';
 import { mediumDateWithNoTimeFormatter } from '@/utils/Utility';
-import { Avatar, Box, Button, Card, CardContent, Divider, Typography } from '@mui/material';
+import { Avatar, Box, Button, Card, CardContent, Chip, Divider, Typography } from '@mui/material';
 import { teal } from '@mui/material/colors';
 import Link from 'next/link';
+import { useSnackbar } from 'notistack';
 import { useCallback } from 'react';
 
 const HubCard = ({ hub, mutateCallback }: { hub: HubType; mutateCallback: (hub: Hub) => void }) => {
     const { user, signOut } = useAuthContext();
+    const { enqueueSnackbar } = useSnackbar();
 
     const handleJoinHub = useCallback(async () => {
         try {
@@ -36,16 +38,17 @@ const HubCard = ({ hub, mutateCallback }: { hub: HubType; mutateCallback: (hub: 
                 if ('res' in (err.cause as any)) {
                     const res = (err.cause as any).res;
                     if (res.status === 409) {
-                        alert('You are already in the waiters list');
+                        enqueueSnackbar('You are already in the waiters list', { variant: 'info' });
                     } else if (res.status === 401) {
+                        enqueueSnackbar('Your session has expired. Please sign in again', { variant: 'warning' });
                         signOut();
                     } else {
-                        alert('Failed to add you to the waiters list');
+                        enqueueSnackbar('Failed to add you to the waiters list', { variant: 'error' });
                     }
                 }
             }
         }
-    }, [hub, mutateCallback, signOut, user.email, user.token]);
+    }, [enqueueSnackbar, hub, mutateCallback, signOut, user.email, user.token]);
 
     return (
         <Card variant='elevation' elevation={1}>
@@ -75,7 +78,7 @@ const HubCard = ({ hub, mutateCallback }: { hub: HubType; mutateCallback: (hub: 
                 </CardContent>
                 <Divider />
                 <Typography sx={{ mt: 1.5, mb: 1.5 }} color='text.secondary' align='center' variant='subtitle2'>
-                    {hub.role}
+                    <Chip label={hub.role} variant='filled' />
                 </Typography>
                 <Divider />
                 <Button

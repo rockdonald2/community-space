@@ -110,23 +110,23 @@ public class HubController {
     }
 
     @ExceptionHandler({NullPointerException.class, IllegalArgumentException.class})
-    public ResponseEntity<Void> nullHandler() {
-        return ResponseEntity.badRequest().build();
+    public ResponseEntity<String> nullHandler() {
+        return ResponseEntity.badRequest().body("Invalid request received");
     }
 
     @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<Void> noSuchElementHandler() {
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<String> noSuchElementHandler() {
+        return new ResponseEntity<>("Requested hub cannot be found", HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler({MongoWriteException.class, ConflictingOperationException.class})
-    public ResponseEntity<Void> conflictHandler() {
-        return new ResponseEntity<>(HttpStatus.CONFLICT);
+    public ResponseEntity<String> conflictHandler() {
+        return new ResponseEntity<>("Conflicting operation attempted", HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(ForbiddenOperationException.class)
-    public ResponseEntity<Void> forbiddenOperationHandler() {
-        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    public ResponseEntity<String> forbiddenOperationHandler() {
+        return new ResponseEntity<>("Operation is not allowed", HttpStatus.FORBIDDEN);
     }
 
 }

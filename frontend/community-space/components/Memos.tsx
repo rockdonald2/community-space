@@ -94,6 +94,7 @@ const Memos = ({ hubId }: { hubId?: string | string[] }) => {
                     <FormControl sx={{ width: '50%' }}>
                         <InputLabel size='small'>Urgency</InputLabel>
                         <Select
+                            sx={{ fontSize: 'medium' }}
                             fullWidth
                             size='small'
                             multiple

@@ -11,11 +11,13 @@ import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
 import { usePresenceContext } from '@/utils/PresenceContext';
 import useSWR, { useSWRConfig } from 'swr';
 import { GATEWAY_URL } from '@/utils/Constants';
+import { useSnackbar } from 'notistack';
 
 const Members = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBER' | 'PENDING' | 'NONE' }) => {
     const { presence } = usePresenceContext();
     const { user, signOut } = useAuthContext();
     const { mutate } = useSWRConfig();
+    const { enqueueSnackbar } = useSnackbar();
 
     const {
         data: hubMembers,
@@ -60,15 +62,16 @@ const Members = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBER
                     if ('res' in (err.cause as any)) {
                         const res = (err.cause as any).res;
                         if (res.status === 401) {
+                            enqueueSnackbar('Your session has expired. Please sign in again', { variant: 'warning' });
                             signOut();
                         } else {
-                            alert('Failed to delete member');
+                            enqueueSnackbar('Failed to delete member', { variant: 'error' });
                         }
                     }
                 }
             }
         },
-        [hubId, mutate, signOut, user.token]
+        [enqueueSnackbar, hubId, mutate, signOut, user.token]
     );
 
     return (

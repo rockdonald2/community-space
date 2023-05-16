@@ -1,6 +1,7 @@
 import LogoutIcon from '@mui/icons-material/Logout';
 import HomeIcon from '@mui/icons-material/Home';
 import GroupIcon from '@mui/icons-material/Group';
+import ExploreIcon from '@mui/icons-material/Explore';
 import { Box, SpeedDial, SpeedDialAction, SpeedDialIcon } from '@mui/material';
 import { useRouter } from 'next/router';
 import { useState, useCallback } from 'react';
@@ -11,6 +12,7 @@ const quickActions: QuickActionType[] = [
     { icon: <LogoutIcon />, name: 'Logout', action: 'signout' },
     { icon: <HomeIcon />, name: 'Back to home', action: 'backToHome' },
     { icon: <GroupIcon />, name: 'Create Hub', action: 'createHub' },
+    { icon: <ExploreIcon />, name: 'Explore Hubs', action: 'explore' },
 ];
 
 const QuickActions = () => {
@@ -20,23 +22,30 @@ const QuickActions = () => {
     const handleClose = () => setOpen(false);
     const { signOut } = useAuthContext();
 
-    const handleAction = useCallback(async (_e: React.MouseEvent<HTMLDivElement>, action: QuickActionActionType) => {
-        switch (action) {
-            case 'signout': {
-                signOut();
-                push('/login');
-                break;
+    const handleAction = useCallback(
+        async (_e: React.MouseEvent<HTMLDivElement>, action: QuickActionActionType) => {
+            switch (action) {
+                case 'signout': {
+                    signOut();
+                    push('/login');
+                    break;
+                }
+                case 'backToHome': {
+                    push('/');
+                    break;
+                }
+                case 'createHub': {
+                    push('/hubs/create');
+                    break;
+                }
+                case 'explore': {
+                    push('/hubs/explore');
+                    break;
+                }
             }
-            case 'backToHome': {
-                push('/');
-                break;
-            }
-            case 'createHub': {
-                push('/hubs/create');
-                break;
-            }
-        }
-    }, []);
+        },
+        [push, signOut]
+    );
 
     return (
         <Box sx={{ transform: 'translateZ(0px)', flexGrow: 1 }}>

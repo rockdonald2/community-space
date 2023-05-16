@@ -28,6 +28,7 @@ import PermMediaIcon from '@mui/icons-material/PermMedia';
 import Filter1Icon from '@mui/icons-material/Filter1';
 import Filter2Icon from '@mui/icons-material/Filter2';
 import Filter3Icon from '@mui/icons-material/Filter3';
+import { useSnackbar } from 'notistack';
 
 const MemoEdit = ({
     initialState,
@@ -49,6 +50,7 @@ const MemoEdit = ({
 }) => {
     const { user, signOut } = useAuthContext();
     const { mutate } = useSWRConfig(); // get a global mutator from the SWR config
+    const { enqueueSnackbar } = useSnackbar();
 
     const [visibility, setVisibility] = useState<Visibility>(initialState?.visibility ?? 'PRIVATE');
     const [urgency, setUrgency] = useState<Urgency>(initialState?.urgency ?? '');
@@ -229,9 +231,10 @@ const MemoEdit = ({
                     if ('res' in (err.cause as any)) {
                         const res = (err.cause as any).res;
                         if (res.status === 401) {
+                            enqueueSnackbar('Your session has expired. Please sign in again', { variant: 'warning' });
                             signOut();
                         } else {
-                            alert('Failed to submit memo due to bad response');
+                            enqueueSnackbar('Failed to submit memo', { variant: 'error' });
                         }
                     }
                 }
@@ -239,7 +242,20 @@ const MemoEdit = ({
         };
 
         handleAsync();
-    }, [title, msg, urgency, isUpdateMode, user.token, cleanupCallback, mutate, hubId, visibility, memoId, signOut]);
+    }, [
+        title,
+        msg,
+        urgency,
+        isUpdateMode,
+        user.token,
+        cleanupCallback,
+        mutate,
+        hubId,
+        visibility,
+        memoId,
+        enqueueSnackbar,
+        signOut,
+    ]);
 
     return (
         <Item>
@@ -281,6 +297,7 @@ const MemoEdit = ({
                     <FormControl sx={{ mr: 1, minWidth: 120 }} size='small'>
                         <InputLabel>Urgency</InputLabel>
                         <Select
+                            sx={{ fontSize: 'medium' }}
                             value={urgency}
                             label='Urgency'
                             onChange={(e: SelectChangeEvent) => handleChange(e, setUrgency)}
@@ -295,6 +312,7 @@ const MemoEdit = ({
                     <FormControl sx={{ mr: 1, minWidth: 120 }} size='small'>
                         <InputLabel>Visibility</InputLabel>
                         <Select
+                            sx={{ fontSize: 'medium' }}
                             value={visibility}
                             label='Visibility'
                             onChange={(e: SelectChangeEvent) => handleChange(e, setVisibility)}
@@ -304,16 +322,18 @@ const MemoEdit = ({
                         </Select>
                     </FormControl>
                 </div>
-                <Button
-                    variant='outlined'
-                    size='large'
-                    endIcon={<SendIcon />}
-                    aria-label='send memo'
-                    type='button'
-                    onClick={handleSubmit}
-                >
-                    {isUpdateMode ? 'Edit' : 'Send'}
-                </Button>
+                <Tooltip title='Submit your memo'>
+                    <Button
+                        variant='outlined'
+                        size='large'
+                        endIcon={<SendIcon />}
+                        aria-label='send memo'
+                        type='button'
+                        onClick={handleSubmit}
+                    >
+                        {isUpdateMode ? 'Edit' : 'Send'}
+                    </Button>
+                </Tooltip>
             </Stack>
         </Item>
     );

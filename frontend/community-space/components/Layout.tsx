@@ -5,11 +5,13 @@ import { useEffect } from 'react';
 import QuickActions from './QuickActions';
 import Blob from './Blob';
 import { SWRConfig } from 'swr';
+import { useSnackbar } from 'notistack';
 
 const Layout = ({ children }) => {
     const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
     const { setMode } = useColorScheme();
     const { isAuthenticated, signOut } = useAuthContext();
+    const { enqueueSnackbar } = useSnackbar();
 
     useEffect(() => {
         setMode(prefersDarkMode ? 'dark' : 'light');
@@ -24,6 +26,9 @@ const Layout = ({ children }) => {
                         value={{
                             onError: (error, key) => {
                                 if (error?.status === 401) {
+                                    enqueueSnackbar('Your session has expired. Please sign in again', {
+                                        variant: 'warning',
+                                    });
                                     signOut();
                                 }
                             },

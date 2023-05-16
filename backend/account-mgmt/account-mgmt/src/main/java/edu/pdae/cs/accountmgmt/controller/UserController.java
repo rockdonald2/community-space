@@ -56,7 +56,7 @@ public class UserController {
 
     @ExceptionHandler(NoSuchElementException.class)
     public ResponseEntity<String> notFoundHandler() {
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+        return new ResponseEntity<>("Requested user cannot be found", HttpStatus.NOT_FOUND);
     }
 
 }

@@ -1,4 +1,4 @@
-import { Divider, IconButton, ListItemIcon, Menu, MenuItem, Typography } from '@mui/material';
+import { Container, Divider, IconButton, ListItemIcon, Menu, MenuItem, Typography } from '@mui/material';
 import Alerter from './Alerter';
 import { UserShort } from '@/types/db.types';
 import { checkIfError, swrWaitersFetcherWithAuth } from '@/utils/Utility';
@@ -11,10 +11,12 @@ import { GATEWAY_URL } from '@/utils/Constants';
 import SkeletonLoader from './SkeletonLoader';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
+import { useSnackbar } from 'notistack';
 
 const Pendings = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBER' | 'PENDING' | 'NONE' }) => {
     const { user, signOut } = useAuthContext();
     const { mutate } = useSWRConfig();
+    const { enqueueSnackbar } = useSnackbar();
 
     const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
     const open = useMemo(() => Boolean(menuAnchorEl), [menuAnchorEl]);
@@ -78,15 +80,18 @@ const Pendings = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBE
                     if ('res' in (err.cause as any)) {
                         const res = (err.cause as any).res;
                         if (res.status === 401) {
+                            enqueueSnackbar('Your session has expired. Please sign in again', { variant: 'warning' });
                             signOut();
                         } else {
-                            alert('Failed to delete user from waiters list or add user to members list');
+                            enqueueSnackbar('Failed to delete user from waiters list or add user to members list', {
+                                variant: 'error',
+                            });
                         }
                     }
                 }
             }
         },
-        [hubId, mutate, signOut, user.token]
+        [enqueueSnackbar, hubId, mutate, signOut, user.token]
     );
 
     const handleDecline = useCallback(
@@ -112,15 +117,16 @@ const Pendings = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBE
                     if ('res' in (err.cause as any)) {
                         const res = (err.cause as any).res;
                         if (res.status === 401) {
+                            enqueueSnackbar('Your session has expired. Please sign in again', { variant: 'warning' });
                             signOut();
                         } else {
-                            alert('Failed to delete user from waiters list');
+                            enqueueSnackbar('Failed to delete user from waiters list', { variant: 'error' });
                         }
                     }
                 }
             }
         },
-        [hubId, mutate, signOut, user.token]
+        [enqueueSnackbar, hubId, mutate, signOut, user.token]
     );
 
     return (
@@ -139,18 +145,25 @@ const Pendings = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBE
                 !hubPendingsIsValidating &&
                 !checkIfError(hubPendings) &&
                 ((hubPendings as UserShort[]).length !== 0 ? (
-                    (hubPendings as UserShort[]).map((user, idx) => (
-                        <IconButton
-                            key={idx}
-                            aria-haspopup='true'
-                            size='small'
-                            onClick={handleClick}
-                            sx={{ cursor: 'pointer' }}
-                            data-user={user.email}
-                        >
-                            <Avatar user={user} generateRandomColor cursor='pointer' />
-                        </IconButton>
-                    ))
+                    <>
+                        <Container sx={{ mb: 1.5 }}>
+                            {(hubPendings as UserShort[]).map((user, idx) => (
+                                <IconButton
+                                    key={idx}
+                                    aria-haspopup='true'
+                                    size='small'
+                                    onClick={handleClick}
+                                    sx={{ cursor: 'pointer' }}
+                                    data-user={user.email}
+                                >
+                                    <Avatar user={user} generateRandomColor cursor='pointer' />
+                                </IconButton>
+                            ))}
+                        </Container>
+                        <Typography color='text.secondary' variant='caption'>
+                            Accept or decline the pending members
+                        </Typography>
+                    </>
                 ) : (
                     <Typography variant='body2' color='text.secondary'>
                         No pending members

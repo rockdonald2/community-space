@@ -30,6 +30,7 @@ import SkeletonLoader from './SkeletonLoader';
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown';
 import remarkGfm from 'remark-gfm';
 import { swrMemoFetcherWithAuth } from '@/utils/Utility';
+import { useSnackbar } from 'notistack';
 
 const MemoDialog = styled(Dialog)(({ theme }) => ({
     '& .MuiPaper-root': {
@@ -52,6 +53,7 @@ const dateFormatter = new Intl.DateTimeFormat('en-gb', {
 const Memo = ({ memo }: { memo: MemoShort }) => {
     const { user } = useAuthContext();
     const { mutate } = useSWRConfig();
+    const { enqueueSnackbar } = useSnackbar();
 
     const [isMemoOpen, setMemoOpen] = useState<boolean>(false);
     const [isMemoModificationError, setUserInputError] = useState<boolean>(false);
@@ -113,12 +115,13 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                 mutate({ key: 'memos', token: user.token, hubId: memo.hubId });
             } catch (err) {
                 console.debug(err.message, err);
+                enqueueSnackbar('Failed to delete memo.', { variant: 'error' });
                 setUserInputError(true);
             }
         };
 
         handleAsync();
-    }, [memo.id, memo.hubId, user.token, mutate]);
+    }, [memo.id, memo.hubId, user.token, mutate, enqueueSnackbar]);
 
     return (
         <>

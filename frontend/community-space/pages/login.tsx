@@ -8,6 +8,7 @@ import styles from '@/styles/Login.module.scss';
 import { useAuthContext } from '@/utils/AuthContext';
 import PasswordField from '@/components/PasswordField';
 import TextField from '@/components/TextField';
+import { useSnackbar } from 'notistack';
 
 function Login() {
     const [emailInput, setEmailInput] = useState<string>(null);
@@ -15,6 +16,7 @@ function Login() {
     const [isBadLogin, setIsBadLogin] = useState<boolean>(false);
     const { push } = useRouter();
     const { signIn } = useAuthContext();
+    const { enqueueSnackbar } = useSnackbar();
 
     const handleInput = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>, setState: Dispatch<SetStateAction<string>>) => {
@@ -27,20 +29,21 @@ function Login() {
         async (e: React.FormEvent<HTMLFormElement>) => {
             e.preventDefault();
 
-            const { user, error } = await signIn({
+            const { user: _, error } = await signIn({
                 email: emailInput,
                 password: passwordInput,
             });
 
             if (error) {
                 setIsBadLogin(true);
+                enqueueSnackbar('An error occurred, please try again!', { variant: 'error' });
                 return console.debug('Error happened while trying to log in', error);
             }
 
             setIsBadLogin(false);
             push('/');
         },
-        [emailInput, passwordInput, push, signIn]
+        [emailInput, enqueueSnackbar, passwordInput, push, signIn]
     );
 
     return (

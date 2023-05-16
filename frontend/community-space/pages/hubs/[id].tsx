@@ -53,6 +53,9 @@ const Hub = () => {
                                 <Typography variant='h5' align='center' color='text.secondary' mb={2}>
                                     Welcome to {(hub as HubType).name} Hub!
                                 </Typography>
+                                <Typography variant='body1' align='left' color='text.secondary'>
+                                    {(hub as HubType).description}
+                                </Typography>
                             </Container>
                             <Divider sx={{ mb: 1.5 }} />
                             <Memos hubId={hubId} />

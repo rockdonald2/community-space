@@ -78,18 +78,18 @@ public class MemoController {
     }
 
     @ExceptionHandler(ForbiddenOperationException.class)
-    public ResponseEntity<Void> forbiddenHandler() {
-        return new ResponseEntity<>(HttpStatus.FORBIDDEN);
+    public ResponseEntity<String> forbiddenHandler() {
+        return new ResponseEntity<>("Operation is not allowed", HttpStatus.FORBIDDEN);
     }
 
     @ExceptionHandler(NullPointerException.class)
-    public ResponseEntity<Void> nullHandler() {
-        return ResponseEntity.badRequest().build();
+    public ResponseEntity<String> nullHandler() {
+        return ResponseEntity.badRequest().body("Invalid request received");
     }
 
     @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<Void> noSuchElementHandler() {
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<String> noSuchElementHandler() {
+        return new ResponseEntity<>("Requested memo cannot be found", HttpStatus.NOT_FOUND);
     }
 
 }

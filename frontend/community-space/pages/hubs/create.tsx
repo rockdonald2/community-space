@@ -6,10 +6,12 @@ import { Dispatch, SetStateAction, useCallback, useState } from 'react';
 import { GATEWAY_URL } from '@/utils/Constants';
 import { useAuthContext } from '@/utils/AuthContext';
 import { useRouter } from 'next/router';
+import { useSnackbar } from 'notistack';
 
 function CreateHub() {
     const { user, signOut } = useAuthContext();
     const { push } = useRouter();
+    const { enqueueSnackbar } = useSnackbar();
 
     const [name, setNameInput] = useState<string>(null);
     const [description, setDescriptionInput] = useState<string>(null);
@@ -61,17 +63,18 @@ function CreateHub() {
                     if ('res' in (err.cause as any)) {
                         const res = (err.cause as any).res;
                         if (res.status === 409) {
-                            alert('Hub with the same name already exists');
+                            enqueueSnackbar('Hub with the same name already exists', { variant: 'warning' });
                         } else if (res.status === 401) {
+                            enqueueSnackbar('Your session has expired. Please sign in again', { variant: 'warning' });
                             signOut();
                         } else {
-                            alert('Failed to create hub');
+                            enqueueSnackbar('Failed to create hub', { variant: 'error' });
                         }
                     }
                 }
             }
         },
-        [description, name, push, signOut, user?.token]
+        [description, enqueueSnackbar, name, push, signOut, user?.token]
     );
 
     return (

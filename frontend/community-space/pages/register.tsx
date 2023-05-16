@@ -7,6 +7,7 @@ import styles from '@/styles/Register.module.scss';
 import { useAuthContext } from '@/utils/AuthContext';
 import PasswordField from '@/components/PasswordField';
 import TextField from '@/components/TextField';
+import { useSnackbar } from 'notistack';
 
 const EMAIL_REGEXP: RegExp = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 
@@ -23,6 +24,7 @@ function Register() {
     const [namesMissing, setNamesMissing] = useState<boolean>(false);
     const { push } = useRouter();
     const { signUp } = useAuthContext();
+    const { enqueueSnackbar } = useSnackbar();
 
     const handleInput = useCallback(
         (e: React.ChangeEvent<HTMLInputElement>, setState: Dispatch<SetStateAction<string>>) => {
@@ -57,12 +59,13 @@ function Register() {
 
             if (error) {
                 setIsError(true);
+                enqueueSnackbar('An error occurred, please try again!', { variant: 'error' });
                 return console.debug('Error happened while trying to sign up', error);
             }
 
             push('/');
         },
-        [emailInput, passwordInput, confirmPasswordInput, firstNameInput, lastNameInput]
+        [passwordInput, emailInput, confirmPasswordInput, firstNameInput, lastNameInput, signUp, push, enqueueSnackbar]
     );
 
     return (

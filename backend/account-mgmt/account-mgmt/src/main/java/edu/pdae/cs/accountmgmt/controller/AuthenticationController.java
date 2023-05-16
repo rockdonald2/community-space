@@ -87,23 +87,23 @@ public class AuthenticationController {
     }
 
     @ExceptionHandler(NullPointerException.class)
-    public ResponseEntity<Void> nullHandler() {
-        return ResponseEntity.badRequest().build();
+    public ResponseEntity<String> nullHandler() {
+        return ResponseEntity.badRequest().body("Invalid request received");
     }
 
     @ExceptionHandler(LoginException.class)
-    public ResponseEntity<Void> loginExceptionHandler() {
-        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    public ResponseEntity<String> loginExceptionHandler() {
+        return new ResponseEntity<>("Either wrong password or username", HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(NoSuchElementException.class)
-    public ResponseEntity<Void> noElementHandler() {
-        return new ResponseEntity<>(HttpStatus.NOT_FOUND);
+    public ResponseEntity<String> noElementHandler() {
+        return new ResponseEntity<>("Requested user cannot be found", HttpStatus.NOT_FOUND);
     }
 
     @ExceptionHandler({ExpiredJwtException.class, SignatureException.class, IllegalArgumentException.class})
-    public ResponseEntity<Void> expiredOrBadSignatureHandler() {
-        return new ResponseEntity<>(HttpStatus.UNAUTHORIZED);
+    public ResponseEntity<String> expiredOrBadSignatureHandler() {
+        return new ResponseEntity<>("Invalid authentication token provided", HttpStatus.UNAUTHORIZED);
     }
 
 }
