@@ -5,16 +5,15 @@ import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-import java.util.Date;
-
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserPresenceDTO implements Serializable { // for some reason redisson needs this to be serializable
+public class UserDataDTO {
 
     private String email;
-    private Date lastSeen;
+    private String firstName;
+    private String lastName;
+    private String token;
 
 }

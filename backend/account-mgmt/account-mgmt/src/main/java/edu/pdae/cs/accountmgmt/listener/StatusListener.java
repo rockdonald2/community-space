@@ -1,17 +1,30 @@
 package edu.pdae.cs.accountmgmt.listener;
 
+import com.corundumstudio.socketio.HandshakeData;
+import com.corundumstudio.socketio.SocketIOServer;
+import com.corundumstudio.socketio.listener.ConnectListener;
+import com.corundumstudio.socketio.listener.DataListener;
+import com.corundumstudio.socketio.listener.DisconnectListener;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import edu.pdae.cs.accountmgmt.model.dto.UserDataDTO;
 import edu.pdae.cs.accountmgmt.model.dto.UserPresenceDTO;
 import edu.pdae.cs.accountmgmt.model.dto.UserPresenceNotificationDTO;
+import edu.pdae.cs.accountmgmt.service.JwtService;
 import edu.pdae.cs.accountmgmt.service.StatusService;
+import io.jsonwebtoken.JwtException;
+import jakarta.annotation.PostConstruct;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
-import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.Payload;
-import org.springframework.messaging.simp.SimpMessageType;
-import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Controller;
 
+import java.net.HttpCookie;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
+import java.util.Arrays;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 @Slf4j
@@ -19,25 +32,59 @@ import java.util.concurrent.TimeUnit;
 @Controller
 public class StatusListener {
 
-    public static final String STATUS_BROADCAST = "/topic/status-broadcast";
-    public static final String STATUS_EXCHANGE = "/status-notify";
-
     private final StatusService statusService;
-    private final SimpMessagingTemplate messagingTemplate;
+    private final SocketIOServer socketIOServer;
+    private final JwtService jwtService;
+    private final ObjectMapper objectMapper;
 
-    @MessageMapping(STATUS_EXCHANGE) // handles messages coming to /ws/status-notify
-    public void handleStatus(@Payload UserPresenceNotificationDTO presenceNotificationDTO) {
-        log.info("Caught external (user) message for presence update for {}", presenceNotificationDTO);
-
-        updateStatus(presenceNotificationDTO);
-        broadcast();
+    @PostConstruct
+    void init() {
+        socketIOServer.addConnectListener(onConnected());
+        socketIOServer.addDisconnectListener(onDisconnected());
+        socketIOServer.addEventListener(Events.NOTIFICATION.getValue(), UserPresenceNotificationDTO.class, onNotificationReceived());
     }
 
-    @Scheduled(fixedDelayString = "${cs.status.broadcast.interval.seconds}", timeUnit = TimeUnit.SECONDS)
-    public void broadcastStatus() {
-        log.info("Broadcasting presence status");
+    private ConnectListener onConnected() throws JwtException {
+        return client -> {
+            final HandshakeData handshakeData = client.getHandshakeData();
+            log.info("Client[{}] - Connected to status module '{}'", client.getSessionId().toString(), handshakeData.getUrl());
 
-        broadcast();
+            final var userData = parseUserCookie(handshakeData.getHttpHeaders().get("Cookie"));
+            if (userData.isEmpty()) {
+                throw new JwtException("Invalid JWT token or cookies for WS connection");
+            }
+
+            client.joinRoom(userData.get().getEmail());
+
+            log.info("Client[{}] - Approved connection - {}", client.getSessionId().toString(), userData.get().getEmail());
+            statusService.putActive(UserPresenceDTO.builder().email(userData.get().getEmail()).build());
+            broadcast();
+        };
+    }
+
+    private DisconnectListener onDisconnected() throws JwtException {
+        return client -> {
+            log.info("Client[{}] - Disconnected", client.getSessionId().toString());
+
+            final var userData = parseUserCookie(client.getHandshakeData().getHttpHeaders().get("Cookie"));
+            if (userData.isEmpty()) {
+                throw new JwtException("Invalid JWT token or cookies for WS connection");
+            }
+
+            client.leaveRoom(userData.get().getEmail());
+
+            log.info("Client[{}] - Removing inactive status - {}", client.getSessionId().toString(), userData.get().getEmail());
+            statusService.removeInactive(UserPresenceDTO.builder().email(userData.get().getEmail()).build());
+            broadcast();
+        };
+    }
+
+    private DataListener<UserPresenceNotificationDTO> onNotificationReceived() {
+        return (client, data, ackSender) -> {
+            log.debug("Client[{}] - Received status message '{}'", client.getSessionId().toString(), data);
+            updateStatus(data);
+            broadcast();
+        };
     }
 
     @Scheduled(fixedDelayString = "${cs.status.cleanup.interval.minutes}", timeUnit = TimeUnit.MINUTES)
@@ -58,7 +105,49 @@ public class StatusListener {
     }
 
     private void broadcast() {
-        messagingTemplate.convertAndSend(STATUS_BROADCAST, statusService.getAllActive(true));
+        log.info("Broadcasting status");
+        socketIOServer.getBroadcastOperations().sendEvent(Events.STATUS.getValue(), statusService.getAllActive(true));
+    }
+
+    private Optional<UserDataDTO> parseUserCookie(String cookie) throws JwtException {
+        final HttpCookie encodedUserData = Arrays.stream(cookie.split(";"))
+                .map(HttpCookie::parse)
+                .filter(list -> list.get(0).getName().equals("user-data"))
+                .findFirst()
+                .orElseThrow(() -> new JwtException("Invalid JWT token for WS connection"))
+                .stream().findFirst().orElseThrow(() -> new JwtException("Invalid JWT token for WS connection"));
+
+        final String decodedUserData = URLDecoder.decode(encodedUserData.getValue(), StandardCharsets.UTF_8);
+        UserDataDTO userDataDTO;
+        try {
+            userDataDTO = objectMapper.readValue(decodedUserData, new TypeReference<>() {
+            });
+        } catch (JsonProcessingException e) {
+            return Optional.empty();
+        }
+
+        final var isValid = jwtService.isTokenValid(userDataDTO.getToken());
+
+        if (!isValid) {
+            return Optional.empty();
+        }
+
+        return Optional.of(userDataDTO);
+    }
+
+    enum Events {
+        NOTIFICATION("notification"),
+        STATUS("status");
+
+        private final String value;
+
+        Events(String value) {
+            this.value = value;
+        }
+
+        public String getValue() {
+            return value;
+        }
     }
 
 }

@@ -6,6 +6,7 @@ import QuickActions from './QuickActions';
 import Blob from './Blob';
 import { SWRConfig } from 'swr';
 import { useSnackbar } from 'notistack';
+import PresenceContextProvider from '@/utils/PresenceContext';
 
 const Layout = ({ children }) => {
     const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
@@ -24,7 +25,7 @@ const Layout = ({ children }) => {
                 <>
                     <SWRConfig
                         value={{
-                            onError: (error, key) => {
+                            onError: (error, _key) => {
                                 if (error?.status === 401) {
                                     enqueueSnackbar('Your session has expired. Please sign in again', {
                                         variant: 'warning',
@@ -34,9 +35,11 @@ const Layout = ({ children }) => {
                             },
                         }}
                     >
-                        <Header />
-                        <>{children}</>
-                        <QuickActions />
+                        <PresenceContextProvider>
+                            <Header />
+                            <>{children}</>
+                            <QuickActions />
+                        </PresenceContextProvider>
                     </SWRConfig>
                 </>
             ) : (

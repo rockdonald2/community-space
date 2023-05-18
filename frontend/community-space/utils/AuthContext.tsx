@@ -4,6 +4,7 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useState } 
 import { GATEWAY_URL } from './Constants';
 import { useCrossContext } from './CrossContext';
 import { useCookies } from 'react-cookie';
+import { useSnackbar } from 'notistack';
 
 const USER_DATA_LS = 'user-data';
 
@@ -16,6 +17,7 @@ const AuthContextProvider = ({ children }) => {
     const [isInitialized, setInitialized] = useState<boolean>(false);
     const { triggerReload } = useCrossContext();
     const [cookies, setCookie, removeCookie] = useCookies([USER_DATA_LS]);
+    const { enqueueSnackbar } = useSnackbar();
 
     useEffect(() => {
         // on every user state change, save the current state to LS
@@ -41,6 +43,7 @@ const AuthContextProvider = ({ children }) => {
                 });
             } catch (err) {
                 console.debug('Failed to sign out user', err);
+                enqueueSnackbar('Failed to sign out', { variant: 'error' });
             }
         };
 
@@ -79,11 +82,15 @@ const AuthContextProvider = ({ children }) => {
                 if (validationRes.ok) {
                     setUser(rawUser);
                     setIsAuthenticated(true);
+                    enqueueSnackbar('Welcome back', { variant: 'success' });
                 } else {
+                    enqueueSnackbar('Session has expired, please sign in', { variant: 'error' });
                     signOut();
                 }
             } catch (err) {
                 console.debug('Failed to send validation for user token', err);
+                enqueueSnackbar('Unexpected issue, please sign in', { variant: 'error' });
+                signOut();
             } finally {
                 setInitialized(true);
             }

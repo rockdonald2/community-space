@@ -15,6 +15,9 @@ public class AccountManagementRouter implements BaseRouter {
     @Value("${cs.account-mgmt.address}")
     private String accountManagementAddress;
 
+    @Value("${cs.account-mgmt.realtime.address}")
+    private String accountManagementRealtimeAddress;
+
     @Override
     public RouteLocatorBuilder.Builder buildRoutes(RouteLocatorBuilder.Builder routeLocatorBuilder) {
         return routeLocatorBuilder
@@ -37,15 +40,10 @@ public class AccountManagementRouter implements BaseRouter {
                         .and()
                         .uri(accountManagementAddress))
                 .route(r -> r
-                        .method("GET")
+                        .path("/ws/account/**")
                         .and()
-                        .path("/stomp/account")
-                        .uri(accountManagementAddress))
-                .route(r -> r
                         .method("GET")
-                        .and()
-                        .path("/stomp/account/**")
-                        .uri(accountManagementAddress));
+                        .uri(accountManagementRealtimeAddress));
     }
 
     @Override
@@ -53,7 +51,7 @@ public class AccountManagementRouter implements BaseRouter {
         return Map.of(
                 "^/api/v1/sessions$", List.of("POST", "GET", "DELETE"),
                 "^/api/v1/users$", List.of("POST"),
-                "^/stomp/account.*$", List.of("GET")
+                "^/ws/account/.*$", List.of("GET")
         );
     }
 

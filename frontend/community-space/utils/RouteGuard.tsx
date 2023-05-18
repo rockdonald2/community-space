@@ -4,7 +4,7 @@ import CircularLoading from '@/components/CircularLoading';
 import { isBrowser } from './Constants';
 import { useMemo } from 'react';
 
-const pathsThatRequireLogin = ['^/$', '^/hubs/create$', '^/hubs/.*$'];
+const pathsThatRequireLogin = ['^/$', '^/hubs/create$', '^/hubs/explore$', '^/hubs/.*$'];
 const pathsThatRequireNoLogin = ['^/login$', '^/register$'];
 
 export const RouteGuard = ({ children }) => {
