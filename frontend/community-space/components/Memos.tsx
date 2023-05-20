@@ -2,13 +2,17 @@ import useSWR from 'swr';
 import {
     boldSelectedElementStyle,
     checkIfError,
+    handleMultiSelectChange,
     sortByCreationDate,
     sortByUrgency,
+    swrMemosFetcherWithAuth,
     swrRecentMemosFetcherWithAuth,
 } from '@/utils/Utility';
 import {
     Box,
+    Button,
     Chip,
+    Container,
     FormControl,
     InputLabel,
     MenuItem,
@@ -23,23 +27,26 @@ import { Memo as MemoType, urgencies } from '@/types/db.types';
 import { useAuthContext } from '@/utils/AuthContext';
 import { ErrorResponse } from '@/types/types';
 import Memo from './Memo';
-import MemoEdit from './MemoEdit';
 import SearchIcon from '@mui/icons-material/Search';
-import { ChangeEvent, Dispatch, SetStateAction, useState } from 'react';
+import { ChangeEvent, useState } from 'react';
 import Alerter from './Alerter';
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
-const Memos = ({ hubId }: { hubId?: string | string[] }) => {
+const Memos = ({ hubId, scope = 'RECENT' }: { hubId?: string | string[]; scope?: 'RECENT' | 'ALL' }) => {
     const theme = useTheme();
-
     const { user } = useAuthContext();
+
+    const [currPage, setCurrPage] = useState<number>(0);
+
     const {
         data: memos,
         error,
         isLoading,
         isValidating,
-    } = useSWR<MemoType[] | ErrorResponse>(
-        { key: 'memos', token: user.token, hubId: hubId },
-        swrRecentMemosFetcherWithAuth,
+    } = useSWR<{ totalCount: number; totalPages: number; content: MemoType[] | ErrorResponse }>(
+        { key: 'memos', token: user.token, hubId: hubId, page: currPage },
+        scope === 'RECENT' ? swrRecentMemosFetcherWithAuth : swrMemosFetcherWithAuth,
         {
             revalidateOnFocus: false,
         }
@@ -50,20 +57,8 @@ const Memos = ({ hubId }: { hubId?: string | string[] }) => {
     const [privateFilter, setPrivateFilter] = useState<boolean>(true);
     const [publicFilter, setPublicFilter] = useState<boolean>(true);
 
-    const handleMultiSelectChange = (
-        event: SelectChangeEvent<typeof urgencyFilter>,
-        setState: Dispatch<SetStateAction<any>>
-    ) => {
-        const {
-            target: { value },
-        } = event;
-
-        setState(typeof value === 'string' ? value.split(',') : value);
-    };
-
     return (
         <Stack spacing={2}>
-            <MemoEdit hubId={hubId} />
             <Box sx={{ display: 'flex', alignItems: 'flex-end' }}>
                 <SearchIcon sx={{ mr: 1, my: 0.5 }} />
                 <TextField
@@ -126,7 +121,7 @@ const Memos = ({ hubId }: { hubId?: string | string[] }) => {
             {!isLoading &&
                 !isValidating &&
                 !checkIfError(memos) &&
-                (memos as MemoType[])
+                (memos.content as MemoType[])
                     .sort(sortByCreationDate)
                     .sort(sortByUrgency)
                     .filter((memo) => memo.title.toLowerCase().includes(titleFilter.toLowerCase()))
@@ -141,6 +136,23 @@ const Memos = ({ hubId }: { hubId?: string | string[] }) => {
                         return urgencyFilter.includes(memo.urgency);
                     })
                     .map((memo, idx) => <Memo memo={memo} key={idx} />)}
+            <Container sx={{ justifyContent: 'center', alignItems: 'center', display: 'flex', mt: 4 }}>
+                <Button
+                    startIcon={<ArrowBackIosNewIcon />}
+                    sx={{ mr: 1 }}
+                    disabled={currPage === 0}
+                    onClick={() => setCurrPage(currPage - 1)}
+                >
+                    Prev
+                </Button>
+                <Button
+                    endIcon={<ArrowForwardIosIcon />}
+                    onClick={() => setCurrPage(currPage + 1)}
+                    disabled={currPage + 1 === memos?.totalPages}
+                >
+                    Next
+                </Button>
+            </Container>
         </Stack>
     );
 };

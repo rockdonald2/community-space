@@ -1,5 +1,6 @@
 package edu.pdae.cs.memomgmt.controller;
 
+import edu.pdae.cs.common.util.PageWrapper;
 import edu.pdae.cs.memomgmt.controller.exception.ForbiddenOperationException;
 import edu.pdae.cs.memomgmt.model.Memo;
 import edu.pdae.cs.memomgmt.model.dto.*;
@@ -9,6 +10,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.springframework.format.annotation.DateTimeFormat;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -20,6 +22,8 @@ import java.util.*;
 @RequestMapping("/api/v1/memos")
 @Slf4j
 public class MemoController {
+
+    private static final int PAGE_SIZE = 10;
 
     private final MemoService memoService;
 
@@ -39,27 +43,39 @@ public class MemoController {
     }
 
     @GetMapping
-    public List<MemoDTO> gets(@RequestParam("createdAfter") @DateTimeFormat(pattern = "yyyy-MM-dd") Optional<Date> createdAfter, @RequestParam("visibility") Optional<Memo.Visibility> visibility, @RequestParam("hubId") Optional<ObjectId> hubId, @RequestHeader("X-AUTH-TOKEN-SUBJECT") String user) {
-        Objects.requireNonNull(user);
+    public ResponseEntity<List<MemoDTO>> gets(@RequestParam("createdAfter") @DateTimeFormat(pattern = "yyyy-MM-dd") Optional<Date> createdAfter, @RequestParam("visibility") Optional<Memo.Visibility> visibility, @RequestParam("hubId") Optional<ObjectId> hubId, @RequestParam("page") Optional<Integer> page, @RequestHeader("X-AUTH-TOKEN-SUBJECT") String user) {
         log.info("Getting all memos");
+        Objects.requireNonNull(user);
 
+        PageWrapper<MemoDTO> wrapper;
         if (createdAfter.isPresent() && visibility.isPresent() && hubId.isPresent()) {
-            return memoService.getAllAfterByHubIdAndByVisibility(createdAfter.get(), visibility.get(), hubId.get(), user);
+            wrapper = memoService.getAllAfterByHubIdAndByVisibility(createdAfter.get(), visibility.get(), hubId.get(), user, page.orElse(0), PAGE_SIZE);
         } else if (createdAfter.isPresent() && hubId.isPresent()) {
-            return memoService.getAllAfterByHubId(createdAfter.get(), hubId.get(), user);
+            wrapper = memoService.getAllAfterByHubId(createdAfter.get(), hubId.get(), user, page.orElse(0), PAGE_SIZE);
         } else if (visibility.isPresent() && hubId.isPresent()) {
-            return memoService.getAllByHubIdAndByVisibility(hubId.get(), visibility.get(), user);
+            wrapper = memoService.getAllByHubIdAndByVisibility(hubId.get(), visibility.get(), user, page.orElse(0), PAGE_SIZE);
         } else if (createdAfter.isPresent() && visibility.isPresent()) {
-            return memoService.getAllAfterAndByVisibility(createdAfter.get(), visibility.get(), user);
+            wrapper = memoService.getAllAfterAndByVisibility(createdAfter.get(), visibility.get(), user, page.orElse(0), PAGE_SIZE);
         } else if (createdAfter.isPresent()) {
-            return memoService.getAllAfter(createdAfter.get(), user);
+            wrapper = memoService.getAllAfter(createdAfter.get(), user, page.orElse(0), PAGE_SIZE);
         } else if (visibility.isPresent()) {
-            return memoService.getAllByVisibility(visibility.get(), user);
+            wrapper = memoService.getAllByVisibility(visibility.get(), user, page.orElse(0), PAGE_SIZE);
         } else if (hubId.isPresent()) {
-            return memoService.getAllByHubId(hubId.get(), user);
+            wrapper = memoService.getAllByHubId(hubId.get(), user, page.orElse(0), PAGE_SIZE);
+        } else {
+            wrapper = memoService.getAll(user, page.orElse(0), PAGE_SIZE);
         }
 
-        return memoService.getAll(user); // ! find-all anti-pattern
+
+        final var headers = new HttpHeaders();
+        headers.set("X-TOTAL-COUNT", String.valueOf(wrapper.getTotalNumberOfElements()));
+        headers.set("X-TOTAL-PAGES", String.valueOf(wrapper.getTotalPages()));
+        headers.set("X-PAGE-SIZE", String.valueOf(wrapper.getPageSize()));
+        headers.set("Access-Control-Expose-Headers", "*");
+
+        return ResponseEntity.ok()
+                .headers(headers)
+                .body(wrapper.getContent());
     }
 
     @PatchMapping("/{id}")

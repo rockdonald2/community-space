@@ -9,6 +9,7 @@ import { useAuthContext } from '@/utils/AuthContext';
 import PasswordField from '@/components/PasswordField';
 import TextField from '@/components/TextField';
 import { useSnackbar } from 'notistack';
+import { handleInput } from '@/utils/Utility';
 
 function Login() {
     const [emailInput, setEmailInput] = useState<string>(null);
@@ -17,13 +18,6 @@ function Login() {
     const { push } = useRouter();
     const { signIn } = useAuthContext();
     const { enqueueSnackbar } = useSnackbar();
-
-    const handleInput = useCallback(
-        (e: React.ChangeEvent<HTMLInputElement>, setState: Dispatch<SetStateAction<string>>) => {
-            setState(e.target.value);
-        },
-        []
-    );
 
     const handleSubmit = useCallback(
         async (e: React.FormEvent<HTMLFormElement>) => {

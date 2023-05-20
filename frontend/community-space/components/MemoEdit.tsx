@@ -218,7 +218,7 @@ const MemoEdit = ({
                     cleanupCallback();
                 }
 
-                mutate({ key: 'memos', token: user.token, hubId: hubId });
+                mutate((key) => key['key'] === 'memos' && key['hubId'] === hubId);
                 setMsg('');
                 setTitle('');
                 setUrgency('');

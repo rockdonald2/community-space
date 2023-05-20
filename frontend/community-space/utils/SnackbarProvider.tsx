@@ -8,7 +8,7 @@ const SnackbarCloseButton = ({ snackbarKey }) => {
 
     return (
         <IconButton onClick={() => closeSnackbar(snackbarKey)}>
-            <CloseIcon fontSize='small' />
+            <CloseIcon fontSize='small' sx={{ color: 'white' }} />
         </IconButton>
     );
 };

@@ -8,6 +8,7 @@ import { useAuthContext } from '@/utils/AuthContext';
 import PasswordField from '@/components/PasswordField';
 import TextField from '@/components/TextField';
 import { useSnackbar } from 'notistack';
+import { handleInput } from '@/utils/Utility';
 
 const EMAIL_REGEXP: RegExp = /^[a-zA-Z0-9.!#$%&'*+/=?^_`{|}~-]+@[a-zA-Z0-9-]+(?:\.[a-zA-Z0-9-]+)*$/;
 
@@ -25,13 +26,6 @@ function Register() {
     const { push } = useRouter();
     const { signUp } = useAuthContext();
     const { enqueueSnackbar } = useSnackbar();
-
-    const handleInput = useCallback(
-        (e: React.ChangeEvent<HTMLInputElement>, setState: Dispatch<SetStateAction<string>>) => {
-            setState(e.target.value);
-        },
-        []
-    );
 
     const handleSubmit = useCallback(
         async (e: React.FormEvent<HTMLFormElement>) => {

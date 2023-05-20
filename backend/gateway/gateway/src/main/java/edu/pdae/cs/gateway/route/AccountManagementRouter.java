@@ -24,25 +24,25 @@ public class AccountManagementRouter implements BaseRouter {
                 .route(r -> r
                         .path("/api/v1/users")
                         .and()
-                        .method("POST", "GET")
+                        .method("POST", "GET", "HEAD")
                         .and()
                         .uri(accountManagementAddress))
                 .route(r -> r
                         .path("/api/v1/users/**")
                         .and()
-                        .method("GET", "DELETE")
+                        .method("GET", "DELETE", "HEAD")
                         .and()
                         .uri(accountManagementAddress))
                 .route(r -> r
                         .path("/api/v1/sessions")
                         .and()
-                        .method("POST", "GET", "DELETE")
+                        .method("POST", "GET", "DELETE", "HEAD")
                         .and()
                         .uri(accountManagementAddress))
                 .route(r -> r
                         .path("/ws/account/**")
                         .and()
-                        .method("GET")
+                        .method("GET", "HEAD")
                         .uri(accountManagementRealtimeAddress));
     }
 

@@ -18,38 +18,38 @@ public class HubManagementRouter implements BaseRouter {
                 .route(r -> r
                         .path("/api/v1/hubs")
                         .and()
-                        .method("POST", "GET")
+                        .method("POST", "GET", "HEAD")
                         .and()
                         .uri(hubManagementAddress))
                 .route(r -> r
                         .path("/api/v1/hubs/**")
                         .and()
-                        .method("GET", "DELETE", "PATCH")
+                        .method("GET", "DELETE", "PATCH", "HEAD")
                         .and()
                         .uri(hubManagementAddress)
                 )
                 .route(r -> r
                         .path("/api/v1/hubs/*/members")
                         .and()
-                        .method("GET", "POST")
+                        .method("GET", "POST", "HEAD")
                         .and()
                         .uri(hubManagementAddress))
                 .route(r -> r
                         .path("/api/v1/hubs/*/members/**")
                         .and()
-                        .method("GET", "DELETE")
+                        .method("GET", "DELETE", "HEAD")
                         .and()
                         .uri(hubManagementAddress))
                 .route(r -> r
                         .path("/api/v1/hubs/*/waiters")
                         .and()
-                        .method("GET", "POST")
+                        .method("GET", "POST", "HEAD")
                         .and()
                         .uri(hubManagementAddress))
                 .route(r -> r
                         .path("/api/v1/hubs/*/waiters/**")
                         .and()
-                        .method("GET", "DELETE")
+                        .method("GET", "DELETE", "HEAD")
                         .and()
                         .uri(hubManagementAddress));
     }

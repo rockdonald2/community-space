@@ -2,6 +2,8 @@ package edu.pdae.cs.memomgmt.repository;
 
 import edu.pdae.cs.memomgmt.model.Memo;
 import org.bson.types.ObjectId;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.data.mongodb.repository.MongoRepository;
 import org.springframework.stereotype.Repository;
 
@@ -11,29 +13,29 @@ import java.util.List;
 @Repository
 public interface MemoRepository extends MongoRepository<Memo, ObjectId> {
 
-    List<Memo> getMemosByCreatedOnBefore(Date date);
+    Page<Memo> getMemosByCreatedOnBefore(Date date, Pageable pageable);
 
-    List<Memo> getMemosByCreatedOnAfter(Date date);
+    Page<Memo> getMemosByCreatedOnAfter(Date date, Pageable pageable);
 
-    List<Memo> getMemosByAuthor(String author);
+    Page<Memo> getMemosByAuthor(String author, Pageable pageable);
 
-    List<Memo> getMemosByVisibility(Memo.Visibility visibility);
+    Page<Memo> getMemosByVisibility(Memo.Visibility visibility, Pageable pageable);
 
-    List<Memo> getMemosByUrgency(Memo.Urgency urgency);
+    Page<Memo> getMemosByUrgency(Memo.Urgency urgency, Pageable pageable);
 
-    List<Memo> getMemosByAuthorAndVisibility(String author, Memo.Visibility visibility);
+    Page<Memo> getMemosByAuthorAndVisibility(String author, Memo.Visibility visibility, Pageable pageable);
 
-    List<Memo> getMemosByCreatedOnAfterAndVisibility(Date date, Memo.Visibility visibility);
+    Page<Memo> getMemosByCreatedOnAfterAndVisibility(Date date, Memo.Visibility visibility, Pageable pageable);
 
-    List<Memo> getMemosByCreatedOnAfterAndVisibilityAndAuthor(Date date, Memo.Visibility visibility, String author);
+    Page<Memo> getMemosByCreatedOnAfterAndVisibilityAndAuthor(Date date, Memo.Visibility visibility, String author, Pageable pageable);
 
-    List<Memo> getMemosByHubId(ObjectId hubId);
+    Page<Memo> getMemosByHubId(ObjectId hubId, Pageable pageable);
 
-    List<Memo> getMemosByHubIdAndVisibility(ObjectId hubId, Memo.Visibility visibility);
+    Page<Memo> getMemosByHubIdAndVisibility(ObjectId hubId, Memo.Visibility visibility, Pageable pageable);
 
-    List<Memo> getMemosByCreatedOnAfterAndHubId(Date date, ObjectId hubId);
+    Page<Memo> getMemosByCreatedOnAfterAndHubId(Date date, ObjectId hubId, Pageable pageable);
 
-    List<Memo> getMemosByCreatedOnAfterAndHubIdAndVisibility(Date date, ObjectId hubId, Memo.Visibility visibility);
+    Page<Memo> getMemosByCreatedOnAfterAndHubIdAndVisibility(Date date, ObjectId hubId, Memo.Visibility visibility, Pageable pageable);
 
     void deleteAllByHubId(ObjectId hubId);
 

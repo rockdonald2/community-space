@@ -16,6 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Objects;
+import java.util.Optional;
 
 @RestController
 @RequiredArgsConstructor
@@ -40,9 +41,9 @@ public class HubController {
     }
 
     @GetMapping
-    public List<HubDTO> gets(@RequestHeader("X-AUTH-TOKEN-SUBJECT") String user) {
+    public List<HubDTO> gets(@RequestHeader("X-AUTH-TOKEN-SUBJECT") String user, @RequestParam("role") Optional<Role> role) {
         log.info("Getting all hubs");
-        return hubService.getAll(user);
+        return hubService.getAll(user, role);
     }
 
     @PatchMapping("/{id}")

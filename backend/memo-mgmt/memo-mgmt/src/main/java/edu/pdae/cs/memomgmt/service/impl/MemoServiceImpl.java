@@ -1,5 +1,6 @@
 package edu.pdae.cs.memomgmt.service.impl;
 
+import edu.pdae.cs.common.util.PageWrapper;
 import edu.pdae.cs.memomgmt.controller.exception.ForbiddenOperationException;
 import edu.pdae.cs.memomgmt.model.Memo;
 import edu.pdae.cs.memomgmt.model.dto.*;
@@ -11,6 +12,8 @@ import org.bson.types.ObjectId;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -121,95 +124,50 @@ public class MemoServiceImpl implements MemoService {
 
     @Override
     @Cacheable("memos")
-    public List<MemoDTO> getAllByVisibility(Memo.Visibility visibility, String asUser) {
-        if (Memo.Visibility.PRIVATE.equals(visibility)) {
-            return memoRepository.getMemosByAuthorAndVisibility(asUser, visibility).stream().map(memo -> modelMapper.map(memo, MemoDTO.class)).toList();
-        }
-
-        return memoRepository.getMemosByVisibility(visibility).stream().map(memo -> modelMapper.map(memo, MemoDTO.class)).toList();
+    public PageWrapper<MemoDTO> getAllByVisibility(Memo.Visibility visibility, String asUser, int currPage, int pageSize) {
+        return constructPageWrapper(memoRepository.getMemosByVisibility(visibility, PageRequest.of(currPage, pageSize)), asUser);
     }
 
     @Override
     @Cacheable("memos")
-    public List<MemoDTO> getAllAfter(Date after, String asUser) {
-        List<Memo> memos = memoRepository.getMemosByCreatedOnAfter(after);
-        memos = filterForUser(memos, asUser);
-
-        return memos.stream()
-                .map(memo -> modelMapper.map(memo, MemoDTO.class))
-                .toList();
+    public PageWrapper<MemoDTO> getAllAfter(Date after, String asUser, int currPage, int pageSize) {
+        return constructPageWrapper(memoRepository.getMemosByCreatedOnAfter(after, PageRequest.of(currPage, pageSize)), asUser);
     }
 
     @Override
     @Cacheable("memos")
-    public List<MemoDTO> getAllAfterAndByVisibility(Date after, Memo.Visibility visibility, String asUser) {
-        List<Memo> memos;
-
-        if (Memo.Visibility.PRIVATE.equals(visibility)) {
-            memos = memoRepository.getMemosByCreatedOnAfterAndVisibilityAndAuthor(after, visibility, asUser);
-        } else {
-            memos = memoRepository.getMemosByCreatedOnAfterAndVisibility(after, visibility);
-        }
-
-        memos = filterForUser(memos, asUser);
-        return memos.stream()
-                .map(memo -> modelMapper.map(memo, MemoDTO.class))
-                .toList();
+    public PageWrapper<MemoDTO> getAllAfterAndByVisibility(Date after, Memo.Visibility visibility, String asUser, int currPage, int pageSize) {
+        return constructPageWrapper(memoRepository.getMemosByCreatedOnAfterAndVisibility(after, visibility, PageRequest.of(currPage, pageSize)), asUser);
     }
 
     @Override
     @Cacheable("memos")
-    public List<MemoDTO> getAll(String asUser) {
-        List<Memo> memos = memoRepository.findAll();
-        memos = filterForUser(memos, asUser);
-
-        return memos.stream()
-                .map(memo -> modelMapper.map(memo, MemoDTO.class))
-                .toList();
+    public PageWrapper<MemoDTO> getAll(String asUser, int currPage, int pageSize) {
+        return constructPageWrapper(memoRepository.findAll(PageRequest.of(currPage, pageSize)), asUser);
     }
 
     @Override
     @Cacheable("memos")
-    public List<MemoDTO> getAllAfterByHubIdAndByVisibility(Date after, Memo.Visibility visibility, ObjectId hubId, String asUser) {
-        List<Memo> memos = memoRepository.getMemosByCreatedOnAfterAndHubIdAndVisibility(after, hubId, visibility);
-        memos = filterForUser(memos, asUser);
-
-        return memos.stream()
-                .map(memo -> modelMapper.map(memo, MemoDTO.class))
-                .toList();
+    public PageWrapper<MemoDTO> getAllAfterByHubIdAndByVisibility(Date after, Memo.Visibility visibility, ObjectId hubId, String asUser, int currPage, int pageSize) {
+        return constructPageWrapper(memoRepository.getMemosByCreatedOnAfterAndHubIdAndVisibility(after, hubId, visibility, PageRequest.of(currPage, pageSize)), asUser);
     }
 
     @Override
     @Cacheable("memos")
-    public List<MemoDTO> getAllAfterByHubId(Date after, ObjectId hubId, String asUser) {
-        List<Memo> memos = memoRepository.getMemosByCreatedOnAfterAndHubId(after, hubId);
-        memos = filterForUser(memos, asUser);
-
-        return memos.stream()
-                .map(memo -> modelMapper.map(memo, MemoDTO.class))
-                .toList();
+    public PageWrapper<MemoDTO> getAllAfterByHubId(Date after, ObjectId hubId, String asUser, int currPage, int pageSize) {
+        return constructPageWrapper(memoRepository.getMemosByCreatedOnAfterAndHubId(after, hubId, PageRequest.of(currPage, pageSize)), asUser);
     }
 
     @Override
     @Cacheable("memos")
-    public List<MemoDTO> getAllByHubIdAndByVisibility(ObjectId hubId, Memo.Visibility visibility, String asUser) {
-        List<Memo> memos = memoRepository.getMemosByHubIdAndVisibility(hubId, visibility);
-        memos = filterForUser(memos, asUser);
-
-        return memos.stream()
-                .map(memo -> modelMapper.map(memo, MemoDTO.class))
-                .toList();
+    public PageWrapper<MemoDTO> getAllByHubIdAndByVisibility(ObjectId hubId, Memo.Visibility visibility, String asUser, int currPage, int pageSize) {
+        return constructPageWrapper(memoRepository.getMemosByHubIdAndVisibility(hubId, visibility, PageRequest.of(currPage, pageSize)), asUser);
     }
 
     @Override
     @Cacheable("memos")
-    public List<MemoDTO> getAllByHubId(ObjectId hubId, String asUser) {
-        List<Memo> memos = memoRepository.getMemosByHubId(hubId);
-        memos = filterForUser(memos, asUser);
-
-        return memos.stream()
-                .map(memo -> modelMapper.map(memo, MemoDTO.class))
-                .toList();
+    public PageWrapper<MemoDTO> getAllByHubId(ObjectId hubId, String asUser, int currPage, int pageSize) {
+        return constructPageWrapper(memoRepository.getMemosByHubId(hubId, PageRequest.of(currPage, pageSize)), asUser);
     }
 
     /**
@@ -226,6 +184,28 @@ public class MemoServiceImpl implements MemoService {
                                 &&
                                 (Memo.Visibility.PUBLIC.equals(memo.getVisibility()) || asUser.equals(memo.getAuthor())))
                 .toList();
+    }
+
+    /**
+     * Will construct a page wrapper for the given page of memos.
+     *
+     * @param memoPage The page of memos
+     * @param asUser   The user to filter for
+     * @return The page wrapper
+     */
+    private PageWrapper<MemoDTO> constructPageWrapper(Page<Memo> memoPage, String asUser) {
+        List<Memo> memos = memoPage.getContent();
+        memos = filterForUser(memos, asUser);
+
+        final var memoDTOs = memos.stream()
+                .map(memo -> modelMapper.map(memo, MemoDTO.class))
+                .toList();
+
+        return PageWrapper.<MemoDTO>builder()
+                .pageSize(memoPage.getSize())
+                .totalNumberOfElements(memoPage.getTotalElements())
+                .totalPages(memoPage.getTotalPages())
+                .content(memoDTOs).build();
     }
 
 }

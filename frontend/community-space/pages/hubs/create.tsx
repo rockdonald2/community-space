@@ -7,6 +7,7 @@ import { GATEWAY_URL } from '@/utils/Constants';
 import { useAuthContext } from '@/utils/AuthContext';
 import { useRouter } from 'next/router';
 import { useSnackbar } from 'notistack';
+import { handleInput } from '@/utils/Utility';
 
 function CreateHub() {
     const { user, signOut } = useAuthContext();
@@ -17,13 +18,6 @@ function CreateHub() {
     const [description, setDescriptionInput] = useState<string>(null);
 
     const [error, setError] = useState<{ msg: string }>(null);
-
-    const handleInput = useCallback(
-        (e: React.ChangeEvent<HTMLInputElement>, setState: Dispatch<SetStateAction<string>>) => {
-            setState(e.target.value);
-        },
-        []
-    );
 
     const handleSubmit = useCallback(
         async (e: React.FormEvent<HTMLFormElement>) => {

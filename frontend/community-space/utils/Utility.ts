@@ -1,7 +1,8 @@
 import { MemoShort } from '@/types/db.types';
-import { Theme } from '@mui/material';
+import { SelectChangeEvent, Theme } from '@mui/material';
 import { GATEWAY_URL } from './Constants';
 import { ErrorResponse } from '@/types/types';
+import { Dispatch, SetStateAction } from 'react';
 
 export const sortByUrgency = (m1: MemoShort, m2: MemoShort) => {
     if (m1.urgency === 'URGENT') return -1; // if any of them is urgent, be it first
@@ -42,9 +43,14 @@ export const boldSelectedElementStyle = (elem: string, container: readonly strin
  * @param args the user's token
  * @returns the recent memos from the repository
  */
-export const swrRecentMemosFetcherWithAuth = async (args: { key: string; token: string; hubId?: string }) => {
+export const swrRecentMemosFetcherWithAuth = async (args: {
+    key: string;
+    token: string;
+    hubId?: string;
+    page: number;
+}) => {
     const yesterday = new Date(Date.now() - 86400000).toISOString().split('T')[0];
-    let url = `${GATEWAY_URL}/api/v1/memos?createdAfter=${yesterday}`;
+    let url = `${GATEWAY_URL}/api/v1/memos?createdAfter=${yesterday}&page=${args.page}`;
 
     if (args.hubId) {
         url = url.concat(`&hubId=${args.hubId}`);
@@ -63,7 +69,64 @@ export const swrRecentMemosFetcherWithAuth = async (args: { key: string; token: 
         } satisfies ErrorResponse;
     }
 
-    return await res.json();
+    let totalCount = -1;
+    let totalPages = -1;
+
+    if (res.headers.get('X-TOTAL-COUNT')) {
+        totalCount = parseInt(res.headers.get('X-TOTAL-COUNT'));
+    }
+
+    if (res.headers.get('X-TOTAL-PAGES')) {
+        totalPages = parseInt(res.headers.get('X-TOTAL-PAGES'));
+    }
+
+    const content = await res.json();
+
+    return {
+        content,
+        totalCount,
+        totalPages,
+    };
+};
+
+export const swrMemosFetcherWithAuth = async (args: { key: string; token: string; hubId?: string; page: number }) => {
+    let url = `${GATEWAY_URL}/api/v1/memos?page=${args.page}`;
+
+    if (args.hubId) {
+        url = url.concat(`&hubId=${args.hubId}`);
+    }
+
+    const res = await fetch(url, {
+        headers: { Authorization: `Bearer ${args.token}` },
+    });
+
+    if (!res.ok) {
+        throw {
+            status: res.status,
+            path: res.url,
+            message: res.statusText,
+            error: 'error',
+        } satisfies ErrorResponse;
+    }
+
+    let totalCount = -1;
+    let totalPages = -1;
+
+    if (res.headers.get('X-TOTAL-COUNT')) {
+        totalCount = parseInt(res.headers.get('X-TOTAL-COUNT'));
+    }
+
+    if (res.headers.get('X-TOTAL-PAGES')) {
+        totalPages = parseInt(res.headers.get('X-TOTAL-PAGES'));
+    }
+
+    const content = await res.json();
+
+    return {
+        content,
+        totalCount,
+        totalPages,
+    };
 };
 
 /**
@@ -201,6 +264,23 @@ export const swrMemoFetcherWithAuth = async (args: { key: string; token: string;
     return await res.json();
 };
 
+export const swrExploreHubFetcherWithAuth = async (args: { key: string; token: string; role: 'OWNER' | 'MEMBER' }) => {
+    const res = await fetch(`${GATEWAY_URL}/api/v1/hubs?role=${args.role}`, {
+        headers: { Authorization: `Bearer ${args.token}` },
+    });
+
+    if (!res.ok) {
+        throw {
+            status: res.status,
+            path: res.url,
+            message: res.statusText,
+            error: 'error',
+        } satisfies ErrorResponse;
+    }
+
+    return await res.json();
+};
+
 export const mediumDateWithNoTimeFormatter = new Intl.DateTimeFormat('en-gb', {
     formatMatcher: 'best fit',
     dateStyle: 'medium',
@@ -213,4 +293,21 @@ export const mediumDateWithNoTimeFormatter = new Intl.DateTimeFormat('en-gb', {
  */
 export const checkIfError = (data: any): boolean => {
     return data === undefined || (data && typeof data === 'object' && 'status' in data);
+};
+
+export const handleMultiSelectChange = (event: SelectChangeEvent<any>, setState: Dispatch<SetStateAction<any>>) => {
+    const {
+        target: { value },
+    } = event;
+
+    setState(typeof value === 'string' ? value.split(',') : value);
+};
+
+export const handleInput = (e: React.ChangeEvent<HTMLInputElement>, setState: Dispatch<SetStateAction<string>>) => {
+    setState(e.target.value);
+};
+
+export const getDaysInCurrentMonth = () => {
+    var now = new Date();
+    return new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
 };

@@ -110,7 +110,7 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                 }
 
                 setMemoOpen(false);
-                mutate({ key: 'memos', token: user.token, hubId: memo.hubId });
+                mutate((key) => key['key'] === 'memos' && key['hubId'] === memo.hubId);
             } catch (err) {
                 console.debug(err.message, err);
                 enqueueSnackbar('Failed to delete memo.', { variant: 'error' });

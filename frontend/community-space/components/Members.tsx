@@ -111,7 +111,6 @@ const Members = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBER
                     anchorEl={menuAnchorEl}
                     open={open}
                     onClose={handleClose}
-                    transitionDuration={0}
                     PaperProps={{
                         elevation: 0,
                         sx: {

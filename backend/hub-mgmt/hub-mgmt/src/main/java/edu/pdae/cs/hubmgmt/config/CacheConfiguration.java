@@ -29,7 +29,7 @@ public class CacheConfiguration {
     }
 
 
-    private RedisCacheConfiguration redisCacheConfigurationForSingleValues(ObjectMapper objectMapper) {
+    private RedisCacheConfiguration redisCacheConfigurationForComplexValues(ObjectMapper objectMapper) {
         var om = objectMapper = objectMapper.copy();
         om = om.activateDefaultTyping(objectMapper.getPolymorphicTypeValidator(), ObjectMapper.DefaultTyping.NON_FINAL);
 
@@ -44,8 +44,8 @@ public class CacheConfiguration {
     @Bean
     public RedisCacheManagerBuilderCustomizer redisCacheManagerBuilderCustomizer(ObjectMapper objectMapper) {
         return builder -> builder
-                .withCacheConfiguration("hub", redisCacheConfigurationForSingleValues(objectMapper))
-                .withCacheConfiguration("member", redisCacheConfigurationForSingleValues(objectMapper))
+                .withCacheConfiguration("hub", redisCacheConfigurationForComplexValues(objectMapper))
+                .withCacheConfiguration("member", redisCacheConfigurationForComplexValues(objectMapper))
                 .withCacheConfiguration("hubs", redisCacheConfigurationForLists(objectMapper))
                 .withCacheConfiguration("members", redisCacheConfigurationForLists(objectMapper))
                 .withCacheConfiguration("waiters", redisCacheConfigurationForLists(objectMapper));

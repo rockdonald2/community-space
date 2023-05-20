@@ -173,7 +173,6 @@ const Pendings = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBE
                 anchorEl={menuAnchorEl}
                 open={open}
                 onClose={handleClose}
-                transitionDuration={0}
                 PaperProps={{
                     elevation: 0,
                     sx: {

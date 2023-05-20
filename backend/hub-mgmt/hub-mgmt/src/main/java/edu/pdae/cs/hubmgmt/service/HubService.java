@@ -4,6 +4,7 @@ import edu.pdae.cs.hubmgmt.model.dto.*;
 import org.bson.types.ObjectId;
 
 import java.util.List;
+import java.util.Optional;
 
 public interface HubService {
 
@@ -11,7 +12,7 @@ public interface HubService {
 
     HubDetailsDTO getById(ObjectId id, String asUser);
 
-    List<HubDTO> getAll(String asUser);
+    List<HubDTO> getAll(String asUser, Optional<Role> role);
 
     HubCreationResponseDTO update(ObjectId id, HubUpdateDTO hubUpdateDTO, String asUser);
 

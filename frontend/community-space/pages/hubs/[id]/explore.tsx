@@ -1,20 +1,18 @@
-import { useAuthContext } from '@/utils/AuthContext';
-import { useRouter } from 'next/router';
-import useSWR from 'swr';
-import { Hub as HubType } from '@/types/db.types';
-import { ErrorResponse } from '@/types/types';
-import { checkIfError, swrHubFetcherWithAuth } from '@/utils/Utility';
-import { Button, Container, Divider, Grid, Typography } from '@mui/material';
-import Head from 'next/head';
-import Memos from '@/components/Memos';
 import Alerter from '@/components/Alerter';
 import Members from '@/components/Members';
+import Memos from '@/components/Memos';
 import Pendings from '@/components/Pendings';
+import { Hub } from '@/types/db.types';
+import { ErrorResponse } from '@/types/types';
+import { useAuthContext } from '@/utils/AuthContext';
+import { checkIfError, swrHubFetcherWithAuth } from '@/utils/Utility';
+import { Grid, Container, Divider, Typography, Button } from '@mui/material';
+import Head from 'next/head';
 import Link from 'next/link';
-import MemoEdit from '@/components/MemoEdit';
-import { useState } from 'react';
+import { useRouter } from 'next/router';
+import useSWR from 'swr';
 
-const Hub = () => {
+const Explore = () => {
     const { query } = useRouter();
     const { id: hubId } = query;
 
@@ -25,25 +23,19 @@ const Hub = () => {
         error: hubError,
         isLoading: hubIsLoading,
         isValidating: hubIsValidating,
-    } = useSWR<HubType | ErrorResponse>({ key: 'hub', token: user.token, hubId: hubId }, swrHubFetcherWithAuth, {
+    } = useSWR<Hub | ErrorResponse>({ key: 'hub', token: user.token, hubId: hubId }, swrHubFetcherWithAuth, {
         revalidateOnFocus: false,
     });
 
     return (
         <>
             <Head>
-                <title>Community Space {!checkIfError(hub) ? `| ${(hub as HubType).name}` : ''}</title>
+                <title>Community Space {!checkIfError(hub) ? `| ${(hub as Hub).name}` : ''}</title>
             </Head>
             <Grid container spacing={2}>
                 <Grid item xs={4}>
                     <Container>
-                        {(hub as HubType)?.role === 'OWNER' && (
-                            <>
-                                <Pendings hubId={(hub as HubType)?.id} hubRole={(hub as HubType)?.role} />
-                                <Divider sx={{ mt: 2, mb: 2 }} />
-                            </>
-                        )}
-                        <Members hubId={(hub as HubType)?.id} hubRole={(hub as HubType)?.role} />
+                        <Members hubId={(hub as Hub)?.id} hubRole={(hub as Hub)?.role} />
                         <Divider sx={{ mt: 2, mb: 2 }} />
                         <Typography mb={2} color='text.secondary' variant='h6'>
                             More stuff
@@ -54,10 +46,10 @@ const Hub = () => {
                                 fullWidth
                                 type='button'
                                 variant='text'
-                                href={`/hubs/${(hub as HubType)?.id}/explore`}
+                                href={`/hubs/${(hub as Hub)?.id}`}
                                 LinkComponent={Link}
                             >
-                                Explore older memos
+                                Explore recent memos
                             </Button>
                         </Container>
                     </Container>
@@ -68,18 +60,17 @@ const Hub = () => {
                         <>
                             <Container sx={{ marginBottom: '1rem' }}>
                                 <Typography variant='h5' align='center' color='text.secondary' mb={2}>
-                                    Welcome to {(hub as HubType).name} Hub!
+                                    Welcome to {(hub as Hub).name} Hub!
                                 </Typography>
                                 <Typography variant='body1' align='left' color='text.secondary'>
-                                    {(hub as HubType).description}
+                                    {(hub as Hub).description}
                                 </Typography>
                             </Container>
                             <Divider sx={{ mb: 1.5 }} />
-                            <MemoEdit hubId={hubId} />
                             <Typography variant='h6' align='left' color='text.secondary' mb={2} mt={2}>
-                                Browse recent memos
+                                Explore all memos
                             </Typography>
-                            <Memos hubId={hubId} />
+                            <Memos scope='ALL' hubId={hubId} />
                         </>
                     )}
                 </Grid>
@@ -88,4 +79,4 @@ const Hub = () => {
     );
 };
 
-export default Hub;
+export default Explore;

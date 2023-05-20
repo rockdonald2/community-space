@@ -77,8 +77,8 @@ public class HubServiceImpl implements HubService {
 
     @Override
     @Cacheable("hubs")
-    public List<HubDTO> getAll(String asUser) {
-        return hubRepository.findAll().stream().map(hub -> {
+    public List<HubDTO> getAll(String asUser, Optional<Role> role) {
+        var hubs = hubRepository.findAll().stream().map(hub -> {
             final HubDTO hubDTO = modelMapper.map(hub, HubDTO.class);
 
             if (hub.getOwner().equals(asUser)) {
@@ -92,7 +92,13 @@ public class HubServiceImpl implements HubService {
             }
 
             return hubDTO;
-        }).toList();
+        });
+
+        if (role.isPresent()) {
+            hubs = hubs.filter(hub -> hub.getRole().equals(role.get()));
+        }
+
+        return hubs.toList();
     }
 
     @Override

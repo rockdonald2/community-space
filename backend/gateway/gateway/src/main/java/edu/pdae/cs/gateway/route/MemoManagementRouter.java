@@ -16,13 +16,13 @@ public class MemoManagementRouter implements BaseRouter {
                 .route(r -> r
                         .path("/api/v1/memos")
                         .and()
-                        .method("POST", "GET")
+                        .method("POST", "GET", "HEAD")
                         .and()
                         .uri(memoManagementAddress))
                 .route(r -> r
                         .path("/api/v1/memos/**")
                         .and()
-                        .method("GET", "DELETE", "PATCH")
+                        .method("GET", "DELETE", "PATCH", "HEAD")
                         .and()
                         .uri(memoManagementAddress));
     }
