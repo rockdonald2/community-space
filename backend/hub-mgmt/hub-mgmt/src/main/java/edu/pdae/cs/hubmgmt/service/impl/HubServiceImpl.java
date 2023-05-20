@@ -1,5 +1,8 @@
 package edu.pdae.cs.hubmgmt.service.impl;
 
+import edu.pdae.cs.common.model.dto.HubMemberMutationDTO;
+import edu.pdae.cs.common.model.dto.HubMutationDTO;
+import edu.pdae.cs.hubmgmt.config.MessagingConfiguration;
 import edu.pdae.cs.hubmgmt.controller.exception.ConflictingOperationException;
 import edu.pdae.cs.hubmgmt.controller.exception.ForbiddenOperationException;
 import edu.pdae.cs.hubmgmt.model.Hub;
@@ -12,6 +15,7 @@ import org.bson.types.ObjectId;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.*;
@@ -23,6 +27,8 @@ public class HubServiceImpl implements HubService {
 
     private final ModelMapper modelMapper;
     private final HubRepository hubRepository;
+    private final KafkaTemplate<String, HubMemberMutationDTO> memberMutationDTOKafkaTemplate;
+    private final KafkaTemplate<String, HubMutationDTO> hubMutationDTOKafkaTemplate;
 
     @Override
     @CacheEvict(value = {"hub", "hubs"}, allEntries = true)
@@ -37,6 +43,12 @@ public class HubServiceImpl implements HubService {
         reqHub.setMembers(new ArrayList<>(Collections.singletonList(asUser))); // add owner as first member
 
         final Hub createdHub = hubRepository.save(reqHub);
+        // send hub create message to consumers
+        hubMutationDTOKafkaTemplate.send(MessagingConfiguration.HUB_MUTATION_TOPIC, HubMutationDTO.builder()
+                .hubId(createdHub.getId().toHexString())
+                .owner(asUser)
+                .state(HubMutationDTO.State.CREATED)
+                .build());
         return modelMapper.map(createdHub, HubCreationResponseDTO.class);
     }
 
@@ -121,6 +133,11 @@ public class HubServiceImpl implements HubService {
         }
 
         hubRepository.deleteById(id);
+        // send delete message
+        hubMutationDTOKafkaTemplate.send(MessagingConfiguration.HUB_MUTATION_TOPIC, HubMutationDTO.builder()
+                .hubId(id.toHexString())
+                .state(HubMutationDTO.State.DELETED)
+                .build());
     }
 
     @Override
@@ -167,6 +184,7 @@ public class HubServiceImpl implements HubService {
 
         hub.getMembers().add(memberDTO.getEmail());
         hubRepository.save(hub);
+        memberMutationDTOKafkaTemplate.send(MessagingConfiguration.MEMBER_MUTATION_TOPIC, HubMemberMutationDTO.builder().hubId(hubId.toHexString()).email(memberDTO.getEmail()).state(HubMemberMutationDTO.State.ADDED).build());
     }
 
     @Override
@@ -191,6 +209,7 @@ public class HubServiceImpl implements HubService {
 
         hub.getMembers().remove(email);
         hubRepository.save(hub);
+        memberMutationDTOKafkaTemplate.send(MessagingConfiguration.MEMBER_MUTATION_TOPIC, HubMemberMutationDTO.builder().hubId(hubId.toHexString()).email(email).state(HubMemberMutationDTO.State.REMOVED).build());
     }
 
     @Override

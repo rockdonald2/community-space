@@ -27,7 +27,7 @@ const Members = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBER
     } = useSWR<UserShort[] | ErrorResponse>(
         { key: 'members', token: user.token, hubId: hubId },
         swrMembersFetcherWithAuth,
-        { revalidateOnFocus: false, refreshWhenHidden: false, refreshWhenOffline: false }
+        { revalidateOnFocus: false }
     );
 
     const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);

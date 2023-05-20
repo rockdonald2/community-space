@@ -37,7 +37,7 @@ const Pendings = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBE
     } = useSWR<UserShort[] | ErrorResponse>(
         { key: 'pendings', token: user.token, hubId: hubId },
         swrWaitersFetcherWithAuth,
-        { revalidateOnFocus: false, refreshWhenHidden: false, refreshWhenOffline: false }
+        { revalidateOnFocus: false }
     );
 
     const handleJoinHub = useCallback(

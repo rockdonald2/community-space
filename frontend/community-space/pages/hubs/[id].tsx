@@ -24,8 +24,6 @@ const Hub = () => {
         isValidating: hubIsValidating,
     } = useSWR<HubType | ErrorResponse>({ key: 'hub', token: user.token, hubId: hubId }, swrHubFetcherWithAuth, {
         revalidateOnFocus: false,
-        refreshWhenHidden: false,
-        refreshWhenOffline: false,
     });
 
     return (

@@ -23,6 +23,7 @@ public class CacheConfiguration {
     private RedisCacheConfiguration redisCacheConfigurationForLists(ObjectMapper objectMapper) {
         return RedisCacheConfiguration.defaultCacheConfig()
                 .disableCachingNullValues()
+                .computePrefixWith(cacheName -> "cs:memo-mgmt:" + cacheName + ":")
                 .entryTtl(Duration.ofMinutes(5))
                 .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(RedisSerializer.string()))
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer(objectMapper)));
@@ -35,6 +36,7 @@ public class CacheConfiguration {
 
         return RedisCacheConfiguration.defaultCacheConfig()
                 .disableCachingNullValues()
+                .computePrefixWith(cacheName -> "cs:memo-mgmt:" + cacheName + ":")
                 .entryTtl(Duration.ofMinutes(5))
                 .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(RedisSerializer.string()))
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer(om)));
@@ -44,12 +46,14 @@ public class CacheConfiguration {
     public RedisCacheManagerBuilderCustomizer redisCacheManagerBuilderCustomizer(ObjectMapper objectMapper) {
         return builder -> builder
                 .withCacheConfiguration("memo", redisCacheConfigurationForSingleValues(objectMapper))
-                .withCacheConfiguration("memos", redisCacheConfigurationForLists(objectMapper));
+                .withCacheConfiguration("memos", redisCacheConfigurationForLists(objectMapper))
+                .withCacheConfiguration("hub", redisCacheConfigurationForSingleValues(objectMapper));
     }
 
     @Bean
     LettuceConnectionFactory lettuceConnectionFactory() {
         return new LettuceConnectionFactory();
     }
+
 
 }

@@ -42,8 +42,6 @@ const Memos = ({ hubId }: { hubId?: string | string[] }) => {
         swrRecentMemosFetcherWithAuth,
         {
             revalidateOnFocus: false,
-            refreshWhenHidden: false,
-            refreshWhenOffline: false,
         }
     );
 

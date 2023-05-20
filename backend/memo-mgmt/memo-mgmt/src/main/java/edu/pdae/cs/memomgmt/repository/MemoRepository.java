@@ -35,4 +35,6 @@ public interface MemoRepository extends MongoRepository<Memo, ObjectId> {
 
     List<Memo> getMemosByCreatedOnAfterAndHubIdAndVisibility(Date date, ObjectId hubId, Memo.Visibility visibility);
 
+    void deleteAllByHubId(ObjectId hubId);
+
 }

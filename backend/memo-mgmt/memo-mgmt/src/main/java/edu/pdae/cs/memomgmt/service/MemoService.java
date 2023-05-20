@@ -15,6 +15,8 @@ public interface MemoService {
 
     void delete(ObjectId id, String asUser);
 
+    void deleteAllByHubId(ObjectId hubId);
+
     MemoDetailsDTO getById(ObjectId id, String asUser);
 
     List<MemoDTO> getAllByVisibility(Memo.Visibility visibility, String asUser);

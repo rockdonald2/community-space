@@ -11,6 +11,8 @@ import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.util.Set;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -24,6 +26,6 @@ public class Hub {
     private ObjectId id;
 
     private String owner;
-    private String[] members;
+    private Set<String> members;
 
 }

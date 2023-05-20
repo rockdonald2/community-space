@@ -22,6 +22,7 @@ public class CacheConfiguration {
     private RedisCacheConfiguration redisCacheConfigurationForLists(ObjectMapper objectMapper) {
         return RedisCacheConfiguration.defaultCacheConfig()
                 .disableCachingNullValues()
+                .computePrefixWith(cacheName -> "cs:hub-mgmt:" + cacheName + ":")
                 .entryTtl(Duration.ofMinutes(5))
                 .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(RedisSerializer.string()))
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer(objectMapper)));
@@ -34,6 +35,7 @@ public class CacheConfiguration {
 
         return RedisCacheConfiguration.defaultCacheConfig()
                 .disableCachingNullValues()
+                .computePrefixWith(cacheName -> "cs:hub-mgmt:" + cacheName + ":")
                 .entryTtl(Duration.ofMinutes(5))
                 .serializeKeysWith(RedisSerializationContext.SerializationPair.fromSerializer(RedisSerializer.string()))
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer(om)));

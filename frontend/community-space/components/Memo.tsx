@@ -72,8 +72,6 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
         swrMemoFetcherWithAuth,
         {
             revalidateOnFocus: false,
-            refreshWhenHidden: false,
-            refreshWhenOffline: false,
         }
     );
 
