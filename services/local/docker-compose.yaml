@@ -9,9 +9,12 @@ services:
     environment:
       MONGO_INITDB_ROOT_USERNAME: root
       MONGO_INITDB_ROOT_PASSWORD: example
+    volumes:
+      - ./mongo/data:/data/db
   mongo-express:
-    image: mongo-express:0.54
-    restart: always
+    image: mongo-express
+    restart: unless-stopped
+    container_name: mongo-express
     ports:
       - 8081:8081
     environment:
