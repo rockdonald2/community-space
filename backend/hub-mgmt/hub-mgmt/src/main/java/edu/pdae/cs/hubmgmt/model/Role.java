@@ -1,4 +1,4 @@
-package edu.pdae.cs.hubmgmt.model.dto;
+package edu.pdae.cs.hubmgmt.model;
 
 public enum Role {
     OWNER,

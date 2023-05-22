@@ -1,10 +1,9 @@
 import { UserShort } from '@/types/db.types';
-import { checkIfError, swrMembersFetcherWithAuth } from '@/utils/Utility';
+import { swrMembersFetcherWithAuth } from '@/utils/Utility';
 import { Typography, IconButton, Menu, Divider, MenuItem, ListItemIcon } from '@mui/material';
 import Alerter from './Alerter';
 import SkeletonLoader from './SkeletonLoader';
 import Avatar from './Avatar';
-import { ErrorResponse } from '@/types/types';
 import { useCallback, useMemo, useState } from 'react';
 import { useAuthContext } from '@/utils/AuthContext';
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
@@ -24,11 +23,9 @@ const Members = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBER
         error: hubMembersError,
         isLoading: hubMembersIsLoading,
         isValidating: hubMembersIsValidating,
-    } = useSWR<UserShort[] | ErrorResponse>(
-        { key: 'members', token: user.token, hubId: hubId },
-        swrMembersFetcherWithAuth,
-        { revalidateOnFocus: false }
-    );
+    } = useSWR<UserShort[]>({ key: 'members', token: user.token, hubId: hubId }, swrMembersFetcherWithAuth, {
+        revalidateOnFocus: false,
+    });
 
     const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
     const open = useMemo(() => Boolean(menuAnchorEl), [menuAnchorEl]);
@@ -88,8 +85,8 @@ const Members = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBER
             />
             {!hubMembersIsLoading &&
                 !hubMembersIsValidating &&
-                !checkIfError(hubMembers) &&
-                (hubMembers as UserShort[]).map((user, idx) => (
+                !hubMembersError &&
+                hubMembers.map((user, idx) => (
                     <IconButton
                         key={idx}
                         aria-haspopup='true'

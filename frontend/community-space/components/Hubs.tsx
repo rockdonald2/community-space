@@ -1,7 +1,6 @@
 import { Hub } from '@/types/db.types';
-import { ErrorResponse } from '@/types/types';
 import { useAuthContext } from '@/utils/AuthContext';
-import { checkIfError, swrHubsFetcherWithAuth } from '@/utils/Utility';
+import { swrHubsFetcherWithAuth } from '@/utils/Utility';
 import useSWR from 'swr';
 import { Button, Grid, Typography } from '@mui/material';
 import HubCard from './HubCard';
@@ -17,7 +16,7 @@ const Hubs = () => {
         isLoading,
         isValidating,
         mutate,
-    } = useSWR<Hub[] | ErrorResponse>({ key: 'hubs', token: user.token }, swrHubsFetcherWithAuth, {
+    } = useSWR<Hub[]>({ key: 'hubs', token: user.token }, swrHubsFetcherWithAuth, {
         revalidateOnFocus: false,
     });
 
@@ -36,9 +35,9 @@ const Hubs = () => {
             <Grid container spacing={2}>
                 {!isLoading &&
                     !isValidating &&
-                    !checkIfError(hubs) &&
-                    ((hubs as Hub[]).length > 0 ? (
-                        (hubs as Hub[]).map((hub: Hub) => (
+                    !error &&
+                    (hubs.length > 0 ? (
+                        hubs.map((hub: Hub) => (
                             <Grid item key={hub.id} xs={12} sm={8} md={6}>
                                 <HubCard hub={hub} mutateCallback={mutateCallback} />
                             </Grid>

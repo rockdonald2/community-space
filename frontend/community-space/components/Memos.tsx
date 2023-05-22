@@ -1,7 +1,6 @@
 import useSWR from 'swr';
 import {
     boldSelectedElementStyle,
-    checkIfError,
     handleMultiSelectChange,
     sortByCreationDate,
     sortByUrgency,
@@ -25,7 +24,6 @@ import {
 } from '@mui/material';
 import { Memo as MemoType, urgencies } from '@/types/db.types';
 import { useAuthContext } from '@/utils/AuthContext';
-import { ErrorResponse } from '@/types/types';
 import Memo from './Memo';
 import SearchIcon from '@mui/icons-material/Search';
 import { ChangeEvent, useState } from 'react';
@@ -44,7 +42,7 @@ const Memos = ({ hubId, scope = 'RECENT' }: { hubId?: string | string[]; scope?:
         error,
         isLoading,
         isValidating,
-    } = useSWR<{ totalCount: number; totalPages: number; content: MemoType[] | ErrorResponse }>(
+    } = useSWR<{ totalCount: number; totalPages: number; content: MemoType[] }>(
         { key: 'memos', token: user.token, hubId: hubId, page: currPage },
         scope === 'RECENT' ? swrRecentMemosFetcherWithAuth : swrMemosFetcherWithAuth,
         {
@@ -120,8 +118,8 @@ const Memos = ({ hubId, scope = 'RECENT' }: { hubId?: string | string[]; scope?:
             <Alerter isValidating={isValidating} isLoading={isLoading} data={memos} error={error} />
             {!isLoading &&
                 !isValidating &&
-                !checkIfError(memos) &&
-                (memos.content as MemoType[])
+                !error &&
+                memos.content
                     .sort(sortByCreationDate)
                     .sort(sortByUrgency)
                     .filter((memo) => memo.title.toLowerCase().includes(titleFilter.toLowerCase()))
@@ -148,7 +146,7 @@ const Memos = ({ hubId, scope = 'RECENT' }: { hubId?: string | string[]; scope?:
                 <Button
                     endIcon={<ArrowForwardIosIcon />}
                     onClick={() => setCurrPage(currPage + 1)}
-                    disabled={currPage + 1 === memos?.totalPages}
+                    disabled={currPage + 1 === memos?.totalPages || memos?.totalPages === 0}
                 >
                     Next
                 </Button>

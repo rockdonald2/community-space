@@ -17,11 +17,18 @@ const Alerter = ({
     return (
         <>
             {(isLoading || isValidating) && <SkeletonLoader nrOfLayers={nrOfLayersInSkeleton} />}
-            {error && (
+            {error && 'status' in error && error?.status === 404 ? (
                 <Alert severity='error'>
                     <AlertTitle>Oops!</AlertTitle>
-                    Unexpected error has occurred.
+                    The requested content cannot be found.
                 </Alert>
+            ) : (
+                error && (
+                    <Alert severity='error'>
+                        <AlertTitle>Oops!</AlertTitle>
+                        Unexpected error has occurred.
+                    </Alert>
+                )
             )}
             {data && 'status' in data && data?.status === 404 ? (
                 <Alert severity='error'>

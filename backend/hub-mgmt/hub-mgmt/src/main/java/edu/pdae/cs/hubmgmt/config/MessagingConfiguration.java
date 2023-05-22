@@ -1,5 +1,6 @@
 package edu.pdae.cs.hubmgmt.config;
 
+import edu.pdae.cs.common.model.dto.ActivityFiredDTO;
 import edu.pdae.cs.common.model.dto.HubMemberMutationDTO;
 import edu.pdae.cs.common.model.dto.HubMutationDTO;
 import lombok.RequiredArgsConstructor;
@@ -31,6 +32,7 @@ public class MessagingConfiguration {
 
     public static final String MEMBER_MUTATION_TOPIC = "cs.memo-mgmt.hub-member-mutation-topic";
     public static final String HUB_MUTATION_TOPIC = "cs.memo-mgmt.hub-mutation-topic";
+    public static final String ACTIVITY_TOPIC = "cs.activity-mgmt.activity-topic";
 
     private final KafkaProperties kafkaProperties;
 
@@ -68,6 +70,21 @@ public class MessagingConfiguration {
     @Bean
     public KafkaTemplate<String, HubMutationDTO> hubMutationDTOKafkaTemplate() {
         return new KafkaTemplate<>(hubMutationDTOProducerFactory());
+    }
+
+    @Bean
+    public ProducerFactory<String, ActivityFiredDTO> activityFiredDTOProducerFactory() {
+        final Map<String, Object> configs = new HashMap<>(kafkaProperties.buildProducerProperties());
+
+        configs.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+
+        return new DefaultKafkaProducerFactory<>(configs);
+    }
+
+    @Bean
+    public KafkaTemplate<String, ActivityFiredDTO> activityFiredDTOKafkaTemplate() {
+        return new KafkaTemplate<>(activityFiredDTOProducerFactory());
     }
 
     @Bean

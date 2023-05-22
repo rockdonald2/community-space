@@ -1,8 +1,6 @@
 import { Hub, Memo, UserShort } from '@/types/db.types';
-import { ErrorResponse } from '@/types/types';
 import { useAuthContext } from '@/utils/AuthContext';
 import {
-    checkIfError,
     mediumDateWithNoTimeFormatter,
     swrMembersFetcherWithAuth,
     swrRecentMemosFetcherWithAuth,
@@ -24,7 +22,7 @@ const HubExploreCard = ({ hub }: { hub: Hub }) => {
         error: memosError,
         isLoading: memosIsLoading,
         isValidating: memosIsValidating,
-    } = useSWR<{ totalCount: number; totalPages: number; content: Memo[] | ErrorResponse }>(
+    } = useSWR<{ totalCount: number; totalPages: number; content: Memo[] }>(
         { key: 'memos', token: user.token, hubId: hub?.id, page: 0 },
         swrRecentMemosFetcherWithAuth
     );
@@ -34,7 +32,7 @@ const HubExploreCard = ({ hub }: { hub: Hub }) => {
         error: hubPendingsError,
         isLoading: hubPendingsIsLoading,
         isValidating: hubPendingsIsValidating,
-    } = useSWR<UserShort[] | ErrorResponse>(
+    } = useSWR<UserShort[]>(
         { key: 'pendings', token: user.token, hubId: hub.id },
         swrWaitersFetcherWithAuth
     );
@@ -44,7 +42,7 @@ const HubExploreCard = ({ hub }: { hub: Hub }) => {
         error: hubMembersError,
         isLoading: hubMembersIsLoading,
         isValidating: hubMembersIsValidating,
-    } = useSWR<UserShort[] | ErrorResponse>(
+    } = useSWR<UserShort[]>(
         { key: 'members', token: user.token, hubId: hub.id },
         swrMembersFetcherWithAuth
     );
@@ -90,7 +88,7 @@ const HubExploreCard = ({ hub }: { hub: Hub }) => {
                             error={memosError}
                             nrOfLayersInSkeleton={1}
                         />
-                        {!memosIsLoading && !memosIsValidating && !checkIfError(memos) && (
+                        {!memosIsLoading && !memosIsValidating && !memosError && (
                             <Chip label={`${memos.totalCount} memos since Yesterday`} variant='filled' />
                         )}
                     </Typography>
@@ -108,9 +106,9 @@ const HubExploreCard = ({ hub }: { hub: Hub }) => {
                             error={hubMembersError}
                             nrOfLayersInSkeleton={1}
                         />
-                        {!hubMembersIsLoading && !hubMembersIsValidating && !checkIfError(hubMembers) && (
+                        {!hubMembersIsLoading && !hubMembersIsValidating && !hubMembersError && (
                             <Chip
-                                label={`${(hubMembers as UserShort[]).length} members`}
+                                label={`${hubMembers.length} members`}
                                 variant='filled'
                                 sx={{ mr: 1 }}
                             />
@@ -125,9 +123,9 @@ const HubExploreCard = ({ hub }: { hub: Hub }) => {
                                     error={hubPendingsError}
                                     nrOfLayersInSkeleton={1}
                                 />
-                                {!hubPendingsIsLoading && !hubPendingsIsValidating && !checkIfError(hubPendings) && (
+                                {!hubPendingsIsLoading && !hubPendingsIsValidating && !hubPendingsError && (
                                     <Chip
-                                        label={`${(hubPendings as UserShort[]).length} pending members`}
+                                        label={`${hubPendings.length} pending members`}
                                         variant='filled'
                                     />
                                 )}
@@ -148,11 +146,11 @@ const HubExploreCard = ({ hub }: { hub: Hub }) => {
                             error={hubMembersError}
                             nrOfLayersInSkeleton={1}
                         />
-                        {!hubMembersIsLoading && !hubMembersIsValidating && !checkIfError(hubMembers) && (
+                        {!hubMembersIsLoading && !hubMembersIsValidating && !hubMembersError && (
                             <Chip
                                 label={`${presence
                                     .map((present) =>
-                                        (hubMembers as UserShort[]).filter((member) => member.email === present.email)
+                                        hubMembers.filter((member) => member.email === present.email)
                                             ? 1
                                             : 0
                                     )

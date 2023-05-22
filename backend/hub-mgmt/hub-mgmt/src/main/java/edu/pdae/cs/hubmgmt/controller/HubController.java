@@ -3,6 +3,7 @@ package edu.pdae.cs.hubmgmt.controller;
 import com.mongodb.MongoWriteException;
 import edu.pdae.cs.hubmgmt.controller.exception.ConflictingOperationException;
 import edu.pdae.cs.hubmgmt.controller.exception.ForbiddenOperationException;
+import edu.pdae.cs.hubmgmt.model.Role;
 import edu.pdae.cs.hubmgmt.model.dto.*;
 import edu.pdae.cs.hubmgmt.service.HubService;
 import jakarta.validation.Valid;

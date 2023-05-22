@@ -1,23 +1,25 @@
 package edu.pdae.cs.memomgmt.config;
 
+import edu.pdae.cs.common.model.dto.ActivityFiredDTO;
 import edu.pdae.cs.common.model.dto.HubMemberMutationDTO;
 import edu.pdae.cs.common.model.dto.HubMutationDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.kafka.clients.admin.NewTopic;
+import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.common.serialization.StringDeserializer;
+import org.apache.kafka.common.serialization.StringSerializer;
 import org.springframework.boot.autoconfigure.kafka.KafkaProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.kafka.annotation.EnableKafka;
 import org.springframework.kafka.config.ConcurrentKafkaListenerContainerFactory;
 import org.springframework.kafka.config.TopicBuilder;
-import org.springframework.kafka.core.ConsumerFactory;
-import org.springframework.kafka.core.DefaultKafkaConsumerFactory;
-import org.springframework.kafka.core.KafkaAdmin;
+import org.springframework.kafka.core.*;
 import org.springframework.kafka.support.converter.ByteArrayJsonMessageConverter;
 import org.springframework.kafka.support.converter.RecordMessageConverter;
 import org.springframework.kafka.support.serializer.JsonDeserializer;
+import org.springframework.kafka.support.serializer.JsonSerializer;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -30,6 +32,7 @@ public class MessagingConfiguration {
 
     public static final String MEMBER_MUTATION_TOPIC = "cs.memo-mgmt.hub-member-mutation-topic";
     public static final String HUB_MUTATION_TOPIC = "cs.memo-mgmt.hub-mutation-topic";
+    public static final String ACTIVITY_TOPIC = "cs.activity-mgmt.activity-topic";
 
     private final KafkaProperties kafkaProperties;
 
@@ -67,6 +70,21 @@ public class MessagingConfiguration {
         ConcurrentKafkaListenerContainerFactory<String, HubMutationDTO> factory = new ConcurrentKafkaListenerContainerFactory<>();
         factory.setConsumerFactory(hubMutationDTOConsumerFactory());
         return factory;
+    }
+
+    @Bean
+    public ProducerFactory<String, ActivityFiredDTO> activityFiredDTOProducerFactory() {
+        final Map<String, Object> configs = new HashMap<>(kafkaProperties.buildProducerProperties());
+
+        configs.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+
+        return new DefaultKafkaProducerFactory<>(configs);
+    }
+
+    @Bean
+    public KafkaTemplate<String, ActivityFiredDTO> activityFiredDTOKafkaTemplate() {
+        return new KafkaTemplate<>(activityFiredDTOProducerFactory());
     }
 
     @Bean

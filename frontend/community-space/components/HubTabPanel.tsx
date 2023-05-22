@@ -1,7 +1,6 @@
 import { Hub } from '@/types/db.types';
-import { ErrorResponse } from '@/types/types';
 import { useAuthContext } from '@/utils/AuthContext';
-import { checkIfError, swrExploreHubFetcherWithAuth } from '@/utils/Utility';
+import { swrExploreHubFetcherWithAuth } from '@/utils/Utility';
 import { Grid } from '@mui/material';
 import useSWR from 'swr';
 import HubExploreCard from './HubExploreCard';
@@ -21,7 +20,7 @@ const HubTabPanel = ({ value, index, role, ...other }: HubTabPanelProps) => {
         error: hubsError,
         isLoading: hubsIsLoading,
         isValidating: hubsIsValidating,
-    } = useSWR<Hub[] | ErrorResponse>({ key: 'explore', token: user.token, role: role }, swrExploreHubFetcherWithAuth, {
+    } = useSWR<Hub[]>({ key: 'explore', token: user.token, role: role }, swrExploreHubFetcherWithAuth, {
         revalidateOnFocus: false,
     });
 
@@ -34,7 +33,7 @@ const HubTabPanel = ({ value, index, role, ...other }: HubTabPanelProps) => {
                 error={hubsError}
                 nrOfLayersInSkeleton={3}
             />
-            {!hubsIsLoading && !hubsIsValidating && !checkIfError(hubs) && (
+            {!hubsIsLoading && !hubsIsValidating && !hubsError && (
                 <div
                     role='tabpanel'
                     hidden={value !== index}
@@ -44,7 +43,7 @@ const HubTabPanel = ({ value, index, role, ...other }: HubTabPanelProps) => {
                 >
                     {value === index && (
                         <Grid container spacing={2} sx={{ mt: 3 }}>
-                            {(hubs as Hub[]).map((hub) => (
+                            {hubs.map((hub) => (
                                 <Grid item key={hub.id} xs={12} sm={8} md={6}>
                                     <HubExploreCard hub={hub} />
                                 </Grid>

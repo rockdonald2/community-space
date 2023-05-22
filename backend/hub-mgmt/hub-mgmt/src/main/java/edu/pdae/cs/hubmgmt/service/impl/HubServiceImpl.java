@@ -1,11 +1,13 @@
 package edu.pdae.cs.hubmgmt.service.impl;
 
+import edu.pdae.cs.common.model.dto.ActivityFiredDTO;
 import edu.pdae.cs.common.model.dto.HubMemberMutationDTO;
 import edu.pdae.cs.common.model.dto.HubMutationDTO;
 import edu.pdae.cs.hubmgmt.config.MessagingConfiguration;
 import edu.pdae.cs.hubmgmt.controller.exception.ConflictingOperationException;
 import edu.pdae.cs.hubmgmt.controller.exception.ForbiddenOperationException;
 import edu.pdae.cs.hubmgmt.model.Hub;
+import edu.pdae.cs.hubmgmt.model.Role;
 import edu.pdae.cs.hubmgmt.model.dto.*;
 import edu.pdae.cs.hubmgmt.repository.HubRepository;
 import edu.pdae.cs.hubmgmt.service.HubService;
@@ -29,6 +31,7 @@ public class HubServiceImpl implements HubService {
     private final HubRepository hubRepository;
     private final KafkaTemplate<String, HubMemberMutationDTO> memberMutationDTOKafkaTemplate;
     private final KafkaTemplate<String, HubMutationDTO> hubMutationDTOKafkaTemplate;
+    private final KafkaTemplate<String, ActivityFiredDTO> activityFiredDTOKafkaTemplate;
 
     @Override
     @CacheEvict(value = {"hub", "hubs"}, allEntries = true)
@@ -43,12 +46,20 @@ public class HubServiceImpl implements HubService {
         reqHub.setMembers(new ArrayList<>(Collections.singletonList(asUser))); // add owner as first member
 
         final Hub createdHub = hubRepository.save(reqHub);
+
         // send hub create message to consumers
         hubMutationDTOKafkaTemplate.send(MessagingConfiguration.HUB_MUTATION_TOPIC, HubMutationDTO.builder()
                 .hubId(createdHub.getId().toHexString())
                 .owner(asUser)
                 .state(HubMutationDTO.State.CREATED)
                 .build());
+        // send message to activity
+        activityFiredDTOKafkaTemplate.send(MessagingConfiguration.ACTIVITY_TOPIC, ActivityFiredDTO.builder()
+                .hubId(createdHub.getId().toHexString())
+                .date(new Date())
+                .type(ActivityFiredDTO.Type.HUB_CREATED)
+                .build());
+
         return modelMapper.map(createdHub, HubCreationResponseDTO.class);
     }
 

@@ -2,8 +2,7 @@ import { useAuthContext } from '@/utils/AuthContext';
 import { useRouter } from 'next/router';
 import useSWR from 'swr';
 import { Hub as HubType } from '@/types/db.types';
-import { ErrorResponse } from '@/types/types';
-import { checkIfError, swrHubFetcherWithAuth } from '@/utils/Utility';
+import { swrHubFetcherWithAuth } from '@/utils/Utility';
 import { Button, Container, Divider, Grid, Typography } from '@mui/material';
 import Head from 'next/head';
 import Memos from '@/components/Memos';
@@ -12,7 +11,6 @@ import Members from '@/components/Members';
 import Pendings from '@/components/Pendings';
 import Link from 'next/link';
 import MemoEdit from '@/components/MemoEdit';
-import { useState } from 'react';
 
 const Hub = () => {
     const { query } = useRouter();
@@ -25,25 +23,25 @@ const Hub = () => {
         error: hubError,
         isLoading: hubIsLoading,
         isValidating: hubIsValidating,
-    } = useSWR<HubType | ErrorResponse>({ key: 'hub', token: user.token, hubId: hubId }, swrHubFetcherWithAuth, {
+    } = useSWR<HubType>({ key: 'hub', token: user.token, hubId: hubId }, swrHubFetcherWithAuth, {
         revalidateOnFocus: false,
     });
 
     return (
         <>
             <Head>
-                <title>Community Space {!checkIfError(hub) ? `| ${(hub as HubType).name}` : ''}</title>
+                <title>Community Space {!hubError ? `| ${hub?.name}` : ''}</title>
             </Head>
             <Grid container spacing={2}>
                 <Grid item xs={4}>
                     <Container>
-                        {(hub as HubType)?.role === 'OWNER' && (
+                        {hub?.role === 'OWNER' && (
                             <>
-                                <Pendings hubId={(hub as HubType)?.id} hubRole={(hub as HubType)?.role} />
+                                <Pendings hubId={hub?.id} hubRole={hub?.role} />
                                 <Divider sx={{ mt: 2, mb: 2 }} />
                             </>
                         )}
-                        <Members hubId={(hub as HubType)?.id} hubRole={(hub as HubType)?.role} />
+                        <Members hubId={hub?.id} hubRole={hub?.role} />
                         <Divider sx={{ mt: 2, mb: 2 }} />
                         <Typography mb={2} color='text.secondary' variant='h6'>
                             More stuff
@@ -54,7 +52,7 @@ const Hub = () => {
                                 fullWidth
                                 type='button'
                                 variant='text'
-                                href={`/hubs/${(hub as HubType)?.id}/explore`}
+                                href={`/hubs/${hub?.id}/explore`}
                                 LinkComponent={Link}
                             >
                                 Explore older memos
@@ -64,14 +62,14 @@ const Hub = () => {
                 </Grid>
                 <Grid item xs={8}>
                     <Alerter isValidating={hubIsValidating} isLoading={hubIsLoading} data={hub} error={hubError} />
-                    {!hubIsLoading && !hubIsValidating && !checkIfError(hub) && (
+                    {!hubIsLoading && !hubIsValidating && !hubError && (
                         <>
                             <Container sx={{ marginBottom: '1rem' }}>
                                 <Typography variant='h5' align='center' color='text.secondary' mb={2}>
-                                    Welcome to {(hub as HubType).name} Hub!
+                                    Welcome to {hub.name} Hub!
                                 </Typography>
                                 <Typography variant='body1' align='left' color='text.secondary'>
-                                    {(hub as HubType).description}
+                                    {hub.description}
                                 </Typography>
                             </Container>
                             <Divider sx={{ mb: 1.5 }} />

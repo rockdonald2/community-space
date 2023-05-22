@@ -1,5 +1,6 @@
 package edu.pdae.cs.hubmgmt.model.dto;
 
+import edu.pdae.cs.hubmgmt.model.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

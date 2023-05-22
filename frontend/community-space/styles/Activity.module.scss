@@ -1,0 +1,29 @@
+.wrapper {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    align-items: center;
+    justify-items: flex-start;
+    row-gap: 10px;
+}
+
+.block {
+    width: 23px;
+    height: 23px;
+    border-radius: 5px;
+    border: 1px solid var(--mui-palette-grey-500);
+    opacity: 0.75;
+
+    @media (prefers-color-scheme: dark) {
+        background-color: var(--mui-palette-grey-900);
+    }
+
+    @media (prefers-color-scheme: light) {
+        background-color: var(--mui-palette-grey-50);
+    }
+
+    &--today {
+        border-color: var(--mui-palette-primary-dark);
+        border-width: 2px;
+        
+    }
+}

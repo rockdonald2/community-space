@@ -281,6 +281,32 @@ export const swrExploreHubFetcherWithAuth = async (args: { key: string; token: s
     return await res.json();
 };
 
+export const swrActivitiesGroupedFetcherWithAuth = async (args: { key: string; token: string }) => {
+    const currDate = new Date();
+    const currYear = currDate.getFullYear();
+    const currMonthNumber = currDate.getMonth() + 1;
+
+    const res = await fetch(
+        `${GATEWAY_URL}/api/v1/activities/groups?from=${currYear}-${currMonthNumber}-01&to=${currYear}-${
+            currMonthNumber + 1
+        }-01&groupBy=DAY`,
+        {
+            headers: { Authorization: `Bearer ${args.token}` },
+        }
+    );
+
+    if (!res.ok) {
+        throw {
+            status: res.status,
+            path: res.url,
+            message: res.statusText,
+            error: 'error',
+        } satisfies ErrorResponse;
+    }
+
+    return await res.json();
+};
+
 export const mediumDateWithNoTimeFormatter = new Intl.DateTimeFormat('en-gb', {
     formatMatcher: 'best fit',
     dateStyle: 'medium',
@@ -310,4 +336,8 @@ export const handleInput = (e: React.ChangeEvent<HTMLInputElement>, setState: Di
 export const getDaysInCurrentMonth = () => {
     var now = new Date();
     return new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+};
+
+export const getCurrentDay = () => {
+    return new Date().getDate();
 };

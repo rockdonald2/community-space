@@ -1,5 +1,6 @@
 package edu.pdae.cs.hubmgmt.service;
 
+import edu.pdae.cs.hubmgmt.model.Role;
 import edu.pdae.cs.hubmgmt.model.dto.*;
 import org.bson.types.ObjectId;
 

@@ -54,3 +54,15 @@ export type HubShort = {
     createdOn: Date;
     owner: string;
 };
+
+export type Activity = {
+    id?: string;
+    type: 'HUB_CREATED' | 'MEMO_CREATED';
+    hubId: string;
+    date: Date;
+};
+
+export type ActivityGrouped = {
+    groupNumber: number;
+    count: number;
+}

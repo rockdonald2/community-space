@@ -66,7 +66,6 @@ public class MemoController {
             wrapper = memoService.getAll(user, page.orElse(0), PAGE_SIZE);
         }
 
-
         final var headers = new HttpHeaders();
         headers.set("X-TOTAL-COUNT", String.valueOf(wrapper.getTotalNumberOfElements()));
         headers.set("X-TOTAL-PAGES", String.valueOf(wrapper.getTotalPages()));

@@ -1,6 +1,8 @@
 package edu.pdae.cs.memomgmt.service.impl;
 
+import edu.pdae.cs.common.model.dto.ActivityFiredDTO;
 import edu.pdae.cs.common.util.PageWrapper;
+import edu.pdae.cs.memomgmt.config.MessagingConfiguration;
 import edu.pdae.cs.memomgmt.controller.exception.ForbiddenOperationException;
 import edu.pdae.cs.memomgmt.model.Memo;
 import edu.pdae.cs.memomgmt.model.dto.*;
@@ -14,6 +16,7 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
 import java.util.Date;
@@ -26,6 +29,7 @@ public class MemoServiceImpl implements MemoService {
     private final MemoRepository memoRepository;
     private final ModelMapper modelMapper;
     private final HubService hubService;
+    private final KafkaTemplate<String, ActivityFiredDTO> activityFiredDTOKafkaTemplate;
 
     @Override
     @CacheEvict(value = {"memo", "memos"}, allEntries = true)
@@ -40,6 +44,13 @@ public class MemoServiceImpl implements MemoService {
         reqMemo.setAuthor(asUser);
 
         final Memo createdMemo = memoRepository.save(reqMemo);
+        // send message to activity topic
+        activityFiredDTOKafkaTemplate.send(MessagingConfiguration.ACTIVITY_TOPIC, ActivityFiredDTO.builder()
+                .hubId(memoCreationDTO.getHubId().toHexString())
+                .date(new Date())
+                .type(ActivityFiredDTO.Type.MEMO_CREATED)
+                .build());
+
         return modelMapper.map(createdMemo, MemoCreationResponseDTO.class);
     }
 

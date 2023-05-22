@@ -33,7 +33,7 @@ const SnackbarProvider = ({ children }: { children: JSX.Element }) => {
         <SnackbarProviderInternal
             preventDuplicate
             maxSnack={10}
-            anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
+            anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
             Components={{
                 success: StyledMaterialDesignContent,
                 error: StyledMaterialDesignContent,

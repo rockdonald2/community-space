@@ -6,7 +6,7 @@ import { useState } from 'react';
 const Explore = () => {
     const [currentTab, setCurrentTab] = useState<number>(0);
 
-    const handleChange = (event: React.SyntheticEvent, newTabValue: number) => {
+    const handleChange = (_event: React.SyntheticEvent, newTabValue: number) => {
         setCurrentTab(newTabValue);
     };
 

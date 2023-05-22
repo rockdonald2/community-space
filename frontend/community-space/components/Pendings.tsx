@@ -1,12 +1,11 @@
 import { Container, Divider, IconButton, ListItemIcon, Menu, MenuItem, Typography } from '@mui/material';
 import Alerter from './Alerter';
 import { UserShort } from '@/types/db.types';
-import { checkIfError, swrWaitersFetcherWithAuth } from '@/utils/Utility';
+import { swrWaitersFetcherWithAuth } from '@/utils/Utility';
 import Avatar from './Avatar';
 import useSWR, { useSWRConfig } from 'swr';
 import { useCallback, useMemo, useState } from 'react';
 import { useAuthContext } from '@/utils/AuthContext';
-import { ErrorResponse } from '@/types/types';
 import { GATEWAY_URL } from '@/utils/Constants';
 import SkeletonLoader from './SkeletonLoader';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
@@ -34,7 +33,7 @@ const Pendings = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBE
         error: hubPendingsError,
         isLoading: hubPendingsIsLoading,
         isValidating: hubPendingsIsValidating,
-    } = useSWR<UserShort[] | ErrorResponse>(
+    } = useSWR<UserShort[]>(
         { key: 'pendings', token: user.token, hubId: hubId },
         swrWaitersFetcherWithAuth,
         { revalidateOnFocus: false }
@@ -143,7 +142,7 @@ const Pendings = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBE
             />
             {!hubPendingsIsLoading &&
                 !hubPendingsIsValidating &&
-                !checkIfError(hubPendings) &&
+                !hubPendingsError &&
                 ((hubPendings as UserShort[]).length !== 0 ? (
                     <>
                         <Container sx={{ mb: 1.5 }}>
