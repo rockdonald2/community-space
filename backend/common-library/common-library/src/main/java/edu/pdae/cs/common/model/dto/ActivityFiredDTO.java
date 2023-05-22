@@ -14,12 +14,17 @@ import java.util.Date;
 public class ActivityFiredDTO {
 
     private Date date;
+    private String hubName;
     private String hubId;
+    private String memoTitle;
+    private String memoId;
     private Type type;
+    private String user;
 
     public enum Type {
         MEMO_CREATED,
         HUB_CREATED,
+        MEMO_COMPLETED,
     }
 
 }

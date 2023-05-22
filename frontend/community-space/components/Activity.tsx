@@ -18,7 +18,7 @@ const Activity = () => {
         error: activitiesError,
         isLoading: isLoadingActivities,
         isValidating: isValidatingActivities,
-    } = useSWR<ActivityGrouped[]>({ key: 'activities', token: user.token }, swrActivitiesGroupedFetcherWithAuth);
+    } = useSWR<ActivityGrouped[]>({ key: 'activities-grouped', token: user.token }, swrActivitiesGroupedFetcherWithAuth);
 
     const [activities, setActivities] = useState<Map<number, number>>(new Map<number, number>());
 

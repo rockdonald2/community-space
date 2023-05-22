@@ -29,11 +29,17 @@ public class Activity {
 
     private Date date;
     private ObjectId hubId;
+    private String hubName;
+    private ObjectId memoId;
+    private String memoTitle;
     private Type type;
+    private String user;
+
 
     public enum Type {
         MEMO_CREATED,
         HUB_CREATED,
+        MEMO_COMPLETED,
     }
 
 }

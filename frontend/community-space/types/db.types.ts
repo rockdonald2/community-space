@@ -24,6 +24,7 @@ export type Memo = {
     visibility: Visibility;
     urgency: Urgency;
     hubId: string;
+    completed?: boolean;
 };
 
 export type MemoShort = {
@@ -57,12 +58,23 @@ export type HubShort = {
 
 export type Activity = {
     id?: string;
-    type: 'HUB_CREATED' | 'MEMO_CREATED';
+    type: 'HUB_CREATED' | 'MEMO_CREATED' | 'MEMO_COMPLETED';
     hubId: string;
+    hubName: string;
+    memoId?: string;
+    memoTitle?: string;
+    user: string;
     date: Date;
 };
 
 export type ActivityGrouped = {
     groupNumber: number;
     count: number;
+};
+
+export type Completion = {
+    memoId: string;
+    hubId: string;
+    user: string;
+    completed: boolean;
 }

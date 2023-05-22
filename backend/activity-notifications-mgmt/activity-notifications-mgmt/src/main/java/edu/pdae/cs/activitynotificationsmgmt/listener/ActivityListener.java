@@ -30,12 +30,18 @@ public class ActivityListener {
             type = Activity.Type.MEMO_CREATED;
         } else if (activityFiredDTO.getType().equals(ActivityFiredDTO.Type.HUB_CREATED)) {
             type = Activity.Type.HUB_CREATED;
+        } else if (activityFiredDTO.getType().equals(ActivityFiredDTO.Type.MEMO_COMPLETED)) {
+            type = Activity.Type.MEMO_COMPLETED;
         } else {
             log.error("Unknown activity type: {}", activityFiredDTO.getType());
             return;
         }
 
-        activityService.addActivity(new ObjectId(activityFiredDTO.getHubId()), activityFiredDTO.getDate(), type);
+        if (activityFiredDTO.getMemoId() == null) {
+            activityService.addActivity(activityFiredDTO.getUser(), new ObjectId(activityFiredDTO.getHubId()), activityFiredDTO.getHubName(), activityFiredDTO.getDate(), type);
+        } else {
+            activityService.addActivity(activityFiredDTO.getUser(), new ObjectId(activityFiredDTO.getHubId()), activityFiredDTO.getHubName(), new ObjectId(activityFiredDTO.getMemoId()), activityFiredDTO.getMemoTitle(), activityFiredDTO.getDate(), type);
+        }
     }
 
 }

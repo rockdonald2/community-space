@@ -47,7 +47,9 @@ public class CacheConfiguration {
         return builder -> builder
                 .withCacheConfiguration("memo", redisCacheConfigurationForComplex(objectMapper))
                 .withCacheConfiguration("memos", redisCacheConfigurationForComplex(objectMapper))
-                .withCacheConfiguration("hub", redisCacheConfigurationForComplex(objectMapper));
+                .withCacheConfiguration("hub", redisCacheConfigurationForComplex(objectMapper))
+                .withCacheConfiguration("completion", redisCacheConfigurationForComplex(objectMapper))
+                .withCacheConfiguration("completions", redisCacheConfigurationForLists(objectMapper));
     }
 
     @Bean

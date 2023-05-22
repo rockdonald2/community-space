@@ -41,7 +41,8 @@ public class HubChangesListener {
         log.info("Caught internal message for hub creation update for {}", hubMutationDTO);
 
         switch (hubMutationDTO.getState()) { // NOSONAR
-            case CREATED -> hubService.createHub(new ObjectId(hubMutationDTO.getHubId()), hubMutationDTO.getOwner());
+            case CREATED ->
+                    hubService.createHub(new ObjectId(hubMutationDTO.getHubId()), hubMutationDTO.getHubName(), hubMutationDTO.getOwner());
             case DELETED -> hubService.deleteHub(new ObjectId(hubMutationDTO.getHubId()));
         }
     }

@@ -7,12 +7,14 @@ import { useRouter } from 'next/router';
 import { useState, useCallback } from 'react';
 import { QuickActionActionType, QuickActionType } from '@/types/types';
 import { useAuthContext } from '@/utils/AuthContext';
+import LocalActivityIcon from '@mui/icons-material/LocalActivity';
 
 const quickActions: QuickActionType[] = [
     { icon: <LogoutIcon />, name: 'Logout', action: 'signout' },
     { icon: <HomeIcon />, name: 'Back to home', action: 'backToHome' },
     { icon: <GroupIcon />, name: 'Create Hub', action: 'createHub' },
     { icon: <ExploreIcon />, name: 'Explore Hubs', action: 'explore' },
+    { icon: <LocalActivityIcon />, name: 'Activity', action: 'activity'}
 ];
 
 const QuickActions = () => {
@@ -40,6 +42,10 @@ const QuickActions = () => {
                 }
                 case 'explore': {
                     push('/hubs/explore');
+                    break;
+                }
+                case 'activity': {
+                    push('/activity');
                     break;
                 }
             }

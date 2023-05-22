@@ -13,6 +13,7 @@ import org.springframework.context.annotation.Lazy;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
+import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -26,10 +27,11 @@ public class HubServiceImpl implements HubService {
 
     @Override
     @CacheEvict({"hub", "memo", "memos"})
-    public void createHub(ObjectId hubId, String ownerEmail) {
+    public void createHub(ObjectId hubId, String hubName, String ownerEmail) {
         hubRepository.save(Hub.builder()
                 .id(hubId)
                 .owner(ownerEmail)
+                .name(hubName)
                 .members(new HashSet<>())
                 .build());
     }
@@ -63,6 +65,11 @@ public class HubServiceImpl implements HubService {
     public boolean isMember(ObjectId hubId, String email) {
         final Hub hub = hubRepository.findById(hubId).orElseThrow();
         return hub.getMembers().contains(email) || hub.getOwner().equals(email);
+    }
+
+    @Override
+    public Hub getHub(ObjectId hubId) throws NoSuchElementException {
+        return hubRepository.findById(hubId).orElseThrow();
     }
 
 }

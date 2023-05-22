@@ -22,5 +22,6 @@ public class MemoDetailsDTO {
     private Memo.Visibility visibility;
     private Memo.Urgency urgency;
     private String hubId;
+    private boolean completed;
 
 }

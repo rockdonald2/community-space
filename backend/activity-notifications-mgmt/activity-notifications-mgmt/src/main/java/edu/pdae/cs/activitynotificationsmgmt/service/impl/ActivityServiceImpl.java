@@ -31,9 +31,14 @@ public class ActivityServiceImpl implements ActivityService {
     private final MongoTemplate mongoTemplate;
 
     @Override
+    public void addActivity(String user, ObjectId hubId, String hubName, Date date, Activity.Type type) {
+        activityRepository.save(Activity.builder().user(user).hubId(hubId).date(date).type(type).hubName(hubName).build());
+    }
+
+    @Override
     @CacheEvict({"activities", "activities-grouped"})
-    public void addActivity(ObjectId hubId, Date date, Activity.Type type) {
-        activityRepository.save(Activity.builder().hubId(hubId).date(date).type(type).build());
+    public void addActivity(String user, ObjectId hubId, String hubName, ObjectId memoId, String memoTitle, Date date, Activity.Type type) {
+        activityRepository.save(Activity.builder().user(user).hubId(hubId).date(date).type(type).hubName(hubName).memoId(memoId).memoTitle(memoTitle).build());
     }
 
     @Override

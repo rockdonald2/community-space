@@ -15,7 +15,7 @@ import {
     Typography,
     styled,
 } from '@mui/material';
-import { Memo as MemoType, MemoShort } from '@/types/db.types';
+import { Memo as MemoType, MemoShort, Completion } from '@/types/db.types';
 import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward';
 import CloseIcon from '@mui/icons-material/Close';
 import { useCallback, useState, useEffect } from 'react';
@@ -29,8 +29,10 @@ import useSWR, { useSWRConfig } from 'swr';
 import SkeletonLoader from './SkeletonLoader';
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown';
 import remarkGfm from 'remark-gfm';
-import { swrMemoFetcherWithAuth } from '@/utils/Utility';
+import { longDateShortTimeDateFormatter, swrCompletionsFetcherWithAuth, swrMemoFetcherWithAuth } from '@/utils/Utility';
 import { useSnackbar } from 'notistack';
+import DoneIcon from '@mui/icons-material/Done';
+import Avatar from '@/components/Avatar';
 
 const MemoDialog = styled(Dialog)(({ theme }) => ({
     '& .MuiPaper-root': {
@@ -44,14 +46,8 @@ const MemoDialog = styled(Dialog)(({ theme }) => ({
     },
 }));
 
-const dateFormatter = new Intl.DateTimeFormat('en-gb', {
-    formatMatcher: 'best fit',
-    dateStyle: 'full',
-    timeStyle: 'short',
-});
-
 const Memo = ({ memo }: { memo: MemoShort }) => {
-    const { user } = useAuthContext();
+    const { user, signOut } = useAuthContext();
     const { mutate } = useSWRConfig();
     const { enqueueSnackbar } = useSnackbar();
 
@@ -64,15 +60,31 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
     // ? Because that we don't fetch the data before opening the memo, on closing it will disregard the data and will collapse the inner body of the dialog
     const {
         data: memoData,
-        error,
-        isLoading,
-        isValidating,
+        error: memoError,
+        isLoading: memoIsLoading,
+        isValidating: memoIsValidating,
     } = useSWR<MemoType>(
         isMemoOpen ? { key: 'memo', token: user.token, memoId: memo.id } : null,
         swrMemoFetcherWithAuth,
         {
             revalidateOnFocus: false,
         }
+    );
+
+    const {
+        data: completionsData,
+        error: completionsError,
+        isValidating: completionsIsValidating,
+        isLoading: completionsIsLoading,
+    } = useSWR<Completion[]>(
+        isMemoOpen && memo.author === user.email
+            ? {
+                  key: 'completions',
+                  token: user.token,
+                  memoId: memo.id,
+              }
+            : null,
+        swrCompletionsFetcherWithAuth
     );
 
     useEffect(() => {
@@ -102,7 +114,7 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                 });
 
                 if (!deleteResponse.ok) {
-                    throw new Error('Failed to delete memo due to bad response.', {
+                    throw new Error('Failed to delete memo due to bad response', {
                         cause: {
                             res: deleteResponse,
                         },
@@ -113,13 +125,65 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                 mutate((key) => key['key'] === 'memos' && key['hubId'] === memo.hubId);
             } catch (err) {
                 console.debug(err.message, err);
-                enqueueSnackbar('Failed to delete memo.', { variant: 'error' });
                 setUserInputError(true);
+                if (err instanceof Error) {
+                    if ('res' in (err.cause as any)) {
+                        const res = (err.cause as any).res;
+                        if (res.status === 401) {
+                            enqueueSnackbar('Your session has expired. Please sign in again', { variant: 'warning' });
+                            signOut();
+                        } else {
+                            enqueueSnackbar('Failed to delete memo', { variant: 'error' });
+                        }
+                    }
+                }
             }
         };
 
         handleAsync();
-    }, [memo.id, memo.hubId, user.token, mutate, enqueueSnackbar]);
+    }, [memo.id, memo.hubId, user.token, mutate, enqueueSnackbar, signOut]);
+
+    const handleCompletion = useCallback(() => {
+        const handleAsync = async () => {
+            try {
+                const completionResponse = await fetch(`${GATEWAY_URL}/api/v1/memos/${memo.id}/completions`, {
+                    headers: {
+                        Authorization: `Bearer ${user.token}`,
+                        'Content-Type': 'application/json',
+                    },
+                    method: 'POST',
+                    body: JSON.stringify({
+                        user: user.email,
+                    }),
+                });
+
+                if (!completionResponse.ok) {
+                    throw new Error('Failed to handle completion of memo', {
+                        cause: {
+                            res: completionResponse,
+                        },
+                    });
+                }
+
+                mutate((key) => key['key'] === 'memos' && key['hubId'] === memo.hubId);
+            } catch (err) {
+                console.debug(err.message, err);
+                if (err instanceof Error) {
+                    if ('res' in (err.cause as any)) {
+                        const res = (err.cause as any).res;
+                        if (res.status === 401) {
+                            enqueueSnackbar('Your session has expired. Please sign in again', { variant: 'warning' });
+                            signOut();
+                        } else {
+                            enqueueSnackbar('Failed to handle completion of memo', { variant: 'error' });
+                        }
+                    }
+                }
+            }
+        };
+
+        handleAsync();
+    }, [enqueueSnackbar, memo.hubId, memo.id, mutate, signOut, user.email, user.token]);
 
     return (
         <>
@@ -139,7 +203,7 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                         <Stack direction={'row'} alignItems={'center'}>
                             <Typography sx={{ fontSize: 14, mb: 0 }} color='text.secondary' gutterBottom>
                                 Posted by&nbsp;<strong>{memo.author}</strong>&nbsp;on{' '}
-                                {dateFormatter.format(new Date(memo.createdOn))}
+                                {longDateShortTimeDateFormatter.format(new Date(memo.createdOn))}
                             </Typography>
                             <Divider variant='middle' orientation='vertical' flexItem style={{ margin: '0 .5rem' }} />
                             <Typography sx={{ fontSize: 14, mb: 0 }} color='text.secondary' gutterBottom>
@@ -174,13 +238,13 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                 </DialogTitle>
                 <DialogContent sx={{ overflow: 'initial' }}>
                     <Typography sx={{ mb: 0 }} color='text.secondary'>
-                        Memo posted on {dateFormatter.format(memo.createdOn)} by {memo.author}
+                        Memo posted on {longDateShortTimeDateFormatter.format(memo.createdOn)} by {memo.author}
                     </Typography>
                     <Chip label={memo.urgency.toLowerCase()} variant='filled' sx={{ mt: 1, mr: 1 }} />
                     <Chip label={memo.visibility.toLowerCase()} variant='filled' sx={{ mt: 1 }} />
                 </DialogContent>
                 <DialogContent dividers>
-                    {isMemoModificationError || error ? (
+                    {isMemoModificationError || memoError ? (
                         <Alert severity='error'>
                             <AlertTitle>Oops!</AlertTitle>
                             Unexpected error has occurred.
@@ -200,7 +264,7 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                                 setUserUpdatingMemo(false);
                             }}
                         />
-                    ) : isLoading || isValidating ? (
+                    ) : memoIsLoading || memoIsValidating ? (
                         <SkeletonLoader nrOfLayers={1} />
                     ) : (
                         <>
@@ -210,6 +274,38 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                         </>
                     )}
                 </DialogContent>
+                {user.email === memo.author && (
+                    <DialogContent sx={{ maxWidth: '85%' }}>
+                        {completionsError ? (
+                            <Alert severity='error'>
+                                <AlertTitle>Oops!</AlertTitle>
+                                Unexpected error has occurred.
+                            </Alert>
+                        ) : completionsIsLoading || completionsIsValidating ? (
+                            <SkeletonLoader nrOfLayers={1} />
+                        ) : (
+                            <>
+                                <Typography variant='subtitle1' sx={{ mb: 1 }}>
+                                    Completions
+                                </Typography>
+                                {completionsData?.map((completion, idx) => (
+                                    <Avatar
+                                        key={idx}
+                                        user={{ email: completion.user }}
+                                        generateRandomColor
+                                        style={{
+                                            width: 25,
+                                            height: 25,
+                                            fontSize: 13,
+                                            marginRight: '.25rem',
+                                            marginBottom: '.25rem',
+                                        }}
+                                    />
+                                ))}
+                            </>
+                        )}
+                    </DialogContent>
+                )}
                 {user.email === memo.author && !isUserUpdatingMemo && (
                     <DialogActions>
                         <Button
@@ -224,6 +320,21 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                             Delete
                         </Button>
                     </DialogActions>
+                )}
+                {user.email !== memo.author && !prevMemoData?.completed ? (
+                    <DialogActions>
+                        <Button variant='outlined' color='primary' endIcon={<DoneIcon />} onClick={handleCompletion}>
+                            Mark as Completed
+                        </Button>
+                    </DialogActions>
+                ) : (
+                    user.email !== memo.author && (
+                        <DialogActions>
+                            <Typography color='text.secondary' variant='caption'>
+                                Already completed
+                            </Typography>
+                        </DialogActions>
+                    )
                 )}
             </MemoDialog>
         </>

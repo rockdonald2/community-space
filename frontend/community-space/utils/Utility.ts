@@ -307,9 +307,57 @@ export const swrActivitiesGroupedFetcherWithAuth = async (args: { key: string; t
     return await res.json();
 };
 
+export const swrCompletionsFetcherWithAuth = async (args: { key: string; token: string; memoId: string }) => {
+    const res = await fetch(`${GATEWAY_URL}/api/v1/memos/${args.memoId}/completions`, {
+        headers: { Authorization: `Bearer ${args.token}` },
+    });
+
+    if (!res.ok) {
+        throw {
+            status: res.status,
+            path: res.url,
+            message: res.statusText,
+            error: 'error',
+        } satisfies ErrorResponse;
+    }
+
+    return await res.json();
+};
+
+export const swrActivitiesFetcherWithAuth = async (args: { key: string; token: string }) => {
+    const currDate = new Date();
+    const previousWeek = new Date(currDate.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+    const res = await fetch(
+        `${GATEWAY_URL}/api/v1/activities?from=${previousWeek.getFullYear()}-${
+            previousWeek.getMonth() + 1
+        }-${previousWeek.getDate()}&to=${currDate.getFullYear()}-${currDate.getMonth() + 1}-${currDate.getDate() + 1}`,
+        {
+            headers: { Authorization: `Bearer ${args.token}` },
+        }
+    );
+
+    if (!res.ok) {
+        throw {
+            status: res.status,
+            path: res.url,
+            message: res.statusText,
+            error: 'error',
+        } satisfies ErrorResponse;
+    }
+
+    return await res.json();
+};
+
 export const mediumDateWithNoTimeFormatter = new Intl.DateTimeFormat('en-gb', {
     formatMatcher: 'best fit',
     dateStyle: 'medium',
+});
+
+export const longDateShortTimeDateFormatter = new Intl.DateTimeFormat('en-gb', {
+    formatMatcher: 'best fit',
+    dateStyle: 'full',
+    timeStyle: 'short',
 });
 
 /**

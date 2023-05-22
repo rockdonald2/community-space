@@ -12,6 +12,7 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.Date;
+import java.util.List;
 
 @Data
 @Builder
@@ -31,6 +32,7 @@ public class Memo {
     private Date createdOn;
     private Visibility visibility;
     private Urgency urgency;
+    private List<String> completions;
 
     @JsonSerialize(using = ToStringSerializer.class)
     private ObjectId hubId;

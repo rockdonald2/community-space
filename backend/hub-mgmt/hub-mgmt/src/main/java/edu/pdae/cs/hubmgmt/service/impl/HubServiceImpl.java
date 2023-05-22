@@ -50,12 +50,15 @@ public class HubServiceImpl implements HubService {
         // send hub create message to consumers
         hubMutationDTOKafkaTemplate.send(MessagingConfiguration.HUB_MUTATION_TOPIC, HubMutationDTO.builder()
                 .hubId(createdHub.getId().toHexString())
+                .hubName(createdHub.getName())
                 .owner(asUser)
                 .state(HubMutationDTO.State.CREATED)
                 .build());
         // send message to activity
         activityFiredDTOKafkaTemplate.send(MessagingConfiguration.ACTIVITY_TOPIC, ActivityFiredDTO.builder()
+                .user(asUser)
                 .hubId(createdHub.getId().toHexString())
+                .hubName(createdHub.getName())
                 .date(new Date())
                 .type(ActivityFiredDTO.Type.HUB_CREATED)
                 .build());

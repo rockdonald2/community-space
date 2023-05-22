@@ -6,6 +6,7 @@ import edu.pdae.cs.memomgmt.model.dto.*;
 import org.bson.types.ObjectId;
 
 import java.util.Date;
+import java.util.List;
 
 public interface MemoService {
 
@@ -34,5 +35,11 @@ public interface MemoService {
     PageWrapper<MemoDTO> getAllByHubIdAndByVisibility(ObjectId hubId, Memo.Visibility visibility, String asUser, int currPage, int pageSize);
 
     PageWrapper<MemoDTO> getAllByHubId(ObjectId hubId, String asUser, int currPage, int pageSize);
+
+    MemoCompletionResponseDTO completeMemo(ObjectId memoId, String user, String asUser);
+
+    List<MemoCompletionResponseDTO> getCompletions(ObjectId memoId, String asUser);
+
+    MemoCompletionResponseDTO verifyCompletion(ObjectId memoId, String userToVerify, String asUser);
 
 }

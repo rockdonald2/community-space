@@ -11,7 +11,8 @@ import java.util.List;
 
 public interface ActivityService {
 
-    void addActivity(ObjectId hubId, Date date, Activity.Type type);
+    void addActivity(String user, ObjectId hubId, String hubName, Date date, Activity.Type type);
+    void addActivity(String user, ObjectId hubId, String hubName, ObjectId memoId, String memoTitle, Date date, Activity.Type type);
 
     List<ActivityDTO> getActivities(Date from, Date to);
 

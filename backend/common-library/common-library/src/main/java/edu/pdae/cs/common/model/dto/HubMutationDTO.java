@@ -14,6 +14,8 @@ public class HubMutationDTO {
 
     private String hubId;
     @Nullable
+    private String hubName;
+    @Nullable
     private String owner;
     private State state;
 

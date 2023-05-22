@@ -25,6 +25,7 @@ public class Hub {
     @JsonSerialize(using = ToStringSerializer.class)
     private ObjectId id;
 
+    private String name;
     private String owner;
     private Set<String> members;
 

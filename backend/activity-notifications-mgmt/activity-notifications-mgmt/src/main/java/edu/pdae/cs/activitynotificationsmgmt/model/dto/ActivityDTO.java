@@ -17,5 +17,9 @@ public class ActivityDTO {
     private Date date;
     private Activity.Type type;
     private String hubId;
+    private String hubName;
+    private String memoId;
+    private String memoTitle;
+    private String user;
 
 }

@@ -1,6 +1,7 @@
 package edu.pdae.cs.memomgmt.controller;
 
 import edu.pdae.cs.common.util.PageWrapper;
+import edu.pdae.cs.memomgmt.controller.exception.ConflictingOperationException;
 import edu.pdae.cs.memomgmt.controller.exception.ForbiddenOperationException;
 import edu.pdae.cs.memomgmt.model.Memo;
 import edu.pdae.cs.memomgmt.model.dto.*;
@@ -92,9 +93,32 @@ public class MemoController {
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 
+    @PostMapping("/{id}/completions")
+    public MemoCompletionResponseDTO handleCompletion(@PathVariable("id") ObjectId id, @RequestBody MemoCompletionDTO memoCompletionDTO, @RequestHeader("X-AUTH-TOKEN-SUBJECT") String asUser) {
+        // add completion to a specific memo
+        return memoService.completeMemo(id, memoCompletionDTO.getUser(), asUser);
+    }
+
+    @GetMapping("/{id}/completions")
+    public List<MemoCompletionResponseDTO> getCompletions(@PathVariable("id") ObjectId id, @RequestHeader("X-AUTH-TOKEN-SUBJECT") String asUser) {
+        // get all completions for a specific memo
+        return memoService.getCompletions(id, asUser);
+    }
+
+    @GetMapping("/{id}/completions/{email}")
+    public MemoCompletionResponseDTO verifyCompletion(@PathVariable("id") ObjectId id, @PathVariable("email") String userToVerify, @RequestHeader("X-AUTH-TOKEN-SUBJECT") String asUser) {
+        // verify if a user has completed a memo
+        return memoService.verifyCompletion(id, userToVerify, asUser);
+    }
+
     @ExceptionHandler(ForbiddenOperationException.class)
     public ResponseEntity<String> forbiddenHandler() {
         return new ResponseEntity<>("Operation is not allowed", HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(ConflictingOperationException.class)
+    public ResponseEntity<String> conflictHandler() {
+        return new ResponseEntity<>("Operation is conflicting", HttpStatus.CONFLICT);
     }
 
     @ExceptionHandler(NullPointerException.class)
