@@ -12,7 +12,7 @@ const Presence = () => {
     return (
         <Container>
             <Typography mb={2} color='text.secondary' variant='h6'>
-                Others online
+                Others online ({presence ? presence.length - 1 : 0})
             </Typography>
             <Stack alignItems={'flex-start'} direction={'row'} flexWrap={'wrap'} sx={{ mb: 2 }}>
                 {presence ? (

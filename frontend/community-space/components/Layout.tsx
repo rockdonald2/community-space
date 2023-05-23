@@ -7,12 +7,14 @@ import Blob from './Blob';
 import { SWRConfig } from 'swr';
 import { useSnackbar } from 'notistack';
 import PresenceContextProvider from '@/utils/PresenceContext';
+import { useRouter } from 'next/router';
 
 const Layout = ({ children }) => {
     const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
     const { setMode } = useColorScheme();
     const { isAuthenticated, signOut } = useAuthContext();
     const { enqueueSnackbar } = useSnackbar();
+    const { push } = useRouter();
 
     useEffect(() => {
         setMode(prefersDarkMode ? 'dark' : 'light');
@@ -31,6 +33,11 @@ const Layout = ({ children }) => {
                                         variant: 'warning',
                                     });
                                     signOut();
+                                } else if (error?.status === 403) {
+                                    enqueueSnackbar('You do not have permission to perform this action', {
+                                        variant: 'error',
+                                    });
+                                    push('/');
                                 }
                             },
                         }}

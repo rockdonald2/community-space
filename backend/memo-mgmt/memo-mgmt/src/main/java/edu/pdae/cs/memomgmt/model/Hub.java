@@ -9,6 +9,7 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.Set;
@@ -25,7 +26,9 @@ public class Hub {
     @JsonSerialize(using = ToStringSerializer.class)
     private ObjectId id;
 
+    @Indexed(unique = true)
     private String name;
+
     private String owner;
     private Set<String> members;
 

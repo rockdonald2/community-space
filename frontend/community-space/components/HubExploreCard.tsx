@@ -33,7 +33,7 @@ const HubExploreCard = ({ hub }: { hub: Hub }) => {
         isLoading: hubPendingsIsLoading,
         isValidating: hubPendingsIsValidating,
     } = useSWR<UserShort[]>(
-        { key: 'pendings', token: user.token, hubId: hub.id },
+        hub.role === 'OWNER' ? { key: 'pendings', token: user.token, hubId: hub.id } : null,
         swrWaitersFetcherWithAuth
     );
 

@@ -6,12 +6,14 @@ import edu.pdae.cs.activitynotificationsmgmt.model.dto.ActivityDTO;
 import edu.pdae.cs.activitynotificationsmgmt.model.dto.ActivityGroupedDTO;
 import edu.pdae.cs.activitynotificationsmgmt.repository.ActivityRepository;
 import edu.pdae.cs.activitynotificationsmgmt.service.ActivityService;
+import edu.pdae.cs.common.util.PageWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
+import org.springframework.data.domain.PageRequest;
 import org.springframework.data.mongodb.core.MongoTemplate;
 import org.springframework.data.mongodb.core.aggregation.Aggregation;
 import org.springframework.data.mongodb.core.query.Criteria;
@@ -43,11 +45,17 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Override
     @Cacheable("activities")
-    public List<ActivityDTO> getActivities(Date from, Date to) {
-        return activityRepository.findActivitiesByDateBetween(from, to)
-                .stream()
-                .map(activity -> modelMapper.map(activity, ActivityDTO.class))
-                .toList();
+    public PageWrapper<ActivityDTO> getActivities(Date from, Date to, int page, int pageSize) {
+        final var activityPage = activityRepository.findActivitiesByDateBetween(from, to, PageRequest.of(page, pageSize));
+        final List<Activity> activityList = activityPage.getContent();
+        final List<ActivityDTO> activityDTOList = activityList.stream().map(activity -> modelMapper.map(activity, ActivityDTO.class)).toList();
+
+        return PageWrapper.<ActivityDTO>builder()
+                .pageSize(pageSize)
+                .content(activityDTOList)
+                .totalNumberOfElements(activityPage.getTotalElements())
+                .totalPages(activityPage.getTotalPages())
+                .build();
     }
 
     @Override

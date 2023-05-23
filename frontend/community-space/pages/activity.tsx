@@ -5,18 +5,26 @@ import { longDateShortTimeDateFormatter, swrActivitiesFetcherWithAuth } from '@/
 import Head from 'next/head';
 import Item from '@/components/Item';
 import Alerter from '@/components/Alerter';
-import { Button, Typography } from '@mui/material';
+import { Button, Container, Typography } from '@mui/material';
 import Link from 'next/link';
+import { useState } from 'react';
+import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
+import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
 
 const Activity = () => {
     const { user } = useAuthContext();
+
+    const [currPage, setPage] = useState<number>(0);
 
     const {
         data: activities,
         error: activitiesError,
         isLoading: activitiesIsLoading,
         isValidating: activitiesIsValidating,
-    } = useSWR<Activity[]>({ key: 'activities', token: user.token }, swrActivitiesFetcherWithAuth);
+    } = useSWR<{ totalPages: number; totalCount: number; content: Activity[] }>(
+        { key: 'activities', token: user.token, page: currPage },
+        swrActivitiesFetcherWithAuth
+    );
 
     return (
         <>
@@ -24,7 +32,7 @@ const Activity = () => {
                 <title>Community Space | Activity</title>
             </Head>
             <Typography variant='h5' align='center' color='text.secondary' mb={2}>
-                Activity in the last week
+                Activity from the last week
             </Typography>
             <Alerter
                 isValidating={activitiesIsValidating}
@@ -33,20 +41,45 @@ const Activity = () => {
                 error={activitiesError}
                 nrOfLayersInSkeleton={3}
             />
-            {!activitiesIsLoading &&
-                !activitiesIsValidating &&
-                !activitiesError &&
-                activities?.map((activity, idx) => (
-                    <Item sx={{ mb: 1 }} key={idx}>
-                        <strong>{activity.user}</strong>{' '}
-                        {activity.type.toLocaleLowerCase().split('_').reverse().join(' a ')} (
-                        {activity.type.includes('MEMO') && `${activity.memoTitle} in `}
-                        <Button type='button' LinkComponent={Link} size='small' href={`/hubs/${activity.hubId}`}>
-                            {activity.hubName}
+            {!activitiesIsLoading && !activitiesIsValidating && !activitiesError && (
+                <>
+                    {activities?.content
+                        ?.map((activity, idx) => (
+                            <Item sx={{ mb: 1 }} key={idx}>
+                                <strong>{activity.user}</strong>{' '}
+                                {activity.type.toLocaleLowerCase().split('_').reverse().join(' a ')} (
+                                {activity.type.includes('MEMO') && `${activity.memoTitle} in `}
+                                <Button
+                                    type='button'
+                                    LinkComponent={Link}
+                                    size='small'
+                                    href={`/hubs/${activity.hubId}`}
+                                >
+                                    {activity.hubName}
+                                </Button>
+                                ) on {longDateShortTimeDateFormatter.format(new Date(activity.date))}
+                            </Item>
+                        ))
+                        .reverse()}
+                    <Container sx={{ justifyContent: 'center', alignItems: 'center', display: 'flex', mt: 4 }}>
+                        <Button
+                            startIcon={<ArrowBackIosNewIcon />}
+                            sx={{ mr: 1 }}
+                            disabled={currPage === 0}
+                            onClick={() => setPage(currPage - 1)}
+                        >
+                            Prev
                         </Button>
-                        ) on {longDateShortTimeDateFormatter.format(new Date(activity.date))}
-                    </Item>
-                )).reverse()}
+                        <Button
+                            endIcon={<ArrowForwardIosIcon />}
+                            onClick={() => setPage(currPage + 1)}
+                            disabled={currPage + 1 === activities?.totalPages || activities?.totalPages === 0}
+                        >
+                            Next
+                        </Button>
+                    </Container>
+                </>
+            )}
         </>
     );
 };

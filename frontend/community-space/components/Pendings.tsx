@@ -131,7 +131,7 @@ const Pendings = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBE
     return (
         <>
             <Typography mb={2} color='text.secondary' variant='h6'>
-                Waiting members
+                Waiting members {hubPendings?.length && `(${hubPendings?.length})`}
             </Typography>
             <Alerter
                 isValidating={hubPendingsIsValidating}

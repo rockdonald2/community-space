@@ -324,14 +324,16 @@ export const swrCompletionsFetcherWithAuth = async (args: { key: string; token: 
     return await res.json();
 };
 
-export const swrActivitiesFetcherWithAuth = async (args: { key: string; token: string }) => {
+export const swrActivitiesFetcherWithAuth = async (args: { key: string; token: string; page: number }) => {
     const currDate = new Date();
     const previousWeek = new Date(currDate.getTime() - 7 * 24 * 60 * 60 * 1000);
 
     const res = await fetch(
         `${GATEWAY_URL}/api/v1/activities?from=${previousWeek.getFullYear()}-${
             previousWeek.getMonth() + 1
-        }-${previousWeek.getDate()}&to=${currDate.getFullYear()}-${currDate.getMonth() + 1}-${currDate.getDate() + 1}`,
+        }-${previousWeek.getDate()}&to=${currDate.getFullYear()}-${currDate.getMonth() + 1}-${
+            currDate.getDate() + 1
+        }&page=${args.page}`,
         {
             headers: { Authorization: `Bearer ${args.token}` },
         }
@@ -346,7 +348,24 @@ export const swrActivitiesFetcherWithAuth = async (args: { key: string; token: s
         } satisfies ErrorResponse;
     }
 
-    return await res.json();
+    let totalCount = -1;
+    let totalPages = -1;
+
+    if (res.headers.get('X-TOTAL-COUNT')) {
+        totalCount = parseInt(res.headers.get('X-TOTAL-COUNT'));
+    }
+
+    if (res.headers.get('X-TOTAL-PAGES')) {
+        totalPages = parseInt(res.headers.get('X-TOTAL-PAGES'));
+    }
+
+    const content = await res.json();
+
+    return {
+        content,
+        totalCount,
+        totalPages,
+    };
 };
 
 export const mediumDateWithNoTimeFormatter = new Intl.DateTimeFormat('en-gb', {

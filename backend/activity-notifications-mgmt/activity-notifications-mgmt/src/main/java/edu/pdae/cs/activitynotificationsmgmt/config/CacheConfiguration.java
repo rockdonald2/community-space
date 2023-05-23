@@ -44,7 +44,7 @@ public class CacheConfiguration {
     @Bean
     public RedisCacheManagerBuilderCustomizer redisCacheManagerBuilderCustomizer(ObjectMapper objectMapper) {
         return builder -> builder
-                .withCacheConfiguration("activities", redisCacheConfigurationForLists(objectMapper))
+                .withCacheConfiguration("activities", redisCacheConfigurationForComplex(objectMapper))
                 .withCacheConfiguration("activities-grouped", redisCacheConfigurationForLists(objectMapper));
     }
 
