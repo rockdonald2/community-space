@@ -38,6 +38,10 @@ const Layout = ({ children }) => {
                                         variant: 'error',
                                     });
                                     push('/');
+                                } else {
+                                    enqueueSnackbar('An error occurred. Please try again later', {
+                                        variant: 'error',
+                                    });
                                 }
                             },
                         }}
