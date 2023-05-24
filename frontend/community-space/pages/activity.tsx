@@ -5,7 +5,7 @@ import { longDateShortTimeDateFormatter, swrActivitiesFetcherWithAuth } from '@/
 import Head from 'next/head';
 import Item from '@/components/Item';
 import Alerter from '@/components/Alerter';
-import { Button, Container, Typography } from '@mui/material';
+import { Button, Chip, Container, Typography } from '@mui/material';
 import Link from 'next/link';
 import { useState } from 'react';
 import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
@@ -45,19 +45,28 @@ const Activity = () => {
                 <>
                     {activities?.content
                         ?.map((activity, idx) => (
-                            <Item sx={{ mb: 1 }} key={idx}>
-                                <strong>{activity.user}</strong>{' '}
-                                {activity.type.toLocaleLowerCase().split('_').reverse().join(' a ')} (
-                                {activity.type.includes('MEMO') && `${activity.memoTitle} in `}
-                                <Button
-                                    type='button'
-                                    LinkComponent={Link}
-                                    size='small'
-                                    href={`/hubs/${activity.hubId}`}
-                                >
-                                    {activity.hubName}
-                                </Button>
-                                ) on {longDateShortTimeDateFormatter.format(new Date(activity.date))}
+                            <Item
+                                sx={{ mb: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+                                key={idx}
+                            >
+                                <Typography>
+                                    <strong>{activity.user}</strong>{' '}
+                                    {activity.type.toLocaleLowerCase().split('_').reverse().join(' a ')} (
+                                    {activity.type.includes('MEMO') && `${activity.memoTitle} in `}
+                                    <Button
+                                        type='button'
+                                        LinkComponent={Link}
+                                        size='small'
+                                        href={`/hubs/${activity.hubId}`}
+                                    >
+                                        {activity.hubName}
+                                    </Button>
+                                    )
+                                </Typography>
+                                <Chip
+                                    label={longDateShortTimeDateFormatter.format(new Date(activity.date))}
+                                    variant='filled'
+                                />
                             </Item>
                         ))
                         .reverse()}

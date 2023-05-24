@@ -8,18 +8,20 @@ import { useState, useCallback } from 'react';
 import { QuickActionActionType, QuickActionType } from '@/types/types';
 import { useAuthContext } from '@/utils/AuthContext';
 import LocalActivityIcon from '@mui/icons-material/LocalActivity';
+import MenuIcon from '@mui/icons-material/Menu';
+import CloseIcon from '@mui/icons-material/Close';
 
 const quickActions: QuickActionType[] = [
     { icon: <LogoutIcon />, name: 'Logout', action: 'signout' },
     { icon: <HomeIcon />, name: 'Back to home', action: 'backToHome' },
     { icon: <GroupIcon />, name: 'Create Hub', action: 'createHub' },
     { icon: <ExploreIcon />, name: 'Explore Hubs', action: 'explore' },
-    { icon: <LocalActivityIcon />, name: 'Activity', action: 'activity'}
+    { icon: <LocalActivityIcon />, name: 'Activity', action: 'activity' },
 ];
 
 const QuickActions = () => {
     const { push } = useRouter();
-    const [open, setOpen] = useState(false);
+    const [open, setOpen] = useState<boolean>(false);
     const handleOpen = () => setOpen(true);
     const handleClose = () => setOpen(false);
     const { signOut } = useAuthContext();
@@ -58,7 +60,7 @@ const QuickActions = () => {
             <SpeedDial
                 ariaLabel='Quick actions dial'
                 sx={{ position: 'absolute', bottom: 0, right: '-10%' }}
-                icon={<SpeedDialIcon />}
+                icon={<SpeedDialIcon icon={<MenuIcon />} openIcon={<CloseIcon />} />}
                 onClose={handleClose}
                 onOpen={handleOpen}
                 open={open}
