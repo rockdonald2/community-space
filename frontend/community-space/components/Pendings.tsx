@@ -33,11 +33,9 @@ const Pendings = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBE
         error: hubPendingsError,
         isLoading: hubPendingsIsLoading,
         isValidating: hubPendingsIsValidating,
-    } = useSWR<UserShort[]>(
-        { key: 'pendings', token: user.token, hubId: hubId },
-        swrWaitersFetcherWithAuth,
-        { revalidateOnFocus: false }
-    );
+    } = useSWR<UserShort[]>({ key: 'pendings', token: user.token, hubId: hubId }, swrWaitersFetcherWithAuth, {
+        revalidateOnFocus: false,
+    });
 
     const handleJoinHub = useCallback(
         async ({ pendingMember }: { pendingMember: UserShort }) => {
@@ -143,10 +141,10 @@ const Pendings = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBE
             {!hubPendingsIsLoading &&
                 !hubPendingsIsValidating &&
                 !hubPendingsError &&
-                ((hubPendings as UserShort[]).length !== 0 ? (
+                (hubPendings.length !== 0 ? (
                     <>
                         <Container sx={{ mb: 1.5 }}>
-                            {(hubPendings as UserShort[]).map((user, idx) => (
+                            {hubPendings.map((user, idx) => (
                                 <IconButton
                                     key={idx}
                                     aria-haspopup='true'
