@@ -1,7 +1,7 @@
 /* eslint-disable react/no-unescaped-entities */
 import { Alert, AlertTitle, Avatar, Button, Divider, Stack, Typography } from '@mui/material';
 import Head from 'next/head';
-import { useState, useCallback, SetStateAction, Dispatch } from 'react';
+import { useState, useCallback } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import styles from '@/styles/Login.module.scss';

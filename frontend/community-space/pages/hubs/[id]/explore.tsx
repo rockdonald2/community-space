@@ -53,8 +53,7 @@ const Explore = () => {
                     </Container>
                 </Grid>
                 <Grid item xs={8}>
-                    <Alerter isValidating={hubIsValidating} isLoading={hubIsLoading} data={hub} error={hubError} />
-                    {!hubIsLoading && !hubIsValidating && !hubError && (
+                    {!hubIsLoading && !hubIsValidating && !hubError ? (
                         <>
                             <Container sx={{ marginBottom: '1rem' }}>
                                 <Typography variant='h5' align='center' color='text.secondary' mb={2}>
@@ -70,6 +69,8 @@ const Explore = () => {
                             </Typography>
                             <Memos scope='ALL' hubId={hubId} />
                         </>
+                    ) : (
+                        <Alerter isValidating={hubIsValidating} isLoading={hubIsLoading} data={hub} error={hubError} />
                     )}
                 </Grid>
             </Grid>

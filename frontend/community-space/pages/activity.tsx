@@ -5,11 +5,10 @@ import { longDateShortTimeDateFormatter, swrActivitiesFetcherWithAuth } from '@/
 import Head from 'next/head';
 import Item from '@/components/Item';
 import Alerter from '@/components/Alerter';
-import { Button, Chip, Container, Typography } from '@mui/material';
+import { Button, Chip, Typography } from '@mui/material';
 import Link from 'next/link';
 import { useState } from 'react';
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import Pagination from '@/components/Pagination';
 
 const Activity = () => {
     const { user } = useAuthContext();
@@ -34,14 +33,7 @@ const Activity = () => {
             <Typography variant='h5' align='center' color='text.secondary' mb={2}>
                 Activity from the last week
             </Typography>
-            <Alerter
-                isValidating={activitiesIsValidating}
-                isLoading={activitiesIsLoading}
-                data={activities}
-                error={activitiesError}
-                nrOfLayersInSkeleton={3}
-            />
-            {!activitiesIsLoading && !activitiesIsValidating && !activitiesError && (
+            {!activitiesIsLoading && !activitiesIsValidating && !activitiesError ? (
                 <>
                     {activities?.content
                         ?.map((activity, idx) => (
@@ -70,24 +62,16 @@ const Activity = () => {
                             </Item>
                         ))
                         .reverse()}
-                    <Container sx={{ justifyContent: 'center', alignItems: 'center', display: 'flex', mt: 4 }}>
-                        <Button
-                            startIcon={<ArrowBackIosNewIcon />}
-                            sx={{ mr: 1 }}
-                            disabled={currPage === 0}
-                            onClick={() => setPage(currPage - 1)}
-                        >
-                            Prev
-                        </Button>
-                        <Button
-                            endIcon={<ArrowForwardIosIcon />}
-                            onClick={() => setPage(currPage + 1)}
-                            disabled={currPage + 1 === activities?.totalPages || activities?.totalPages === 0}
-                        >
-                            Next
-                        </Button>
-                    </Container>
+                    <Pagination currPage={currPage} setPage={setPage} totalPages={activities?.totalPages} />
                 </>
+            ) : (
+                <Alerter
+                    isValidating={activitiesIsValidating}
+                    isLoading={activitiesIsLoading}
+                    data={activities}
+                    error={activitiesError}
+                    nrOfLayersInSkeleton={2}
+                />
             )}
         </>
     );

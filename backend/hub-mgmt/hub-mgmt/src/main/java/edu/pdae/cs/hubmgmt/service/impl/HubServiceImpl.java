@@ -43,7 +43,7 @@ public class HubServiceImpl implements HubService {
         final Hub reqHub = modelMapper.map(hubCreationDTO, Hub.class);
         reqHub.setCreatedOn(new Date());
         reqHub.setOwner(asUser);
-        reqHub.setMembers(new ArrayList<>(Collections.singletonList(asUser))); // add owner as first member
+        reqHub.setMembers(new HashSet<>(Collections.singletonList(asUser))); // add owner as first member
 
         final Hub createdHub = hubRepository.save(reqHub);
 

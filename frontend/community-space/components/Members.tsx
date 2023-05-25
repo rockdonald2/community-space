@@ -76,16 +76,7 @@ const Members = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBER
             <Typography mb={2} color='text.secondary' variant='h6'>
                 Members {hubMembers?.length && `(${hubMembers?.length})`}
             </Typography>
-            <Alerter
-                isValidating={hubMembersIsValidating}
-                isLoading={hubMembersIsLoading}
-                data={hubMembers}
-                error={hubMembersError}
-                nrOfLayersInSkeleton={1}
-            />
-            {!hubMembersIsLoading &&
-                !hubMembersIsValidating &&
-                !hubMembersError &&
+            {!hubMembersIsLoading && !hubMembersIsValidating && !hubMembersError ? (
                 hubMembers.map((user, idx) => (
                     <IconButton
                         key={idx}
@@ -102,7 +93,16 @@ const Members = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBER
                             isOnline={presence?.filter((p) => p.email === user.email).length > 0}
                         />
                     </IconButton>
-                ))}
+                ))
+            ) : (
+                <Alerter
+                    isValidating={hubMembersIsValidating}
+                    isLoading={hubMembersIsLoading}
+                    data={hubMembers}
+                    error={hubMembersError}
+                    nrOfLayersInSkeleton={1}
+                />
+            )}
             <>
                 <Menu
                     anchorEl={menuAnchorEl}

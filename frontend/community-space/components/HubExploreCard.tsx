@@ -42,10 +42,7 @@ const HubExploreCard = ({ hub }: { hub: Hub }) => {
         error: hubMembersError,
         isLoading: hubMembersIsLoading,
         isValidating: hubMembersIsValidating,
-    } = useSWR<UserShort[]>(
-        { key: 'members', token: user.token, hubId: hub.id },
-        swrMembersFetcherWithAuth
-    );
+    } = useSWR<UserShort[]>({ key: 'members', token: user.token, hubId: hub.id }, swrMembersFetcherWithAuth);
 
     return (
         <>
@@ -81,15 +78,16 @@ const HubExploreCard = ({ hub }: { hub: Hub }) => {
                         align='center'
                         variant='subtitle2'
                     >
-                        <Alerter
-                            isValidating={memosIsValidating}
-                            isLoading={memosIsLoading}
-                            data={memos}
-                            error={memosError}
-                            nrOfLayersInSkeleton={1}
-                        />
-                        {!memosIsLoading && !memosIsValidating && !memosError && (
+                        {!memosIsLoading && !memosIsValidating && !memosError ? (
                             <Chip label={`${memos.totalCount} memos since Yesterday`} variant='filled' />
+                        ) : (
+                            <Alerter
+                                isValidating={memosIsValidating}
+                                isLoading={memosIsLoading}
+                                data={memos}
+                                error={memosError}
+                                nrOfLayersInSkeleton={1}
+                            />
                         )}
                     </Typography>
                     <Divider />
@@ -99,34 +97,29 @@ const HubExploreCard = ({ hub }: { hub: Hub }) => {
                         align='center'
                         variant='subtitle2'
                     >
-                        <Alerter
-                            isValidating={hubMembersIsValidating}
-                            isLoading={hubMembersIsLoading}
-                            data={hubMembers}
-                            error={hubMembersError}
-                            nrOfLayersInSkeleton={1}
-                        />
-                        {!hubMembersIsLoading && !hubMembersIsValidating && !hubMembersError && (
-                            <Chip
-                                label={`${hubMembers.length} members`}
-                                variant='filled'
-                                sx={{ mr: 1 }}
+                        {!hubMembersIsLoading && !hubMembersIsValidating && !hubMembersError ? (
+                            <Chip label={`${hubMembers.length} members`} variant='filled' sx={{ mr: 1 }} />
+                        ) : (
+                            <Alerter
+                                isValidating={hubMembersIsValidating}
+                                isLoading={hubMembersIsLoading}
+                                data={hubMembers}
+                                error={hubMembersError}
+                                nrOfLayersInSkeleton={1}
                             />
                         )}
 
                         {hub.role === 'OWNER' && (
                             <>
-                                <Alerter
-                                    isValidating={hubPendingsIsValidating}
-                                    isLoading={hubPendingsIsLoading}
-                                    data={hubPendings}
-                                    error={hubPendingsError}
-                                    nrOfLayersInSkeleton={1}
-                                />
-                                {!hubPendingsIsLoading && !hubPendingsIsValidating && !hubPendingsError && (
-                                    <Chip
-                                        label={`${hubPendings.length} pending members`}
-                                        variant='filled'
+                                {!hubPendingsIsLoading && !hubPendingsIsValidating && !hubPendingsError ? (
+                                    <Chip label={`${hubPendings.length} pending members`} variant='filled' />
+                                ) : (
+                                    <Alerter
+                                        isValidating={hubPendingsIsValidating}
+                                        isLoading={hubPendingsIsLoading}
+                                        data={hubPendings}
+                                        error={hubPendingsError}
+                                        nrOfLayersInSkeleton={1}
                                     />
                                 )}
                             </>
@@ -139,23 +132,22 @@ const HubExploreCard = ({ hub }: { hub: Hub }) => {
                         align='center'
                         variant='subtitle2'
                     >
-                        <Alerter
-                            isValidating={hubMembersIsValidating}
-                            isLoading={hubMembersIsLoading}
-                            data={hubMembers}
-                            error={hubMembersError}
-                            nrOfLayersInSkeleton={1}
-                        />
-                        {!hubMembersIsLoading && !hubMembersIsValidating && !hubMembersError && (
+                        {!hubMembersIsLoading && !hubMembersIsValidating && !hubMembersError ? (
                             <Chip
                                 label={`${presence
                                     .map((present) =>
-                                        hubMembers.filter((member) => member.email === present.email)
-                                            ? 1
-                                            : 0
+                                        hubMembers.filter((member) => member.email === present.email) ? 1 : 0
                                     )
                                     .reduce((acc, curr) => acc + curr, 0)} active members at the moment`}
                                 variant='filled'
+                            />
+                        ) : (
+                            <Alerter
+                                isValidating={hubMembersIsValidating}
+                                isLoading={hubMembersIsLoading}
+                                data={hubMembers}
+                                error={hubMembersError}
+                                nrOfLayersInSkeleton={1}
                             />
                         )}
                     </Typography>

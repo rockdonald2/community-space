@@ -22,21 +22,18 @@ const Hubs = () => {
 
     const mutateCallback = useCallback(
         (hub: Hub) => {
-            let newHubs = [...(hubs as Hub[])];
-            newHubs[(newHubs as Hub[]).findIndex((h) => h.id === hub.id)] = hub;
-            mutate([...(newHubs as Hub[])], false);
+            let newHubs = [...hubs];
+            newHubs[newHubs.findIndex((h) => h.id === hub.id)] = hub;
+            mutate([...newHubs], false);
         },
         [hubs, mutate]
     );
 
     return (
         <>
-            <Alerter isLoading={isLoading} isValidating={isValidating} data={hubs} error={error} />
-            <Grid container spacing={2}>
-                {!isLoading &&
-                    !isValidating &&
-                    !error &&
-                    (hubs.length > 0 ? (
+            {!isLoading && !isValidating && !error ? (
+                <Grid container spacing={2}>
+                    {hubs.length > 0 ? (
                         hubs.map((hub: Hub) => (
                             <Grid item key={hub.id} xs={12} sm={8} md={6}>
                                 <HubCard hub={hub} mutateCallback={mutateCallback} />
@@ -50,8 +47,11 @@ const Hubs = () => {
                             </Button>
                             .
                         </Typography>
-                    ))}
-            </Grid>
+                    )}
+                </Grid>
+            ) : (
+                <Alerter isLoading={isLoading} isValidating={isValidating} data={hubs} error={error} />
+            )}
         </>
     );
 };

@@ -18,7 +18,10 @@ const Activity = () => {
         error: activitiesError,
         isLoading: isLoadingActivities,
         isValidating: isValidatingActivities,
-    } = useSWR<ActivityGrouped[]>({ key: 'activities-grouped', token: user.token }, swrActivitiesGroupedFetcherWithAuth);
+    } = useSWR<ActivityGrouped[]>(
+        { key: 'activities-grouped', token: user.token },
+        swrActivitiesGroupedFetcherWithAuth
+    );
 
     const [activities, setActivities] = useState<Map<number, number>>(new Map<number, number>());
 
@@ -39,14 +42,7 @@ const Activity = () => {
             <Typography mb={2} color='text.secondary' variant='h6'>
                 Activity
             </Typography>
-            <Alerter
-                isLoading={isLoadingActivities}
-                isValidating={isValidatingActivities}
-                error={activitiesError}
-                data={rawActivities}
-                nrOfLayersInSkeleton={1}
-            />
-            {!isLoadingActivities && !isValidatingActivities && !activitiesError && (
+            {!isLoadingActivities && !isValidatingActivities && !activitiesError ? (
                 <>
                     <Container className={styles.wrapper} sx={{ mb: 2 }}>
                         {new Array(currDaysInMonth).fill(0).map((_day, idx) => (
@@ -69,6 +65,14 @@ const Activity = () => {
                         ))}
                     </Container>
                 </>
+            ) : (
+                <Alerter
+                    isLoading={isLoadingActivities}
+                    isValidating={isValidatingActivities}
+                    error={activitiesError}
+                    data={rawActivities}
+                    nrOfLayersInSkeleton={1}
+                />
             )}
             <Typography color='text.secondary' variant='caption'>
                 Activities include both hub and memo activity

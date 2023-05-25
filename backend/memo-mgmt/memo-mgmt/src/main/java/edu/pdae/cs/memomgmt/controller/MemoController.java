@@ -94,6 +94,7 @@ public class MemoController {
     }
 
     @PostMapping("/{id}/completions")
+    @ResponseStatus(HttpStatus.CREATED)
     public MemoCompletionResponseDTO handleCompletion(@PathVariable("id") ObjectId id, @RequestBody MemoCompletionDTO memoCompletionDTO, @RequestHeader("X-AUTH-TOKEN-SUBJECT") String asUser) {
         // add completion to a specific memo
         return memoService.completeMemo(id, memoCompletionDTO.getUser(), asUser);

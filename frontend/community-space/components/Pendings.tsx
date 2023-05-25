@@ -131,17 +131,8 @@ const Pendings = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBE
             <Typography mb={2} color='text.secondary' variant='h6'>
                 Waiting members {hubPendings?.length && `(${hubPendings?.length})`}
             </Typography>
-            <Alerter
-                isValidating={hubPendingsIsValidating}
-                isLoading={hubPendingsIsLoading}
-                data={hubPendings}
-                error={hubPendingsError}
-                nrOfLayersInSkeleton={1}
-            />
-            {!hubPendingsIsLoading &&
-                !hubPendingsIsValidating &&
-                !hubPendingsError &&
-                (hubPendings.length !== 0 ? (
+            {!hubPendingsIsLoading && !hubPendingsIsValidating && !hubPendingsError ? (
+                hubPendings.length !== 0 ? (
                     <>
                         <Container sx={{ mb: 1.5 }}>
                             {hubPendings.map((user, idx) => (
@@ -165,7 +156,16 @@ const Pendings = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBE
                     <Typography variant='body2' color='text.secondary'>
                         No pending members
                     </Typography>
-                ))}
+                )
+            ) : (
+                <Alerter
+                    isValidating={hubPendingsIsValidating}
+                    isLoading={hubPendingsIsLoading}
+                    data={hubPendings}
+                    error={hubPendingsError}
+                    nrOfLayersInSkeleton={1}
+                />
+            )}
             <Menu
                 anchorEl={menuAnchorEl}
                 open={open}

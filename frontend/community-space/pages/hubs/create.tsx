@@ -2,7 +2,7 @@ import { Alert, AlertTitle, Avatar, Button, Divider, Link, Stack, Typography } f
 import TextField from '@/components/TextField';
 import Head from 'next/head';
 import styles from '@/styles/CreateHub.module.scss';
-import { Dispatch, SetStateAction, useCallback, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { GATEWAY_URL } from '@/utils/Constants';
 import { useAuthContext } from '@/utils/AuthContext';
 import { useRouter } from 'next/router';

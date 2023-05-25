@@ -13,9 +13,9 @@ import org.springframework.data.mongodb.core.index.Indexed;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 @Data
 @Builder
@@ -39,8 +39,8 @@ public class Hub {
     private String owner;
 
     @Builder.Default
-    private List<String> members = new ArrayList<>();
+    private Set<String> members = new HashSet<>();
     @Builder.Default
-    private List<String> waiting = new ArrayList<>();
+    private Set<String> waiting = new HashSet<>();
 
 }

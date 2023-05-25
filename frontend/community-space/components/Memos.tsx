@@ -9,9 +9,7 @@ import {
 } from '@/utils/Utility';
 import {
     Box,
-    Button,
     Chip,
-    Container,
     FormControl,
     InputLabel,
     MenuItem,
@@ -28,8 +26,7 @@ import Memo from './Memo';
 import SearchIcon from '@mui/icons-material/Search';
 import { ChangeEvent, useState } from 'react';
 import Alerter from './Alerter';
-import ArrowBackIosNewIcon from '@mui/icons-material/ArrowBackIosNew';
-import ArrowForwardIosIcon from '@mui/icons-material/ArrowForwardIos';
+import Pagination from './Pagination';
 
 const Memos = ({ hubId, scope = 'RECENT' }: { hubId?: string | string[]; scope?: 'RECENT' | 'ALL' }) => {
     const theme = useTheme();
@@ -115,10 +112,7 @@ const Memos = ({ hubId, scope = 'RECENT' }: { hubId?: string | string[]; scope?:
                     </FormControl>
                 </Stack>
             </Box>
-            <Alerter isValidating={isValidating} isLoading={isLoading} data={memos} error={error} />
-            {!isLoading &&
-                !isValidating &&
-                !error &&
+            {!isLoading && !isValidating && !error ? (
                 memos.content
                     .sort(sortByCreationDate)
                     .sort(sortByUrgency)
@@ -133,24 +127,11 @@ const Memos = ({ hubId, scope = 'RECENT' }: { hubId?: string | string[]; scope?:
                         if (urgencyFilter.length === 0) return true;
                         return urgencyFilter.includes(memo.urgency);
                     })
-                    .map((memo, idx) => <Memo memo={memo} key={idx} />)}
-            <Container sx={{ justifyContent: 'center', alignItems: 'center', display: 'flex', mt: 4 }}>
-                <Button
-                    startIcon={<ArrowBackIosNewIcon />}
-                    sx={{ mr: 1 }}
-                    disabled={currPage === 0}
-                    onClick={() => setCurrPage(currPage - 1)}
-                >
-                    Prev
-                </Button>
-                <Button
-                    endIcon={<ArrowForwardIosIcon />}
-                    onClick={() => setCurrPage(currPage + 1)}
-                    disabled={currPage + 1 === memos?.totalPages || memos?.totalPages === 0}
-                >
-                    Next
-                </Button>
-            </Container>
+                    .map((memo, idx) => <Memo memo={memo} key={idx} />)
+            ) : (
+                <Alerter isValidating={isValidating} isLoading={isLoading} data={memos} error={error} />
+            )}
+            <Pagination currPage={currPage} setPage={setCurrPage} totalPages={memos?.totalPages} />
         </Stack>
     );
 };
