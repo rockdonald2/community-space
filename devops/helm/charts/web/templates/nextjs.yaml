@@ -1,0 +1,9 @@
+{{- if .Values.nextjsEnv }}
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: {{ .Chart.Name }}-{{ .Release.Name }}-nextjs
+data:
+  .env: |-
+    {{- .Values.nextjsEnv | nindent 4 }}
+{{- end }}

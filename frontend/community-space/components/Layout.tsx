@@ -22,7 +22,7 @@ const Layout = ({ children }) => {
 
     return (
         <>
-            <Blob />
+            {/* <Blob /> */}
             {isAuthenticated ? (
                 <>
                     <SWRConfig

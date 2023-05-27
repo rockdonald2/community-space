@@ -1,3 +1,7 @@
 .vscode
 .idea
-services/local/mongo
+devops/local/mongo
+.terraform
+.terraform.lock.hcl
+*.tfplan
+*.tgz

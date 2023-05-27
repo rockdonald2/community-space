@@ -9,6 +9,7 @@ import { RouteGuard } from '@/utils/RouteGuard';
 import CrossContextProvider from '@/utils/CrossContext';
 import { CookiesProvider } from 'react-cookie';
 import SnackbarProvider from '@/utils/SnackbarProvider';
+import { StyledEngineProvider } from '@mui/material/styles';
 
 export default function App({ Component, pageProps }: AppProps) {
     return (
@@ -16,22 +17,24 @@ export default function App({ Component, pageProps }: AppProps) {
             <Head>
                 <meta name='viewport' content='width=device-width, initial-scale=1' />
             </Head>
-            <CssVarsProvider>
-                <CssBaseline enableColorScheme />
-                <CookiesProvider>
-                    <SnackbarProvider>
-                        <CrossContextProvider>
-                            <AuthContextProvider>
-                                <RouteGuard>
-                                    <Layout>
-                                        <Component {...pageProps} />
-                                    </Layout>
-                                </RouteGuard>
-                            </AuthContextProvider>
-                        </CrossContextProvider>
-                    </SnackbarProvider>
-                </CookiesProvider>
-            </CssVarsProvider>
+            <StyledEngineProvider injectFirst>
+                <CssVarsProvider>
+                    <CssBaseline enableColorScheme />
+                    <CookiesProvider>
+                        <SnackbarProvider>
+                            <CrossContextProvider>
+                                <AuthContextProvider>
+                                    <RouteGuard>
+                                        <Layout>
+                                            <Component {...pageProps} />
+                                        </Layout>
+                                    </RouteGuard>
+                                </AuthContextProvider>
+                            </CrossContextProvider>
+                        </SnackbarProvider>
+                    </CookiesProvider>
+                </CssVarsProvider>
+            </StyledEngineProvider>
         </>
     );
 }

@@ -1,0 +1,6 @@
+apiVersion: v2
+name: activity-notifications-mgmt
+description: Helm chart for activity-notifications-mgmt
+type: application
+version: 0.1.0
+appVersion: "1.0.0"

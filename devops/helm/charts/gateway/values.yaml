@@ -1,0 +1,47 @@
+image:
+  name: registry.digitalocean.com/cs-dev-registry/community-space
+  tag: gateway-latest
+  pullSecrets: do-repository-credentials
+  pullPolicy: Always
+
+service:
+  ports:
+    - name: http
+      port: 8080
+  type: ClusterIP
+
+replicas: 1
+
+resources:
+  limits:
+    cpu: 250m
+    memory: 500Mi
+
+hpa:
+  targetCpuUtilization: 75
+  minReplicas: 1
+  maxReplicas: 1
+
+liveness:
+  path: /actuator/health/liveness
+  port: 8080
+readiness:
+  path: /actuator/health/readiness
+  port: 8080
+
+env:
+  CS_ACCOUNT_MGMT_ADDRESS: http://account-mgmt-community-space-service:8082
+  CS_ACCOUNT_MGMT_REALTIME_ADDRESS: http://account-mgmt-community-space-service:9082
+  CS_HUB_MGMT_ADDRESS: http://hub-mgmt-community-space-service:8084
+  CS_MEMO_MGMT_ADDRESS: http://memo-mgmt-community-space-service:8083
+  CS_ACTIVITY_NOTIFICATIONS_MGMT_ADDRESS: http://activity-notifications-mgmt-community-space-service:8085
+  CS_CORS_ALLOWED_ORIGINS: http://157.245.24.200
+  MANAGEMENT_ENDPOINT_HEALTH_SHOW-DETAILS: always
+  MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED: "true"
+  MANAGEMENT_ENDPOINT_HEALTH_GROUP_READINESS_INCLUDE: "diskSpace, ping"
+  MANAGEMENT_ENDPOINT_HEALTH_GROUP_LIVENESS_INCLUDE: "diskSpace, ping"
+
+secrets:
+  - envName: CS_AUTH_SECRET_KEY
+    secretName: gateway-jwt-secret
+    secretValue: "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970"

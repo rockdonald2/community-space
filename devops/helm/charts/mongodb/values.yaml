@@ -1,0 +1,6 @@
+env: { }
+
+replicas: 1
+storageSpace: 1Gi
+
+disableSameNodePods: true

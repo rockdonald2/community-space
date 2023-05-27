@@ -1,0 +1,50 @@
+image:
+  name: registry.digitalocean.com/cs-dev-registry/community-space
+  tag: account-mgmt-latest
+  pullSecrets: do-repository-credentials
+  pullPolicy: Always
+
+service:
+  ports:
+    - name: http
+      port: 8082
+    - name: ws
+      port: 9082
+  type: ClusterIP
+
+replicas: 1
+
+resources:
+  limits:
+    cpu: 250m
+    memory: 500Mi
+
+hpa:
+  targetCpuUtilization: 75
+  minReplicas: 1
+  maxReplicas: 3
+
+liveness:
+  path: /actuator/health/liveness
+  port: 8082
+readiness:
+  path: /actuator/health/readiness
+  port: 8082
+
+env:
+  SPRING_DATA_MONGODB_USERNAME: mongoadmin
+  SPRING_DATA_MONGODB_DATABASE: account-mgmt
+  SPRING_DATA_MONGODB_HOST: mongodb-community-space-service.community-space.svc.cluster.local
+  SPRING_DATA_REDIS_HOST: community-space-redis-master
+  MANAGEMENT_ENDPOINT_HEALTH_SHOW-DETAILS: always
+  MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED: "true"
+  MANAGEMENT_ENDPOINT_HEALTH_GROUP_READINESS_INCLUDE: "redis, diskSpace, mongo, ping"
+  MANAGEMENT_ENDPOINT_HEALTH_GROUP_LIVENESS_INCLUDE: "redis, diskSpace, mongo, ping"
+
+secrets:
+  - envName: SPRING_DATA_MONGODB_PASSWORD
+    secretName: account-mgmt-mongodb-password
+    secretValue: "adminpassword"
+  - envName: CS_AUTH_SECRET_KEY
+    secretName: account-mgmt-jwt-secret
+    secretValue: "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970"

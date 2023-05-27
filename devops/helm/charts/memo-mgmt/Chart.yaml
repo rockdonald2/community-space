@@ -1,0 +1,6 @@
+apiVersion: v2
+name: memo-mgmt
+description: Helm chart for memo-mgmt
+type: application
+version: 0.1.0
+appVersion: "1.0.0"

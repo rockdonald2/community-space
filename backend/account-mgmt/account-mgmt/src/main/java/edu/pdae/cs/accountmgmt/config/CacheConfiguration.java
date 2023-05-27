@@ -1,6 +1,7 @@
 package edu.pdae.cs.accountmgmt.config;
 
 import lombok.RequiredArgsConstructor;
+import org.springframework.boot.autoconfigure.data.redis.RedisProperties;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -18,14 +19,9 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 public class CacheConfiguration {
 
     @Bean
-    LettuceConnectionFactory lettuceConnectionFactory() {
-        return new LettuceConnectionFactory();
-    }
-
-    @Bean
-    public <V> RedisTemplate<String, V> redisTemplate() {
+    public <V> RedisTemplate<String, V> redisTemplate(LettuceConnectionFactory lettuceConnectionFactory) {
         RedisTemplate<String, V> template = new RedisTemplate<>();
-        template.setConnectionFactory(lettuceConnectionFactory());
+        template.setConnectionFactory(lettuceConnectionFactory);
         template.setKeySerializer(RedisSerializer.string());
         template.setValueSerializer(RedisSerializer.json());
         template.setHashKeySerializer(RedisSerializer.string());

@@ -1,0 +1,24 @@
+redis:
+  image:
+    tag: 6.2-debian-11
+  auth:
+    enabled: false
+  architecture: replication
+  master:
+    kind: StatefulSet
+    persistence:
+      enabled: false
+  replica:
+    replicaCount: 1
+    persistence:
+      enabled: false
+
+kafka:
+  externalAccess:
+    enabled: false
+  zookeeper:
+    enabled: true
+    replicaCount: 1
+  kraft:
+    enabled: false
+  replicaCount: 1

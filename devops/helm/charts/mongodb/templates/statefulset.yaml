@@ -1,0 +1,164 @@
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ .Chart.Name }}-{{ .Release.Name }}-service
+  labels:
+    app.kubernetes.io/name: {{ .Chart.Name }}-{{ .Release.Name }}-headless-service
+spec:
+  ports:
+    - port: 27017
+      targetPort: 27017
+      name: db
+  clusterIP: None
+  selector:
+    app.kubernetes.io/name: {{ .Chart.Name }}-{{ .Release.Name }}-statefulset
+---
+apiVersion: apps/v1
+kind: StatefulSet
+metadata:
+  name: {{ .Chart.Name }}-{{ .Release.Name }}-statefulset
+spec:
+  selector:
+    matchLabels:
+      app.kubernetes.io/name: {{ .Chart.Name }}-{{ .Release.Name }}-statefulset
+      name: {{ .Chart.Name }}-{{ .Release.Name }}-statefulset
+  serviceName: {{ .Chart.Name }}-{{ .Release.Name }}-service
+  replicas: {{ .Values.replicas }}
+  template:
+    metadata:
+      labels:
+        app.kubernetes.io/name: {{ .Chart.Name }}-{{ .Release.Name }}-statefulset
+        name: {{ .Chart.Name }}-{{ .Release.Name }}-statefulset
+      annotations:
+        checksum/config: {{ include (print $.Template.BasePath "/configmap.yaml") . | sha256sum }}
+    spec:
+      serviceAccountName: {{ .Chart.Name }}-{{ .Release.Name }}-serviceaccount
+      terminationGracePeriodSeconds: 10
+      {{- if .Values.disableSameNodePods }}
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+            - labelSelector:
+                matchExpressions:
+                  - key: app.kubernetes.io/name
+                    operator: In
+                    values:
+                      - {{ .Chart.Name }}-statefulset
+              topologyKey: "kubernetes.io/hostname"
+      {{- end }}
+      containers:
+        - name: mongodb
+          image: mongo:4.0.12
+          ports:
+            - containerPort: 27017
+              name: db
+          command:
+            - /bin/sh
+            - -c
+            - >
+              if [ -f /data/db/admin-user.lock ]; then
+                echo "KUBERNETES LOG $HOSTNAME- Starting Mongo Daemon with runtime settings (clusterAuthMode)"
+                mongod --smallfiles --noprealloc --replSet rs0 --bind_ip_all --clusterAuthMode keyFile --keyFile /etc/secrets-volume/mongodb-keyfile --setParameter authenticationMechanisms=SCRAM-SHA-1;
+              else
+                echo "KUBERNETES LOG $HOSTNAME- Starting Mongo Daemon with setup setting (authMode)"
+                mongod --auth;
+              fi;
+          lifecycle:
+            postStart:
+              exec:
+                command:
+                  - /bin/sh
+                  - -c
+                  - >
+                    if [ ! -f /data/db/admin-user.lock ]; then
+                      echo "KUBERNETES LOG $HOSTNAME- no Admin-user.lock file found yet"
+                      while (! mongo --eval "db.adminCommand('ping')"); do sleep 10; echo "KUBERNETES LOG $HOSTNAME - waiting another 10 seconds for mongo to start" >> /data/db/configlog.txt; done;
+                      touch /data/db/admin-user.lock
+                      if [ "$HOSTNAME" = "{{ .Chart.Name }}-{{ .Release.Name }}-statefulset-0" ]; then
+                        echo "KUBERNETES LOG $HOSTNAME- creating admin user ${MONGODB_USERNAME}"
+                        mongo --eval "db = db.getSiblingDB('admin'); db.createUser({ user: '${MONGODB_USERNAME}', pwd: '${MONGODB_PASSWORD}', roles: [{ role: 'root', db: 'admin' }]});" >> /data/db/config.log
+                      fi;
+                      echo "KUBERNETES LOG $HOSTNAME-shutting mongod down for final restart"
+                      mongod --shutdown;
+                    fi;
+          volumeMounts:
+            - name: data
+              mountPath: /data/db
+            - name: mongo-key
+              mountPath: "/etc/secrets-volume"
+              readOnly: true
+          resources:
+            limits:
+              cpu: 100m
+              memory: 200Mi
+            requests:
+              cpu: 50m
+              memory: 100Mi
+          envFrom:
+            - configMapRef:
+                name: {{ .Chart.Name }}-{{ .Release.Name }}-configmap
+          env:
+            - name: MONGODB_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-credentials
+                  key: username
+            - name: MONGODB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-credentials
+                  key: password
+          livenessProbe:
+            exec:
+              command:
+                - mongo
+                - --eval
+                - "db.adminCommand('ping')"
+            initialDelaySeconds: 5
+            periodSeconds: 60
+            timeoutSeconds: 10
+          readinessProbe:
+            exec:
+              command:
+                - mongo
+                - --eval
+                - "db.adminCommand('ping')"
+            initialDelaySeconds: 5
+            periodSeconds: 60
+            timeoutSeconds: 10
+        - name: mongo-sidecar
+          image: morphy/k8s-mongo-sidecar
+          env:
+            - name: KUBERNETES_POD_LABELS
+              value: "name={{ .Chart.Name }}-{{ .Release.Name }}-statefulset"
+            - name: KUBERNETES_SERVICE_NAME
+              value: "{{ .Chart.Name }}-{{ .Release.Name }}-service"
+            - name: KUBERNETES_NAMESPACE
+              value: "{{ .Release.Namespace }}"
+            - name: MONGO_USERNAME
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-credentials
+                  key: username
+            - name: MONGO_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: mongo-credentials
+                  key: password
+            - name: MONGO_DATABASE
+              value: 'admin'
+      volumes:
+        - name: mongo-key
+          secret:
+            defaultMode: 0400
+            secretName: mongo-key
+  volumeClaimTemplates:
+    - metadata:
+        name: data
+      spec:
+        accessModes: [ "ReadWriteOnce" ]
+        storageClassName: "do-block-storage"
+        resources:
+          requests:
+            storage: {{ .Values.storageSpace | quote }}

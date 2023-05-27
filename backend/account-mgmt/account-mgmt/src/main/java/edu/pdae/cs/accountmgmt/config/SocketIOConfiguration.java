@@ -21,10 +21,10 @@ public class SocketIOConfiguration {
     @Value("${cs.realtime.port}")
     private Integer port;
 
-    @Value("${spring.data.redis.host:localhost}")
+    @Value("${spring.data.redis.host}")
     private String redisHost;
 
-    @Value("${spring.data.redis.port:6379}")
+    @Value("${spring.data.redis.port}")
     private Integer redisPort;
 
 
@@ -44,6 +44,7 @@ public class SocketIOConfiguration {
     }
 
     private RedissonStoreFactory redissonStoreFactory() {
+        log.info("Connecting to Redis host: {}, over port: {}", redisHost, redisPort);
         final Config redissonConfig = new Config();
         redissonConfig.useSingleServer().setAddress(String.format("redis://%s:%s", redisHost, redisPort));
         final RedissonClient redisson = Redisson.create(redissonConfig);

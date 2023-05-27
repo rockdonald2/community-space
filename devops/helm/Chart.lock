@@ -1,0 +1,30 @@
+dependencies:
+- name: mongodb
+  repository: ""
+  version: 0.1.0
+- name: gateway
+  repository: ""
+  version: 0.1.0
+- name: account-mgmt
+  repository: ""
+  version: 0.1.0
+- name: activity-notifications-mgmt
+  repository: ""
+  version: 0.1.0
+- name: memo-mgmt
+  repository: ""
+  version: 0.1.0
+- name: hub-mgmt
+  repository: ""
+  version: 0.1.0
+- name: web
+  repository: ""
+  version: 0.1.0
+- name: redis
+  repository: https://charts.bitnami.com/bitnami
+  version: 17.11.3
+- name: kafka
+  repository: https://charts.bitnami.com/bitnami
+  version: 22.1.3
+digest: sha256:ae8f20b10fb178f8155f78251be0c05033cc0821555b7b8677e3ed7dc4fb2988
+generated: "2023-05-27T10:39:20.9849336+03:00"

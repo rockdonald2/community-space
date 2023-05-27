@@ -1,0 +1,46 @@
+image:
+  name: registry.digitalocean.com/cs-dev-registry/community-space
+  tag: memo-mgmt-latest
+  pullSecrets: do-repository-credentials
+  pullPolicy: Always
+
+service:
+  ports:
+    - name: http
+      port: 8083
+  type: ClusterIP
+
+replicas: 1
+
+resources:
+  limits:
+    cpu: 250m
+    memory: 500Mi
+
+hpa:
+  targetCpuUtilization: 75
+  minReplicas: 1
+  maxReplicas: 1
+
+liveness:
+  path: /actuator/health/liveness
+  port: 8083
+readiness:
+  path: /actuator/health/readiness
+  port: 8083
+
+env:
+  SPRING_DATA_MONGODB_USERNAME: mongoadmin
+  SPRING_DATA_MONGODB_DATABASE: memo-mgmt
+  SPRING_DATA_MONGODB_HOST: mongodb-community-space-service.community-space.svc.cluster.local
+  SPRING_DATA_REDIS_HOST: community-space-redis-master
+  SPRING_KAFKA_BOOTSTRAP-SERVERS: "community-space-kafka-headless.community-space.svc.cluster.local:9092"
+  MANAGEMENT_ENDPOINT_HEALTH_SHOW-DETAILS: always
+  MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED: "true"
+  MANAGEMENT_ENDPOINT_HEALTH_GROUP_READINESS_INCLUDE: "redis, diskSpace, mongo, ping"
+  MANAGEMENT_ENDPOINT_HEALTH_GROUP_LIVENESS_INCLUDE: "redis, diskSpace, mongo, ping"
+
+secrets:
+  - envName: SPRING_DATA_MONGODB_PASSWORD
+    secretName: memo-mgmt-mongodb-password
+    secretValue: "adminpassword"

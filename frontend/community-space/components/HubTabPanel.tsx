@@ -26,14 +26,7 @@ const HubTabPanel = ({ value, index, role, ...other }: HubTabPanelProps) => {
 
     return (
         <>
-            <Alerter
-                isValidating={hubsIsValidating}
-                isLoading={hubsIsLoading}
-                data={hubs}
-                error={hubsError}
-                nrOfLayersInSkeleton={3}
-            />
-            {!hubsIsLoading && !hubsIsValidating && !hubsError && (
+            {!hubsIsLoading && !hubsIsValidating && !hubsError ? (
                 <div
                     role='tabpanel'
                     hidden={value !== index}
@@ -51,6 +44,14 @@ const HubTabPanel = ({ value, index, role, ...other }: HubTabPanelProps) => {
                         </Grid>
                     )}
                 </div>
+            ) : (
+                <Alerter
+                    isValidating={hubsIsValidating}
+                    isLoading={hubsIsLoading}
+                    data={hubs}
+                    error={hubsError}
+                    nrOfLayersInSkeleton={2}
+                />
             )}
         </>
     );

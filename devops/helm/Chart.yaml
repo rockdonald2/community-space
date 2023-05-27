@@ -1,0 +1,28 @@
+apiVersion: v2
+name: community-space
+description: Helm chart for the community-space project
+type: application
+version: 0.1.0
+appVersion: "1.0.0"
+
+dependencies:
+  - name: mongodb
+    version: 0.1.0
+  - name: gateway
+    version: 0.1.0
+  - name: account-mgmt
+    version: 0.1.0
+  - name: activity-notifications-mgmt
+    version: 0.1.0
+  - name: memo-mgmt
+    version: 0.1.0
+  - name: hub-mgmt
+    version: 0.1.0
+  - name: web
+    version: 0.1.0
+  - name: redis
+    version: 17.11.3
+    repository: https://charts.bitnami.com/bitnami
+  - name: kafka
+    version: 22.1.3
+    repository: https://charts.bitnami.com/bitnami
