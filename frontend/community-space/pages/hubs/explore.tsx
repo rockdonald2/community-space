@@ -1,3 +1,4 @@
+import Breadcrumbs from '@/components/Breadcrumbs';
 import HubTabPanel, { a11yProps } from '@/components/HubTabPanel';
 import { Box, Tab, Tabs } from '@mui/material';
 import Head from 'next/head';
@@ -15,6 +16,7 @@ const Explore = () => {
             <Head>
                 <title>Community Space | Explore</title>
             </Head>
+            <Breadcrumbs currRoute={{ name: 'Explore' }} />
             <Box sx={{ borderBottom: 1, borderColor: 'divider' }}>
                 <Tabs value={currentTab} onChange={handleChange} aria-label='basic tabs example'>
                     <Tab label='Owned Hubs' {...a11yProps(0)} />

@@ -5,3 +5,4 @@ devops/local/mongo
 .terraform.lock.hcl
 *.tfplan
 *.tgz
+services/local/mongo

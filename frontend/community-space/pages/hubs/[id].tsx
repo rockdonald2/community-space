@@ -11,6 +11,7 @@ import Members from '@/components/Members';
 import Pendings from '@/components/Pendings';
 import Link from 'next/link';
 import MemoEdit from '@/components/MemoEdit';
+import Breadcrumbs from '@/components/Breadcrumbs';
 
 const Hub = () => {
     const { query } = useRouter();
@@ -32,6 +33,7 @@ const Hub = () => {
             <Head>
                 <title>Community Space {!hubError ? `| ${hub?.name}` : ''}</title>
             </Head>
+            <Breadcrumbs currRoute={{name: hub?.name ?? ''}} />
             <Grid container spacing={2}>
                 <Grid item xs={4}>
                     <Container>

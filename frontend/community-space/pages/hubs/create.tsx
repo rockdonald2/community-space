@@ -1,4 +1,4 @@
-import { Alert, AlertTitle, Avatar, Button, Divider, Link, Stack, Typography } from '@mui/material';
+import { Alert, AlertTitle, Avatar, Button, Divider, Stack, Typography } from '@mui/material';
 import TextField from '@/components/TextField';
 import Head from 'next/head';
 import styles from '@/styles/CreateHub.module.scss';
@@ -8,6 +8,8 @@ import { useAuthContext } from '@/utils/AuthContext';
 import { useRouter } from 'next/router';
 import { useSnackbar } from 'notistack';
 import { handleInput } from '@/utils/Utility';
+import Breadcrumbs from '@/components/Breadcrumbs';
+import Link from 'next/link';
 
 function CreateHub() {
     const { user, signOut } = useAuthContext();
@@ -72,52 +74,57 @@ function CreateHub() {
     );
 
     return (
-        <Stack className={styles.wrapper}>
+        <>
             <Head>
                 <title>Community Space | Create Hub</title>
             </Head>
-            <Stack className={styles['avatar-wrapper']}>
-                <Avatar className={styles['avatar-wrapper__avatar']}>H</Avatar>
-                <Divider variant='middle' orientation='vertical' flexItem />
-                <Typography variant='h5' component='h5' className={styles['avatar-wrapper__msg']}>
-                    Create your own Hub
-                </Typography>
-            </Stack>
-            {error && (
-                <div className={styles.alert}>
-                    <Alert severity='error'>
-                        <AlertTitle>Oops!</AlertTitle>
-                        {error.msg}
-                    </Alert>
-                </div>
-            )}
-            <form className={styles.form} onSubmit={handleSubmit}>
-                <Stack className={styles['form__wrapper']}>
-                    <TextField
-                        label='Name'
-                        handleInput={(e: React.ChangeEvent<HTMLInputElement>) => handleInput(e, setNameInput)}
-                    />
-                    <TextField
-                        label='Description'
-                        handleInput={(e: React.ChangeEvent<HTMLInputElement>) => handleInput(e, setDescriptionInput)}
-                        multiline
-                    />
-                    <Button
-                        variant='outlined'
-                        aria-label='create-hub'
-                        type='submit'
-                        size='large'
-                        className={styles['form__button']}
-                    >
-                        Create Hub
-                    </Button>
+            <Breadcrumbs currRoute={{ name: 'Create' }} />
+            <Stack className={styles.wrapper}>
+                <Stack className={styles['avatar-wrapper']}>
+                    <Avatar className={styles['avatar-wrapper__avatar']}>H</Avatar>
+                    <Divider variant='middle' orientation='vertical' flexItem />
+                    <Typography variant='h5' component='h5' className={styles['avatar-wrapper__msg']}>
+                        Create your own Hub
+                    </Typography>
                 </Stack>
-            </form>
-            <Divider flexItem className={styles['form__divider']} />
-            <Button href='/' LinkComponent={Link} variant='text' className={styles['create__button']}>
-                See the list of existing Hubs
-            </Button>
-        </Stack>
+                {error && (
+                    <div className={styles.alert}>
+                        <Alert severity='error'>
+                            <AlertTitle>Oops!</AlertTitle>
+                            {error.msg}
+                        </Alert>
+                    </div>
+                )}
+                <form className={styles.form} onSubmit={handleSubmit}>
+                    <Stack className={styles['form__wrapper']}>
+                        <TextField
+                            label='Name'
+                            handleInput={(e: React.ChangeEvent<HTMLInputElement>) => handleInput(e, setNameInput)}
+                        />
+                        <TextField
+                            label='Description'
+                            handleInput={(e: React.ChangeEvent<HTMLInputElement>) =>
+                                handleInput(e, setDescriptionInput)
+                            }
+                            multiline
+                        />
+                        <Button
+                            variant='outlined'
+                            aria-label='create-hub'
+                            type='submit'
+                            size='large'
+                            className={styles['form__button']}
+                        >
+                            Create Hub
+                        </Button>
+                    </Stack>
+                </form>
+                <Divider flexItem className={styles['form__divider']} />
+                <Button href='/' LinkComponent={Link} variant='text' className={styles['create__button']}>
+                    See the list of existing Hubs
+                </Button>
+            </Stack>
+        </>
     );
 }
 

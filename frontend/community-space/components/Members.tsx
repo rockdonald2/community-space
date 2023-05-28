@@ -74,7 +74,7 @@ const Members = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBER
     return (
         <>
             <Typography mb={2} color='text.secondary' variant='h6'>
-                Members {hubMembers?.length && `(${hubMembers?.length})`}
+                Members {hubMembers?.length ? `(${hubMembers?.length})` : '(0)'}
             </Typography>
             {!hubMembersIsLoading && !hubMembersIsValidating && !hubMembersError ? (
                 hubMembers.map((user, idx) => (

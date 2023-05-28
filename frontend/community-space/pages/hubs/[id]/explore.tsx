@@ -1,4 +1,5 @@
 import Alerter from '@/components/Alerter';
+import Breadcrumbs from '@/components/Breadcrumbs';
 import Members from '@/components/Members';
 import Memos from '@/components/Memos';
 import { Hub } from '@/types/db.types';
@@ -30,6 +31,7 @@ const Explore = () => {
             <Head>
                 <title>Community Space {!hubError ? `| ${hub.name}` : ''}</title>
             </Head>
+            <Breadcrumbs prevRoutes={[{ name: hub?.name, href: `/hubs/${hub?.id}` }]} currRoute={{ name: 'Explore' }} />
             <Grid container spacing={2}>
                 <Grid item xs={4}>
                     <Container>

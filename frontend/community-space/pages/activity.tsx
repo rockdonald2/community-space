@@ -9,6 +9,7 @@ import { Button, Chip, Typography } from '@mui/material';
 import Link from 'next/link';
 import { useState } from 'react';
 import Pagination from '@/components/Pagination';
+import Breadcrumbs from '@/components/Breadcrumbs';
 
 const Activity = () => {
     const { user } = useAuthContext();
@@ -30,6 +31,7 @@ const Activity = () => {
             <Head>
                 <title>Community Space | Activity</title>
             </Head>
+            <Breadcrumbs currRoute={{ name: 'Activity' }} />
             <Typography variant='h5' align='center' color='text.secondary' mb={2}>
                 Activity from the last week
             </Typography>
