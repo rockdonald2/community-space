@@ -15,6 +15,10 @@ build:
     - chmod +x devops/ci/build.sh
     - cd devops/ci
     - bash build.sh
+  artifacts:
+    paths:
+      - backend/**/build/libs/*.jar
+    expire_in: 3 days
   only:
     - main
 
