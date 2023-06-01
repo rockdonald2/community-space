@@ -5,6 +5,8 @@ stages:
 
 before_script:
   - echo "Start CI"
+  - apt-get install openjdk-17-jdk -y
+  - java --version
   - export GRADLE_USER_HOME=`pwd`/.gradle
 
 build:
