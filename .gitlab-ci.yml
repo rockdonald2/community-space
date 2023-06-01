@@ -12,7 +12,7 @@ build:
   script:
     - devops/ci/build.sh
   only:
-    - master
+    - main
 
 after_script:
   - echo "End CI"
