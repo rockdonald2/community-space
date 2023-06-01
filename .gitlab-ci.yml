@@ -10,7 +10,8 @@ before_script:
 build:
   stage: build
   script:
-    - devops/ci/build.sh
+    - chmod +x devops/ci/build.sh
+    - bash devops/ci/build.sh
   only:
     - main
 
