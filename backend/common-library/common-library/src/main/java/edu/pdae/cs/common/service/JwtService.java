@@ -31,7 +31,7 @@ public class JwtService {
         return !isTokenExpired(token); // will only throw if the token was falsified
     }
 
-    private boolean isTokenExpired(String token) {
+    protected boolean isTokenExpired(String token) {
         return extractExpiration(token).before(new Date());
     }
 
@@ -44,11 +44,11 @@ public class JwtService {
         return claimsResolver.apply(claims);
     }
 
-    private Date extractExpiration(String token) {
+    protected Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
 
-    private Claims extractAllClaims(String token) {
+    protected Claims extractAllClaims(String token) {
         try {
             return Jwts
                     .parserBuilder()
@@ -61,7 +61,7 @@ public class JwtService {
         } // let any other JwtException flow through this block
     }
 
-    private Key getSigningKey() {
+    protected Key getSigningKey() {
         byte[] keyBytes = Decoders.BASE64.decode(secretKey);
         return Keys.hmacShaKeyFor(keyBytes);
     }

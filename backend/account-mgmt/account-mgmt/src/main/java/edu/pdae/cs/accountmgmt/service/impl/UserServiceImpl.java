@@ -4,7 +4,6 @@ import edu.pdae.cs.accountmgmt.model.Token;
 import edu.pdae.cs.accountmgmt.model.User;
 import edu.pdae.cs.accountmgmt.model.dto.*;
 import edu.pdae.cs.accountmgmt.repository.UserRepository;
-import edu.pdae.cs.accountmgmt.service.JwtService;
 import edu.pdae.cs.accountmgmt.service.UserService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -15,6 +14,7 @@ import org.springframework.stereotype.Service;
 
 import javax.security.auth.login.LoginException;
 import java.util.List;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 @Service
@@ -25,7 +25,7 @@ public class UserServiceImpl implements UserService {
     private final ModelMapper modelMapper;
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
-    private final JwtService jwtService;
+    private final JwtServiceExtended jwtService;
 
     @Override
     public UserCreationResponseDTO register(UserCreationDTO creationDTO) throws NoSuchElementException {
@@ -34,7 +34,7 @@ public class UserServiceImpl implements UserService {
         final User reqUser = modelMapper.map(creationDTO, User.class);
         reqUser.setPassword(passwordEncoder.encode(reqUser.getPassword()));
 
-        final Token jwtToken = Token.builder().data(jwtService.generateToken(reqUser.getEmail())).build();
+        final Token jwtToken = Token.builder().data(jwtService.generateToken(Map.of("FirstName", creationDTO.getFirstName(), "LastName", creationDTO.getLastName()), reqUser.getEmail())).build();
         final User createdUser = userRepository.save(reqUser);
 
         return UserCreationResponseDTO
@@ -56,7 +56,7 @@ public class UserServiceImpl implements UserService {
             throw new LoginException("Passwords don't match");
         }
 
-        final Token jwtToken = Token.builder().data(jwtService.generateToken(loginDTO.getEmail())).build();
+        final Token jwtToken = Token.builder().data(jwtService.generateToken(Map.of("FirstName", repoUser.getFirstname(), "LastName", repoUser.getLastname()), loginDTO.getEmail())).build();
 
         return UserLoginResponseDTO
                 .builder()

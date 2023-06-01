@@ -36,7 +36,10 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
             }
 
             final String subject = jwtService.extractSubject(token);
-            request = request.mutate().header("X-AUTH-TOKEN-SUBJECT", subject).build();
+            request = request.mutate()
+                    .header("X-AUTH-TOKEN-SUBJECT", subject)
+                    .header("X-AUTH-TOKEN", token)
+                    .build();
             exchange = exchange.mutate().request(request).build();
         }
 

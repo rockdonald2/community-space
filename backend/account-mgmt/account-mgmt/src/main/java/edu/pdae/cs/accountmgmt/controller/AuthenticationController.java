@@ -4,8 +4,8 @@ import edu.pdae.cs.accountmgmt.model.User;
 import edu.pdae.cs.accountmgmt.model.dto.UserLoginDTO;
 import edu.pdae.cs.accountmgmt.model.dto.UserLoginResponseDTO;
 import edu.pdae.cs.accountmgmt.repository.UserRepository;
-import edu.pdae.cs.accountmgmt.service.JwtService;
 import edu.pdae.cs.accountmgmt.service.UserService;
+import edu.pdae.cs.accountmgmt.service.impl.JwtServiceExtended;
 import io.jsonwebtoken.ExpiredJwtException;
 import io.jsonwebtoken.security.SignatureException;
 import lombok.RequiredArgsConstructor;
@@ -25,7 +25,7 @@ import java.util.Objects;
 public class AuthenticationController {
 
     private final UserService userService;
-    private final JwtService jwtService;
+    private final JwtServiceExtended jwtService;
     private final UserRepository userRepository;
 
     @PostMapping
@@ -44,7 +44,7 @@ public class AuthenticationController {
         log.info("Incoming validate request before token validation");
 
         final String token = getAuthToken(rawHeader);
-        final String email = Objects.requireNonNull(jwtService.extractEmail(token)); // first check, check for e-mail and auth, we verify the signing key here
+        final String email = Objects.requireNonNull(jwtService.extractSubject(token)); // first check, check for e-mail and auth, we verify the signing key here
         // can throw validation exceptions, but will let through if it is expired
 
         log.info("Incoming validation request for {}", email);
@@ -72,7 +72,7 @@ public class AuthenticationController {
         log.info("Incoming logout request before token validation");
 
         final String token = getAuthToken(rawHeader);
-        final String email = Objects.requireNonNull(jwtService.extractEmail(token)); // can throw 400 or 401 if token is malicious, or email is missing
+        final String email = Objects.requireNonNull(jwtService.extractSubject(token)); // can throw 400 or 401 if token is malicious, or email is missing
 
         log.info("Incoming logout request for {}", email);
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);

@@ -6,6 +6,7 @@ import { Notification } from '@/types/db.types';
 import useSWR from 'swr';
 import { swrNotificationsFetcherWithAuth } from '@/utils/Utility';
 import { INotificationContext } from '@/types/types';
+import { useSnackbar } from 'notistack';
 
 const Events = {
     CONNECT: 'connect',
@@ -17,6 +18,7 @@ export function useNotifications() {
     const { user } = useAuthContext();
     const [_isConnected, setConnected] = useState<boolean>(false);
     const socket = useRef<Socket>(null);
+    const { enqueueSnackbar } = useSnackbar();
 
     const { data, error, isLoading, isValidating, mutate } = useSWR<Notification[]>( // loading initial data with REST API
         { key: 'notifications', token: user.token },
@@ -36,10 +38,11 @@ export function useNotifications() {
     }, []);
 
     const onNotification = useCallback(
-        (notification: Notification) => {
-            mutate([notification, ...data], false);
+        async (notification: Notification) => {
+            await mutate([notification, ...data], false);
+            enqueueSnackbar('You have a new notification!');
         },
-        [data, mutate]
+        [data, enqueueSnackbar, mutate]
     );
 
     useEffect(() => {

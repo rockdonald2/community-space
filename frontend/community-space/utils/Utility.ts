@@ -433,3 +433,20 @@ export const getDaysInCurrentMonth = () => {
 export const getCurrentDay = () => {
     return new Date().getDate();
 };
+
+export const calculateRelativeTimeFromNow = (date: Date) => {
+    const formatter = new Intl.RelativeTimeFormat(`en`, { style: `narrow` });
+
+    const currDate: Date = new Date();
+    const diff: number = currDate.getTime() - date.getTime();
+    const totalDaysBetween: number = Math.floor(diff / (1000 * 3600 * 24));
+    const totalHoursBetween: number = Math.floor(diff / (1000 * 3600));
+
+    if (totalDaysBetween > 1) {
+        return formatter.format(-1 * totalDaysBetween, 'day');
+    } else if (totalHoursBetween > 1) {
+        return formatter.format(-1 * totalHoursBetween, 'hour');
+    }
+
+    return formatter.format(-1 * Math.floor(diff / (1000 * 60)), 'minute');
+};

@@ -10,8 +10,8 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.pdae.cs.accountmgmt.model.dto.UserDataDTO;
 import edu.pdae.cs.accountmgmt.model.dto.UserPresenceNotificationDTO;
-import edu.pdae.cs.accountmgmt.service.JwtService;
 import edu.pdae.cs.accountmgmt.service.StatusService;
+import edu.pdae.cs.accountmgmt.service.impl.JwtServiceExtended;
 import edu.pdae.cs.common.model.dto.UserPresenceDTO;
 import io.jsonwebtoken.JwtException;
 import jakarta.annotation.PostConstruct;
@@ -36,7 +36,7 @@ public class StatusListener {
 
     private final StatusService statusService;
     private final SocketIOServer socketIOServer;
-    private final JwtService jwtService;
+    private final JwtServiceExtended jwtService;
     private final ObjectMapper objectMapper;
 
     @PostConstruct

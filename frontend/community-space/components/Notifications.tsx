@@ -7,6 +7,7 @@ import CheckIcon from '@mui/icons-material/Check';
 import Alerter from './Alerter';
 import { useSnackbar } from 'notistack';
 import { useNotifications } from '@/utils/UseNotifications';
+import { calculateRelativeTimeFromNow } from '@/utils/Utility';
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
     '& .MuiBadge-badge': {
@@ -25,21 +26,6 @@ const StyledBadge = styled(Badge)(({ theme }) => ({
         },
     },
 }));
-
-const calculateRelativeTime = (date: Date) => {
-    const formatter = new Intl.RelativeTimeFormat(`en`, { style: `narrow` });
-
-    const currDate: Date = new Date();
-    const diff: number = currDate.getTime() - date.getTime();
-    const totalDaysBetween: number = Math.ceil(diff / (1000 * 3600 * 24));
-    const totalHoursBetween: number = Math.ceil(diff / (1000 * 3600));
-
-    if (totalDaysBetween > 1) {
-        return formatter.format(-1 * totalDaysBetween, 'day');
-    }
-
-    return formatter.format(-1 * totalHoursBetween, 'hour');
-};
 
 const Notifications = () => {
     const { signOut } = useAuthContext();
@@ -133,13 +119,7 @@ const Notifications = () => {
                     notifications
                         ?.filter((notification) => notification.isRead !== true)
                         .map((notification, idx) => (
-                            <Grid
-                                container
-                                key={idx}
-                                sx={{ maxWidth: '60vw' }}
-                                direction='row'
-                                alignItems='center'
-                            >
+                            <Grid container key={idx} sx={{ maxWidth: '60vw' }} direction='row' alignItems='center'>
                                 <Grid item xs={10}>
                                     <Stack>
                                         <Typography
@@ -166,7 +146,7 @@ const Notifications = () => {
                                                 mb: 1,
                                             }}
                                         >
-                                            {calculateRelativeTime(new Date(notification.createdAt))}
+                                            {calculateRelativeTimeFromNow(new Date(notification.createdAt))}
                                         </Typography>
                                     </Stack>
                                 </Grid>

@@ -38,6 +38,11 @@ const Layout = ({ children }) => {
                                         variant: 'error',
                                     });
                                     push('/');
+                                } else if (error?.status === 404) {
+                                    enqueueSnackbar('The requested resource was not found', {
+                                        variant: 'error',
+                                    });
+                                    push('/');
                                 } else {
                                     enqueueSnackbar('An error occurred. Please try again later', {
                                         variant: 'error',

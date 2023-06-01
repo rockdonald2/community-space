@@ -8,7 +8,7 @@ const Pagination = ({
     totalPages,
 }: {
     currPage: number;
-    setPage: any;
+    setPage: (page: number) => void;
     totalPages: number | null;
 }) => {
     return (
