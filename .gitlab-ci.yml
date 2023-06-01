@@ -10,11 +10,7 @@ before_script:
 build:
   stage: build
   script:
-    - ./gradlew assemble
-  artifacts:
-    paths:
-      - build/libs/*.jar
-    expire_in: 1 week
+    - devops/ci/build.sh
   only:
     - master
 
