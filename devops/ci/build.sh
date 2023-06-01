@@ -8,6 +8,7 @@ echo "===> Building common-lib"
 echo
 
 cd common-library/common-library || exit 1
+chmod +x gradlew
 ./gradlew publishToMavenLocal
 cd ../..
 
@@ -17,6 +18,7 @@ echo "===> Building account-mgmt"
 echo
 
 cd account-mgmt/account-mgmt || exit 1
+chmod +x gradlew
 ./gradlew assemble
 cd ../..
 
@@ -26,6 +28,7 @@ echo "===> Building gateway"
 echo
 
 cd gateway/gateway || exit 1
+chmod +x gradlew
 ./gradlew assemble
 cd ../..
 
@@ -35,6 +38,7 @@ echo "===> Building hub-mgmt"
 echo
 
 cd hub-mgmt/hub-mgmt || exit 1
+chmod +x gradlew
 ./gradlew assemble
 cd ../..
 
@@ -44,6 +48,7 @@ echo "===> Building memo-mgmt"
 echo
 
 cd memo-mgmt/memo-mgmt || exit 1
+chmod +x gradlew
 ./gradlew assemble
 cd ../..
 
@@ -53,6 +58,7 @@ echo "===> Building activity-notifications-mgmt"
 echo
 
 cd activity-notifications-mgmt/activity-notifications-mgmt || exit 1
+chmod +x gradlew
 ./gradlew assemble
 cd ../..
 
