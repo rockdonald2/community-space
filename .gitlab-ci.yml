@@ -11,7 +11,8 @@ build:
   stage: build
   script:
     - chmod +x devops/ci/build.sh
-    - bash devops/ci/build.sh
+    - cd devops/ci
+    - bash build.sh
   only:
     - main
 
