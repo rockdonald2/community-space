@@ -4,6 +4,7 @@ import edu.pdae.cs.common.util.PageWrapper;
 import edu.pdae.cs.memomgmt.model.Memo;
 import edu.pdae.cs.memomgmt.model.dto.*;
 import org.bson.types.ObjectId;
+import edu.pdae.cs.common.model.Visibility;
 
 import java.util.Date;
 import java.util.List;
@@ -20,19 +21,19 @@ public interface MemoService {
 
     MemoDetailsDTO getById(ObjectId id, String asUser);
 
-    PageWrapper<MemoDTO> getAllByVisibility(Memo.Visibility visibility, String asUser, int currPage, int pageSize);
+    PageWrapper<MemoDTO> getAllByVisibility(Visibility visibility, String asUser, int currPage, int pageSize);
 
     PageWrapper<MemoDTO> getAllAfter(Date after, String asUser, int currPage, int pageSize);
 
-    PageWrapper<MemoDTO> getAllAfterAndByVisibility(Date after, Memo.Visibility visibility, String asUser, int currPage, int pageSize);
+    PageWrapper<MemoDTO> getAllAfterAndByVisibility(Date after, Visibility visibility, String asUser, int currPage, int pageSize);
 
     PageWrapper<MemoDTO> getAll(String asUser, int currPage, int pageSize);
 
-    PageWrapper<MemoDTO> getAllAfterByHubIdAndByVisibility(Date after, Memo.Visibility visibility, ObjectId hubId, String asUser, int currPage, int pageSize);
+    PageWrapper<MemoDTO> getAllAfterByHubIdAndByVisibility(Date after, Visibility visibility, ObjectId hubId, String asUser, int currPage, int pageSize);
 
     PageWrapper<MemoDTO> getAllAfterByHubId(Date after, ObjectId hubId, String asUser, int currPage, int pageSize);
 
-    PageWrapper<MemoDTO> getAllByHubIdAndByVisibility(ObjectId hubId, Memo.Visibility visibility, String asUser, int currPage, int pageSize);
+    PageWrapper<MemoDTO> getAllByHubIdAndByVisibility(ObjectId hubId, Visibility visibility, String asUser, int currPage, int pageSize);
 
     PageWrapper<MemoDTO> getAllByHubId(ObjectId hubId, String asUser, int currPage, int pageSize);
 

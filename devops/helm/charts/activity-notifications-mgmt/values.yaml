@@ -8,6 +8,8 @@ service:
   ports:
     - name: http
       port: 8085
+    - name: ws
+      port: 9085
   type: ClusterIP
 
 replicas: 1
@@ -44,3 +46,6 @@ secrets:
   - envName: SPRING_DATA_MONGODB_PASSWORD
     secretName: activity-notifications-mgmt-mongodb-password
     secretValue: "adminpassword"
+  - envName: CS_AUTH_SECRET_KEY
+    secretName: activity-notifications-jwt-secret
+    secretValue: "404E635266556A586E3272357538782F413F4428472B4B6250645367566B5970"

@@ -1,6 +1,7 @@
 import { useAuthContext } from '@/utils/AuthContext';
-import { Divider, Stack, Typography } from '@mui/material';
+import { Box, Divider, Stack, Typography } from '@mui/material';
 import Avatar from './Avatar';
+import Notifications from './Notifications';
 
 const Header = () => {
     const { user } = useAuthContext();
@@ -16,6 +17,9 @@ const Header = () => {
                 <Typography color='text.secondary'>
                     logged in as <strong>{`${user.firstName} ${user.lastName}`}</strong> ({user.email})
                 </Typography>
+                <Box sx={{ ml: 'auto' }}>
+                    <Notifications />
+                </Box>
             </Stack>
             <Divider sx={{ marginBottom: '1rem' }} />
         </>

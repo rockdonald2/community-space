@@ -1,5 +1,6 @@
 package edu.pdae.cs.hubmgmt.service.impl;
 
+import edu.pdae.cs.common.model.Visibility;
 import edu.pdae.cs.common.model.dto.ActivityFiredDTO;
 import edu.pdae.cs.common.model.dto.HubMemberMutationDTO;
 import edu.pdae.cs.common.model.dto.HubMutationDTO;
@@ -61,6 +62,7 @@ public class HubServiceImpl implements HubService {
                 .hubName(createdHub.getName())
                 .date(new Date())
                 .type(ActivityFiredDTO.Type.HUB_CREATED)
+                .visibility(Visibility.PUBLIC)
                 .build());
 
         return modelMapper.map(createdHub, HubCreationResponseDTO.class);

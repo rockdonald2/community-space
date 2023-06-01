@@ -1,4 +1,4 @@
-import { User } from './db.types';
+import { User, Notification } from './db.types';
 
 export type UserSignUp = {
     email: string;
@@ -70,3 +70,11 @@ export type ErrorResponse = {
     path: string;
     message?: string;
 };
+
+export interface INotificationContext {
+    notifications: Notification[];
+    markAsRead: (notification: Notification) => Promise<void>;
+    isLoading: boolean;
+    isValidating: boolean;
+    error: any;
+}

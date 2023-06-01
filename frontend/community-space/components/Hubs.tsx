@@ -16,9 +16,7 @@ const Hubs = () => {
         isLoading,
         isValidating,
         mutate,
-    } = useSWR<Hub[]>({ key: 'hubs', token: user.token }, swrHubsFetcherWithAuth, {
-        revalidateOnFocus: false,
-    });
+    } = useSWR<Hub[]>({ key: 'hubs', token: user.token }, swrHubsFetcherWithAuth);
 
     const mutateCallback = useCallback(
         (hub: Hub) => {

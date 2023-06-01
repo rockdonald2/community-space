@@ -1,5 +1,6 @@
 package edu.pdae.cs.memomgmt.service.impl;
 
+import edu.pdae.cs.common.model.Visibility;
 import edu.pdae.cs.common.model.dto.ActivityFiredDTO;
 import edu.pdae.cs.common.util.PageWrapper;
 import edu.pdae.cs.memomgmt.config.MessagingConfiguration;
@@ -62,6 +63,7 @@ public class MemoServiceImpl implements MemoService {
                 .type(ActivityFiredDTO.Type.MEMO_CREATED)
                 .memoId(createdMemo.getId().toHexString())
                 .memoTitle(createdMemo.getTitle())
+                .visibility(createdMemo.getVisibility())
                 .build());
 
         return modelMapper.map(createdMemo, MemoCreationResponseDTO.class);
@@ -126,6 +128,7 @@ public class MemoServiceImpl implements MemoService {
     }
 
     @Override
+    @CacheEvict(value = {"memo", "memos"}, allEntries = true)
     public void deleteAllByHubId(ObjectId hubId) {
         memoRepository.deleteAllByHubId(hubId);
     }
@@ -139,7 +142,7 @@ public class MemoServiceImpl implements MemoService {
             throw new ForbiddenOperationException("You are not a member of this hub");
         }
 
-        if (Memo.Visibility.PRIVATE.equals(memo.getVisibility()) && !asUser.equals(memo.getAuthor())) {
+        if (Visibility.PRIVATE.equals(memo.getVisibility()) && !asUser.equals(memo.getAuthor())) {
             throw new ForbiddenOperationException("Memo is private and the requester is not the author");
         }
 
@@ -151,7 +154,7 @@ public class MemoServiceImpl implements MemoService {
 
     @Override
     @Cacheable("memos")
-    public PageWrapper<MemoDTO> getAllByVisibility(Memo.Visibility visibility, String asUser, int currPage, int pageSize) {
+    public PageWrapper<MemoDTO> getAllByVisibility(Visibility visibility, String asUser, int currPage, int pageSize) {
         return constructPageWrapper(memoRepository.getMemosByVisibility(visibility, PageRequest.of(currPage, pageSize)), asUser);
     }
 
@@ -163,7 +166,7 @@ public class MemoServiceImpl implements MemoService {
 
     @Override
     @Cacheable("memos")
-    public PageWrapper<MemoDTO> getAllAfterAndByVisibility(Date after, Memo.Visibility visibility, String asUser, int currPage, int pageSize) {
+    public PageWrapper<MemoDTO> getAllAfterAndByVisibility(Date after, Visibility visibility, String asUser, int currPage, int pageSize) {
         return constructPageWrapper(memoRepository.getMemosByCreatedOnAfterAndVisibility(after, visibility, PageRequest.of(currPage, pageSize)), asUser);
     }
 
@@ -175,7 +178,7 @@ public class MemoServiceImpl implements MemoService {
 
     @Override
     @Cacheable("memos")
-    public PageWrapper<MemoDTO> getAllAfterByHubIdAndByVisibility(Date after, Memo.Visibility visibility, ObjectId hubId, String asUser, int currPage, int pageSize) {
+    public PageWrapper<MemoDTO> getAllAfterByHubIdAndByVisibility(Date after, Visibility visibility, ObjectId hubId, String asUser, int currPage, int pageSize) {
         return constructPageWrapper(memoRepository.getMemosByCreatedOnAfterAndHubIdAndVisibility(after, hubId, visibility, PageRequest.of(currPage, pageSize)), asUser);
     }
 
@@ -187,7 +190,7 @@ public class MemoServiceImpl implements MemoService {
 
     @Override
     @Cacheable("memos")
-    public PageWrapper<MemoDTO> getAllByHubIdAndByVisibility(ObjectId hubId, Memo.Visibility visibility, String asUser, int currPage, int pageSize) {
+    public PageWrapper<MemoDTO> getAllByHubIdAndByVisibility(ObjectId hubId, Visibility visibility, String asUser, int currPage, int pageSize) {
         return constructPageWrapper(memoRepository.getMemosByHubIdAndVisibility(hubId, visibility, PageRequest.of(currPage, pageSize)), asUser);
     }
 
@@ -204,6 +207,10 @@ public class MemoServiceImpl implements MemoService {
 
         if (!hubService.isMember(memo.getHubId(), asUser)) {
             throw new ForbiddenOperationException("You are not a member of this hub");
+        }
+
+        if (memo.getVisibility().equals(Visibility.PRIVATE)) {
+            throw new ConflictingOperationException("The memo is private");
         }
 
         final Hub hub = hubService.getHub(memo.getHubId());
@@ -231,6 +238,7 @@ public class MemoServiceImpl implements MemoService {
                 .hubName(hub.getName())
                 .memoId(memoId.toHexString())
                 .memoTitle(memo.getTitle())
+                .visibility(memo.getVisibility())
                 .build());
 
         return MemoCompletionResponseDTO.builder()
@@ -290,7 +298,7 @@ public class MemoServiceImpl implements MemoService {
                 .filter(memo ->
                         hubService.isMember(memo.getHubId(), asUser)
                                 &&
-                                (Memo.Visibility.PUBLIC.equals(memo.getVisibility()) || asUser.equals(memo.getAuthor())))
+                                (Visibility.PUBLIC.equals(memo.getVisibility()) || asUser.equals(memo.getAuthor())))
                 .toList();
     }
 

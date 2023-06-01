@@ -6,6 +6,7 @@ import edu.pdae.cs.activitynotificationsmgmt.model.dto.ActivityDTO;
 import edu.pdae.cs.activitynotificationsmgmt.model.dto.ActivityGroupedDTO;
 import edu.pdae.cs.activitynotificationsmgmt.repository.ActivityRepository;
 import edu.pdae.cs.activitynotificationsmgmt.service.ActivityService;
+import edu.pdae.cs.common.model.Visibility;
 import edu.pdae.cs.common.util.PageWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -33,22 +34,23 @@ public class ActivityServiceImpl implements ActivityService {
     private final MongoTemplate mongoTemplate;
 
     @Override
-    public void addActivity(String user, ObjectId hubId, String hubName, Date date, Activity.Type type) {
-        activityRepository.save(Activity.builder().user(user).hubId(hubId).date(date).type(type).hubName(hubName).build());
+    @CacheEvict(value = {"activities", "activities-grouped"}, allEntries = true)
+    public void addActivity(String user, ObjectId hubId, String hubName, Date date, Activity.Type type, Visibility visibility) {
+        activityRepository.save(Activity.builder().user(user).visibility(visibility).hubId(hubId).date(date).type(type).hubName(hubName).build());
     }
 
     @Override
-    @CacheEvict({"activities", "activities-grouped"})
-    public void addActivity(String user, ObjectId hubId, String hubName, ObjectId memoId, String memoTitle, Date date, Activity.Type type) {
-        activityRepository.save(Activity.builder().user(user).hubId(hubId).date(date).type(type).hubName(hubName).memoId(memoId).memoTitle(memoTitle).build());
+    @CacheEvict(value = {"activities", "activities-grouped"}, allEntries = true)
+    public void addActivity(String user, ObjectId hubId, String hubName, ObjectId memoId, String memoTitle, Date date, Activity.Type type, Visibility visibility) {
+        activityRepository.save(Activity.builder().user(user).hubId(hubId).visibility(visibility).date(date).type(type).hubName(hubName).memoId(memoId).memoTitle(memoTitle).build());
     }
 
     @Override
     @Cacheable("activities")
-    public PageWrapper<ActivityDTO> getActivities(Date from, Date to, int page, int pageSize) {
+    public PageWrapper<ActivityDTO> getActivities(Date from, Date to, String asUser, int page, int pageSize) {
         final var activityPage = activityRepository.findActivitiesByDateBetween(from, to, PageRequest.of(page, pageSize));
         final List<Activity> activityList = activityPage.getContent();
-        final List<ActivityDTO> activityDTOList = activityList.stream().map(activity -> modelMapper.map(activity, ActivityDTO.class)).toList();
+        final List<ActivityDTO> activityDTOList = activityList.stream().filter(activity -> activity.getVisibility().equals(Visibility.PUBLIC) || activity.getUser().equals(asUser)).map(activity -> modelMapper.map(activity, ActivityDTO.class)).toList();
 
         return PageWrapper.<ActivityDTO>builder()
                 .pageSize(pageSize)

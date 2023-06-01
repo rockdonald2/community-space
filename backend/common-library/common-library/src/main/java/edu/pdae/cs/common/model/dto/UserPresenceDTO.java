@@ -1,4 +1,4 @@
-package edu.pdae.cs.accountmgmt.model.dto;
+package edu.pdae.cs.common.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;

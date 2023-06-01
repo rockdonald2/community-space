@@ -1,6 +1,6 @@
 package edu.pdae.cs.accountmgmt.service;
 
-import edu.pdae.cs.accountmgmt.model.dto.UserPresenceDTO;
+import edu.pdae.cs.common.model.dto.UserPresenceDTO;
 
 import java.util.Set;
 

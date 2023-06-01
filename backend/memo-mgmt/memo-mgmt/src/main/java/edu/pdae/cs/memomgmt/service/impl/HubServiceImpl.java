@@ -26,7 +26,7 @@ public class HubServiceImpl implements HubService {
     private MemoService memoService;
 
     @Override
-    @CacheEvict({"hub", "memo", "memos"})
+    @CacheEvict({"hub", "memo", "memos", "member"})
     public void createHub(ObjectId hubId, String hubName, String ownerEmail) {
         hubRepository.save(Hub.builder()
                 .id(hubId)
@@ -37,7 +37,7 @@ public class HubServiceImpl implements HubService {
     }
 
     @Override
-    @CacheEvict({"hub", "memo", "memos"})
+    @CacheEvict({"hub", "memo", "memos", "member"})
     public void deleteHub(ObjectId hubId) {
         // we need to delete all the memos as well
         memoService.deleteAllByHubId(hubId);
@@ -45,7 +45,7 @@ public class HubServiceImpl implements HubService {
     }
 
     @Override
-    @CacheEvict({"hub", "memo", "memos"})
+    @CacheEvict({"member", "memo", "memos"})
     public void addMember(ObjectId hubId, String email) {
         final Hub hub = hubRepository.findById(hubId).orElseThrow();
         hub.getMembers().add(email);
@@ -53,7 +53,7 @@ public class HubServiceImpl implements HubService {
     }
 
     @Override
-    @CacheEvict({"hub", "memo", "memos"})
+    @CacheEvict({"memo", "memos", "member"})
     public void removeMember(ObjectId hubId, String email) {
         final Hub hub = hubRepository.findById(hubId).orElseThrow();
         hub.getMembers().remove(email);
@@ -61,13 +61,14 @@ public class HubServiceImpl implements HubService {
     }
 
     @Override
-    @Cacheable("hub")
+    @Cacheable("member")
     public boolean isMember(ObjectId hubId, String email) {
         final Hub hub = hubRepository.findById(hubId).orElseThrow();
         return hub.getMembers().contains(email) || hub.getOwner().equals(email);
     }
 
     @Override
+    @Cacheable("hub")
     public Hub getHub(ObjectId hubId) throws NoSuchElementException {
         return hubRepository.findById(hubId).orElseThrow();
     }

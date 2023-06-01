@@ -1,0 +1,202 @@
+import { Badge, Divider, Grid, IconButton, Menu, Stack, Tooltip, Typography, styled } from '@mui/material';
+import { useState, useMemo, useCallback } from 'react';
+import NotificationsIcon from '@mui/icons-material/Notifications';
+import { useAuthContext } from '@/utils/AuthContext';
+import { Notification } from '@/types/db.types';
+import CheckIcon from '@mui/icons-material/Check';
+import Alerter from './Alerter';
+import { useSnackbar } from 'notistack';
+import { useNotifications } from '@/utils/UseNotifications';
+
+const StyledBadge = styled(Badge)(({ theme }) => ({
+    '& .MuiBadge-badge': {
+        backgroundColor: 'var(--mui-palette-primary-dark)',
+        color: 'var(--mui-palette-primary-dark)',
+        boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
+        '&::after': {
+            position: 'absolute',
+            top: 0,
+            right: 0,
+            width: '100%',
+            height: '100%',
+            borderRadius: '50%',
+            border: '1px solid currentColor',
+            content: '""',
+        },
+    },
+}));
+
+const calculateRelativeTime = (date: Date) => {
+    const formatter = new Intl.RelativeTimeFormat(`en`, { style: `narrow` });
+
+    const currDate: Date = new Date();
+    const diff: number = currDate.getTime() - date.getTime();
+    const totalDaysBetween: number = Math.ceil(diff / (1000 * 3600 * 24));
+    const totalHoursBetween: number = Math.ceil(diff / (1000 * 3600));
+
+    if (totalDaysBetween > 1) {
+        return formatter.format(-1 * totalDaysBetween, 'day');
+    }
+
+    return formatter.format(-1 * totalHoursBetween, 'hour');
+};
+
+const Notifications = () => {
+    const { signOut } = useAuthContext();
+    const { enqueueSnackbar } = useSnackbar();
+
+    const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
+    const open = useMemo(() => Boolean(menuAnchorEl), [menuAnchorEl]);
+    const handleClick = useCallback((event: React.MouseEvent<HTMLElement>) => {
+        setMenuAnchorEl(event.currentTarget);
+    }, []);
+    const handleClose = useCallback(() => {
+        setMenuAnchorEl(null);
+    }, []);
+
+    const { notifications, error, isLoading, isValidating, markAsRead } = useNotifications();
+
+    const handleRead = useCallback(
+        async (notification: Notification) => {
+            try {
+                await markAsRead(notification);
+            } catch (err) {
+                console.debug('Failed to mark notification as read', err);
+                if (err instanceof Error) {
+                    if ('res' in (err.cause as any)) {
+                        const res = (err.cause as any).res;
+                        if (res.status === 401) {
+                            enqueueSnackbar('Your session has expired. Please sign in again', { variant: 'warning' });
+                            signOut();
+                        } else {
+                            enqueueSnackbar('Failed to mark notification as read', { variant: 'error' });
+                        }
+                    }
+                }
+            }
+        },
+        [enqueueSnackbar, markAsRead, signOut]
+    );
+
+    return (
+        <>
+            <Tooltip title='Notifications'>
+                <IconButton
+                    size='small'
+                    sx={{ ml: 2 }}
+                    aria-controls={open ? 'notifications-menu' : undefined}
+                    aria-haspopup='true'
+                    aria-expanded={open ? 'true' : undefined}
+                    onClick={handleClick}
+                >
+                    <StyledBadge variant={notifications?.length > 0 ? 'dot' : 'standard'}>
+                        <NotificationsIcon />
+                    </StyledBadge>
+                </IconButton>
+            </Tooltip>
+            <Menu
+                anchorEl={menuAnchorEl}
+                open={open}
+                onClose={handleClose}
+                PaperProps={{
+                    elevation: 0,
+                    sx: {
+                        overflow: 'visible',
+                        filter: 'drop-shadow(0px 2px 6px rgba(0,0,0,0.18))',
+                        mt: 1.5,
+                        '&:before': {
+                            content: '""',
+                            display: 'block',
+                            position: 'absolute',
+                            top: 0,
+                            right: 12,
+                            width: 12,
+                            height: 12,
+                            bgcolor: 'background.paper',
+                            transform: 'translateY(-45%) rotate(45deg)',
+                            zIndex: 0,
+                        },
+                    },
+                }}
+                transformOrigin={{ horizontal: 'right', vertical: 'top' }}
+                anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+            >
+                <Typography
+                    sx={{ padding: 1, paddingLeft: 2, paddingRight: 2, textAlign: 'left', mb: 0.5 }}
+                    variant='subtitle1'
+                    color='text.secondary'
+                >
+                    Notifications
+                </Typography>
+                <Divider sx={{ mb: 0.5 }} />
+                {!isLoading && !isValidating && !error && notifications?.length > 0 ? (
+                    notifications
+                        ?.filter((notification) => notification.isRead !== true)
+                        .map((notification, idx) => (
+                            <Grid
+                                container
+                                key={idx}
+                                sx={{ maxWidth: '60vw' }}
+                                direction='row'
+                                alignItems='center'
+                            >
+                                <Grid item xs={10}>
+                                    <Stack>
+                                        <Typography
+                                            variant='body2'
+                                            color='text.secondary'
+                                            sx={{
+                                                paddingLeft: 1.5,
+                                                paddingRight: 1.5,
+                                                paddingTop: 1.5,
+                                                textAlign: 'left',
+                                                width: '100%',
+                                            }}
+                                        >
+                                            {notification.msg}
+                                        </Typography>
+                                        <Typography
+                                            variant='caption'
+                                            color='text.secondary'
+                                            sx={{
+                                                paddingLeft: 1.5,
+                                                paddingRight: 1.5,
+                                                paddingTop: 0.5,
+                                                textAlign: 'left',
+                                                mb: 1,
+                                            }}
+                                        >
+                                            {calculateRelativeTime(new Date(notification.createdAt))}
+                                        </Typography>
+                                    </Stack>
+                                </Grid>
+                                <Grid item xs={2}>
+                                    <Tooltip arrow title='Mark as read'>
+                                        <IconButton
+                                            size='small'
+                                            color='primary'
+                                            onClick={async () => await handleRead(notification)}
+                                        >
+                                            <CheckIcon />
+                                        </IconButton>
+                                    </Tooltip>
+                                </Grid>
+                            </Grid>
+                        ))
+                ) : isLoading || isValidating || error ? (
+                    <Alerter data={notifications} error={error} isLoading={isLoading} isValidating={isValidating} />
+                ) : (
+                    <Typography
+                        sx={{ padding: 1, paddingLeft: 2, paddingRight: 2, textAlign: 'left', mb: 0.5 }}
+                        variant='body2'
+                        color='text.secondary'
+                    >
+                        No new notifications...
+                    </Typography>
+                )}
+            </Menu>
+        </>
+    );
+};
+
+export default Notifications;

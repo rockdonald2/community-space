@@ -1,6 +1,5 @@
 package edu.pdae.cs.memomgmt.config;
 
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.boot.autoconfigure.cache.RedisCacheManagerBuilderCustomizer;
@@ -47,6 +46,7 @@ public class CacheConfiguration {
                 .withCacheConfiguration("memo", redisCacheConfigurationForComplex(objectMapper))
                 .withCacheConfiguration("memos", redisCacheConfigurationForComplex(objectMapper))
                 .withCacheConfiguration("hub", redisCacheConfigurationForComplex(objectMapper))
+                .withCacheConfiguration("member", redisCacheConfigurationForComplex(objectMapper))
                 .withCacheConfiguration("completion", redisCacheConfigurationForComplex(objectMapper))
                 .withCacheConfiguration("completions", redisCacheConfigurationForLists(objectMapper));
     }

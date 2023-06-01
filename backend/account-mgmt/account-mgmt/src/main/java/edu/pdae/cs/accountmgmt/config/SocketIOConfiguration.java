@@ -27,7 +27,6 @@ public class SocketIOConfiguration {
     @Value("${spring.data.redis.port}")
     private Integer redisPort;
 
-
     @Bean
     public SocketIOServer socketIOServer() {
         final com.corundumstudio.socketio.Configuration config = new com.corundumstudio.socketio.Configuration();

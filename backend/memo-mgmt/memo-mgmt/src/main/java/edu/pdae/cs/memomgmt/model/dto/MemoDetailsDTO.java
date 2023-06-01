@@ -1,5 +1,6 @@
 package edu.pdae.cs.memomgmt.model.dto;
 
+import edu.pdae.cs.common.model.Visibility;
 import edu.pdae.cs.memomgmt.model.Memo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -19,7 +20,7 @@ public class MemoDetailsDTO {
     private String author;
     private Date createdOn;
     private String content;
-    private Memo.Visibility visibility;
+    private Visibility visibility;
     private Memo.Urgency urgency;
     private String hubId;
     private boolean completed;

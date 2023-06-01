@@ -1,7 +1,7 @@
 package edu.pdae.cs.gateway.filter;
 
+import edu.pdae.cs.common.service.JwtService;
 import edu.pdae.cs.gateway.config.GatewayRouteCategorizer;
-import edu.pdae.cs.gateway.service.JwtService;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;

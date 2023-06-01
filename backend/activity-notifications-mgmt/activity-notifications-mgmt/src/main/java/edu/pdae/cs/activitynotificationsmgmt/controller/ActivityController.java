@@ -27,9 +27,9 @@ public class ActivityController {
     private final ActivityService activityService;
 
     @GetMapping
-    public ResponseEntity<List<ActivityDTO>> gets(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date from, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date to, @RequestParam("page") Optional<Integer> page) {
+    public ResponseEntity<List<ActivityDTO>> gets(@RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date from, @RequestParam @DateTimeFormat(pattern = "yyyy-MM-dd") Date to, @RequestParam("page") Optional<Integer> page, @RequestHeader("X-AUTH-TOKEN-SUBJECT") String user) {
         log.info("Getting all activities from {} to {}", from, to);
-        final PageWrapper<ActivityDTO> activities = activityService.getActivities(from, to, page.orElse(0), PAGE_SIZE);
+        final PageWrapper<ActivityDTO> activities = activityService.getActivities(from, to, user, page.orElse(0), PAGE_SIZE);
 
         final var headers = new HttpHeaders();
         headers.set("X-TOTAL-COUNT", String.valueOf(activities.getTotalNumberOfElements()));

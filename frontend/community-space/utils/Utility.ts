@@ -368,6 +368,31 @@ export const swrActivitiesFetcherWithAuth = async (args: { key: string; token: s
     };
 };
 
+export const swrNotificationsFetcherWithAuth = async (args: { key: string; token: string }) => {
+    const currDate = new Date();
+    const previousWeek = new Date(currDate.getTime() - 7 * 24 * 60 * 60 * 1000);
+
+    const res = await fetch(
+        `${GATEWAY_URL}/api/v1/notifications?from=${previousWeek.getFullYear()}-${
+            previousWeek.getMonth() + 1
+        }-${previousWeek.getDate()}&to=${currDate.getFullYear()}-${currDate.getMonth() + 1}-${currDate.getDate() + 1}`,
+        {
+            headers: { Authorization: `Bearer ${args.token}` },
+        }
+    );
+
+    if (!res.ok) {
+        throw {
+            status: res.status,
+            path: res.url,
+            message: res.statusText,
+            error: 'error',
+        } satisfies ErrorResponse;
+    }
+
+    return await res.json();
+};
+
 export const mediumDateWithNoTimeFormatter = new Intl.DateTimeFormat('en-gb', {
     formatMatcher: 'best fit',
     dateStyle: 'medium',
@@ -401,7 +426,7 @@ export const handleInput = (e: React.ChangeEvent<HTMLInputElement>, setState: Di
 };
 
 export const getDaysInCurrentMonth = () => {
-    var now = new Date();
+    const now = new Date();
     return new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
 };
 

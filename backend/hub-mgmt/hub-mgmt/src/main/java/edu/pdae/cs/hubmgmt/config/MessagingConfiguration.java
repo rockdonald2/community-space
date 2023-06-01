@@ -30,8 +30,8 @@ import java.util.Map;
 @EnableKafka
 public class MessagingConfiguration {
 
-    public static final String MEMBER_MUTATION_TOPIC = "cs.memo-mgmt.hub-member-mutation-topic";
-    public static final String HUB_MUTATION_TOPIC = "cs.memo-mgmt.hub-mutation-topic";
+    public static final String MEMBER_MUTATION_TOPIC = "cs.hub-mgmt.hub-member-mutation-topic";
+    public static final String HUB_MUTATION_TOPIC = "cs.hub-mgmt.hub-mutation-topic";
     public static final String ACTIVITY_TOPIC = "cs.activity-mgmt.activity-topic";
 
     private final KafkaProperties kafkaProperties;

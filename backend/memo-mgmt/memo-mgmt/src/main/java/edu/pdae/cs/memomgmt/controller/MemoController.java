@@ -1,9 +1,11 @@
 package edu.pdae.cs.memomgmt.controller;
 
+import edu.pdae.cs.common.model.Visibility;
+import edu.pdae.cs.common.model.dto.MemoMutationDTO;
 import edu.pdae.cs.common.util.PageWrapper;
+import edu.pdae.cs.memomgmt.config.MessagingConfiguration;
 import edu.pdae.cs.memomgmt.controller.exception.ConflictingOperationException;
 import edu.pdae.cs.memomgmt.controller.exception.ForbiddenOperationException;
-import edu.pdae.cs.memomgmt.model.Memo;
 import edu.pdae.cs.memomgmt.model.dto.*;
 import edu.pdae.cs.memomgmt.service.MemoService;
 import jakarta.validation.Valid;
@@ -14,6 +16,7 @@ import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.*;
@@ -27,13 +30,25 @@ public class MemoController {
     private static final int PAGE_SIZE = 10;
 
     private final MemoService memoService;
+    private final KafkaTemplate<String, MemoMutationDTO> memoMutationDTOKafkaTemplate;
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
     public MemoCreationResponseDTO create(@RequestBody MemoCreationDTO memoCreationDTO, @RequestHeader("X-AUTH-TOKEN-SUBJECT") String user) {
         log.info("Creating new memo from author {}", user);
         Objects.requireNonNull(user);
-        return memoService.create(memoCreationDTO, user);
+        final var createdDto = memoService.create(memoCreationDTO, user);
+
+        // send a message to Kafka about the creation
+        memoMutationDTOKafkaTemplate.send(MessagingConfiguration.MEMO_MUTATION_TOPIC, MemoMutationDTO.builder()
+                .hubId(createdDto.getHubId())
+                .memoId(createdDto.getId())
+                .title(createdDto.getTitle())
+                .owner(user)
+                .state(MemoMutationDTO.State.CREATED)
+                .build());
+
+        return createdDto;
     }
 
     @GetMapping("/{id}")
@@ -44,7 +59,7 @@ public class MemoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<MemoDTO>> gets(@RequestParam("createdAfter") @DateTimeFormat(pattern = "yyyy-MM-dd") Optional<Date> createdAfter, @RequestParam("visibility") Optional<Memo.Visibility> visibility, @RequestParam("hubId") Optional<ObjectId> hubId, @RequestParam("page") Optional<Integer> page, @RequestHeader("X-AUTH-TOKEN-SUBJECT") String user) {
+    public ResponseEntity<List<MemoDTO>> gets(@RequestParam("createdAfter") @DateTimeFormat(pattern = "yyyy-MM-dd") Optional<Date> createdAfter, @RequestParam("visibility") Optional<Visibility> visibility, @RequestParam("hubId") Optional<ObjectId> hubId, @RequestParam("page") Optional<Integer> page, @RequestHeader("X-AUTH-TOKEN-SUBJECT") String user) {
         log.info("Getting all memos");
         Objects.requireNonNull(user);
 
@@ -89,7 +104,15 @@ public class MemoController {
     @ResponseStatus(HttpStatus.NO_CONTENT)
     public ResponseEntity<Void> delete(@PathVariable("id") ObjectId id, @RequestHeader("X-AUTH-TOKEN-SUBJECT") String user) {
         log.info("Deleting memo {}", id);
+
         memoService.delete(id, user);
+
+        // send a message to Kafka about the deletion
+        memoMutationDTOKafkaTemplate.send(MessagingConfiguration.MEMO_MUTATION_TOPIC, MemoMutationDTO.builder()
+                .memoId(id.toHexString())
+                .state(MemoMutationDTO.State.DELETED)
+                .build());
+
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

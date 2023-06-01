@@ -9,7 +9,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.data.annotation.Id;
+import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
+import edu.pdae.cs.common.model.Visibility;
 
 import java.util.Date;
 import java.util.List;
@@ -19,6 +21,7 @@ import java.util.List;
 @NoArgsConstructor
 @AllArgsConstructor
 @JsonIgnoreProperties(ignoreUnknown = true)
+@Document("memos")
 public class Memo {
 
     @Id
@@ -36,11 +39,6 @@ public class Memo {
 
     @JsonSerialize(using = ToStringSerializer.class)
     private ObjectId hubId;
-
-    public enum Visibility {
-        PUBLIC,
-        PRIVATE
-    }
 
     public enum Urgency {
         LOW,

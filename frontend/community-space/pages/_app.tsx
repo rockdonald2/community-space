@@ -1,7 +1,7 @@
 import '@/styles/globals.scss';
 import type { AppProps } from 'next/app';
 import Head from 'next/head';
-import { Experimental_CssVarsProvider as CssVarsProvider } from '@mui/material/styles';
+import { Experimental_CssVarsProvider as CssVarsProvider, StyledEngineProvider } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
 import Layout from '@/components/Layout';
 import AuthContextProvider from '@/utils/AuthContext';
@@ -9,7 +9,6 @@ import { RouteGuard } from '@/utils/RouteGuard';
 import CrossContextProvider from '@/utils/CrossContext';
 import { CookiesProvider } from 'react-cookie';
 import SnackbarProvider from '@/utils/SnackbarProvider';
-import { StyledEngineProvider } from '@mui/material/styles';
 
 export default function App({ Component, pageProps }: AppProps) {
     return (

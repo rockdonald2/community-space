@@ -3,6 +3,7 @@ package edu.pdae.cs.activitynotificationsmgmt.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import edu.pdae.cs.common.model.Visibility;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -18,7 +19,7 @@ import java.util.Date;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@Document(collection = "activity")
+@Document(collection = "activities")
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class Activity {
 
@@ -34,7 +35,7 @@ public class Activity {
     private String memoTitle;
     private Type type;
     private String user;
-
+    private Visibility visibility;
 
     public enum Type {
         MEMO_CREATED,

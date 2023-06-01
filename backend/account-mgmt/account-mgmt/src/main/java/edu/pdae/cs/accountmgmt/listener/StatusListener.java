@@ -9,12 +9,14 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.pdae.cs.accountmgmt.model.dto.UserDataDTO;
-import edu.pdae.cs.accountmgmt.model.dto.UserPresenceDTO;
 import edu.pdae.cs.accountmgmt.model.dto.UserPresenceNotificationDTO;
 import edu.pdae.cs.accountmgmt.service.JwtService;
 import edu.pdae.cs.accountmgmt.service.StatusService;
+import edu.pdae.cs.common.model.dto.UserPresenceDTO;
 import io.jsonwebtoken.JwtException;
 import jakarta.annotation.PostConstruct;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.scheduling.annotation.Scheduled;
@@ -135,19 +137,13 @@ public class StatusListener {
         return Optional.of(userDataDTO);
     }
 
-    enum Events {
+    @Getter
+    @AllArgsConstructor
+    public enum Events {
         NOTIFICATION("notification"),
         STATUS("status");
 
         private final String value;
-
-        Events(String value) {
-            this.value = value;
-        }
-
-        public String getValue() {
-            return value;
-        }
     }
 
 }

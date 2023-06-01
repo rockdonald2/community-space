@@ -27,8 +27,7 @@ public class CacheConfiguration {
                 .serializeValuesWith(RedisSerializationContext.SerializationPair.fromSerializer(new GenericJackson2JsonRedisSerializer(objectMapper)));
     }
 
-
-    private RedisCacheConfiguration redisCacheConfigurationForComplex(ObjectMapper objectMapper) {
+    private RedisCacheConfiguration redisCacheConfigurationForComplexValues(ObjectMapper objectMapper) {
         var om = objectMapper = objectMapper.copy();
         om = om.activateDefaultTyping(objectMapper.getPolymorphicTypeValidator(), ObjectMapper.DefaultTyping.NON_FINAL);
 
@@ -43,8 +42,12 @@ public class CacheConfiguration {
     @Bean
     public RedisCacheManagerBuilderCustomizer redisCacheManagerBuilderCustomizer(ObjectMapper objectMapper) {
         return builder -> builder
-                .withCacheConfiguration("activities", redisCacheConfigurationForComplex(objectMapper))
-                .withCacheConfiguration("activities-grouped", redisCacheConfigurationForLists(objectMapper));
+                .withCacheConfiguration("activities", redisCacheConfigurationForComplexValues(objectMapper))
+                .withCacheConfiguration("activities-grouped", redisCacheConfigurationForLists(objectMapper))
+                .withCacheConfiguration("hub", redisCacheConfigurationForComplexValues(objectMapper))
+                .withCacheConfiguration("member", redisCacheConfigurationForComplexValues(objectMapper))
+                .withCacheConfiguration("memo", redisCacheConfigurationForComplexValues(objectMapper))
+                .withCacheConfiguration("notifications", redisCacheConfigurationForLists(objectMapper));
     }
 
 }

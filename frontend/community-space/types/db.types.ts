@@ -77,4 +77,11 @@ export type Completion = {
     hubId: string;
     user: string;
     completed: boolean;
-}
+};
+
+export type Notification = {
+    id: string;
+    msg: string;
+    createdAt: Date;
+    isRead?: boolean;
+};

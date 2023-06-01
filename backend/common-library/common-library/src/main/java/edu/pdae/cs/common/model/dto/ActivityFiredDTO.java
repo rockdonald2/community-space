@@ -1,5 +1,6 @@
 package edu.pdae.cs.common.model.dto;
 
+import edu.pdae.cs.common.model.Visibility;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -20,6 +21,7 @@ public class ActivityFiredDTO {
     private String memoId;
     private Type type;
     private String user;
+    private Visibility visibility;
 
     public enum Type {
         MEMO_CREATED,

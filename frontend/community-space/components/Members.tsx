@@ -29,11 +29,9 @@ const Members = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBER
 
     const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
     const open = useMemo(() => Boolean(menuAnchorEl), [menuAnchorEl]);
-
     const handleClick = useCallback((event: React.MouseEvent<HTMLElement>) => {
         setMenuAnchorEl(event.currentTarget);
     }, []);
-
     const handleClose = useCallback(() => {
         setMenuAnchorEl(null);
     }, []);
@@ -131,7 +129,7 @@ const Members = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBER
                     transformOrigin={{ horizontal: 'right', vertical: 'top' }}
                     anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
                 >
-                    <Typography sx={{ padding: 1, textAlign: 'left', mb: 0.5 }} variant='body2' color='text.secondary'>
+                    <Typography sx={{ padding: 1, textAlign: 'left', mb: 0.5 }} variant='subtitle1' color='text.secondary'>
                         {menuAnchorEl?.dataset.user || <SkeletonLoader nrOfLayers={1} />}
                     </Typography>
                     <Divider sx={{ mb: 0.5 }} />

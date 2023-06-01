@@ -6,6 +6,7 @@ import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+import edu.pdae.cs.common.model.Visibility;
 
 @Data
 @Builder
@@ -16,7 +17,7 @@ public class MemoUpdateDTO {
     @Nullable
     private String content;
     @Nullable
-    private Memo.Visibility visibility;
+    private Visibility visibility;
     @Nullable
     private Memo.Urgency urgency;
     @Nullable
