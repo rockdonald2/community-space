@@ -2,9 +2,6 @@
 
 cd ../../backend || exit 1 # failed to change directory
 
-# login to registry
-docker login -u "$DOCKER_REGISTRY_USER" -p "$DOCKER_REGISTRY_PASSWORD"
-
 # Deploy account-mgmt
 echo
 echo "===> Deploying account-mgmt"
