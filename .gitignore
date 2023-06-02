@@ -6,3 +6,27 @@ devops/local/mongo
 *.tfplan
 *.tgz
 services/local/mongo
+
+# latex
+*.xdv
+*.aux
+*.log
+*.fdb_latexmk
+*.fls
+*.out
+*.nav
+*.run.xml
+*.snm
+*.sync*
+*.toc
+*.bbl
+*.bcf
+*.blg
+.DS_STORE
+raw/*
+.vscode
+*-blx.bib
+*.ilg
+*.ind
+*.idx
+*.vrb
