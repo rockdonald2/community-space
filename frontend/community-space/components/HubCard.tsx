@@ -82,7 +82,6 @@ const HubCard = ({ hub, mutateCallback }: { hub: HubType; mutateCallback: (hub: 
                 </Typography>
                 <Divider />
                 <Button
-                    size='small'
                     fullWidth
                     type='button'
                     variant='text'

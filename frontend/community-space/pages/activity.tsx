@@ -43,7 +43,7 @@ const Activity = () => {
                                 sx={{
                                     mb: 1,
                                     display: 'flex',
-                                    alignItems: 'center',
+                                    alignItems: { xs: 'flex-start', md: 'center' },
                                     justifyContent: 'space-between',
                                     flexDirection: {
                                         xs: 'column',
@@ -69,6 +69,7 @@ const Activity = () => {
                                 <Chip
                                     label={longDateShortTimeDateFormatter.format(new Date(activity.date))}
                                     variant='filled'
+                                    sx={{ mt: { xs: 1, md: 0 } }}
                                 />
                             </Item>
                         ))

@@ -286,7 +286,7 @@ const MemoEdit = ({
                     onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange(e, setMsg)}
                 />
                 {msg && (
-                    <ButtonGroup color={'inherit'} sx={{ mb: 1 }} size='small' aria-label='editor button group'>
+                    <ButtonGroup color={'inherit'} sx={{ mb: 1, display: 'flex', flexWrap: 'wrap' }} size='small' aria-label='editor button group'>
                         {editorButtons}
                     </ButtonGroup>
                 )}
@@ -300,8 +300,8 @@ const MemoEdit = ({
                 <div>
                     <FormControl
                         sx={{
-                            mr: { xs: 0, md: 1 },
-                            mb: { xs: 1, md: 0 },
+                            mr: { xs: 0, md: 1.25 },
+                            mb: { xs: 1.25, md: 0 },
                             minWidth: 120,
                             width: { xs: '100%', md: 'unset' },
                         }}
