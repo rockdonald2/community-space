@@ -1,5 +1,4 @@
-package edu.pdae.cs.accountmgmt.model.dto;
-
+package edu.pdae.cs.common.model.dto;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -10,16 +9,18 @@ import lombok.NoArgsConstructor;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class UserPresenceNotificationDTO {
+public class UserMutationDTO {
 
+    private String id;
     private String email;
-    private Status status;
     private String firstName;
     private String lastName;
 
-    public enum Status {
-        ONLINE,
-        OFFLINE
+    private State state;
+
+    public enum State {
+        ADDED,
+        REMOVED
     }
 
 }

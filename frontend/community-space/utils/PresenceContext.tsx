@@ -1,7 +1,7 @@
 import { IPresenceContext, UserPresence } from '@/types/types';
-import { useContext, createContext, useState, useMemo, useEffect, useCallback, useRef } from 'react';
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from 'react';
 import { useBeforeunload } from 'react-beforeunload';
-import { Socket, io } from 'socket.io-client';
+import { io, Socket } from 'socket.io-client';
 import { useAuthContext } from './AuthContext';
 import { GATEWAY_WS } from './Constants';
 
@@ -12,8 +12,8 @@ const Events = {
     CONNECT: 'connect',
     DISCONNECT: 'disconnect',
     STATUS: 'status',
-    NOTIFICATION: 'notification'
-}
+    NOTIFICATION: 'notification',
+};
 
 const PresenceContextProvider = ({ children }: { children: React.ReactNode }) => {
     const { user } = useAuthContext();
@@ -57,10 +57,15 @@ const PresenceContextProvider = ({ children }: { children: React.ReactNode }) =>
     const ping = useCallback(
         (status: 'ONLINE' | 'OFFLINE') => {
             if (isConnected) {
-                socket.current.emit(Events.NOTIFICATION, { email: user.email, status });
+                socket.current.emit(Events.NOTIFICATION, {
+                    email: user.email,
+                    status,
+                    firstName: user.firstName,
+                    lastName: user.lastName,
+                });
             }
         },
-        [isConnected, socket, user.email]
+        [isConnected, user.email, user.firstName, user.lastName]
     );
 
     const pingActive = useCallback(() => ping('ONLINE'), [ping]);

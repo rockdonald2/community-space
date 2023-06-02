@@ -64,7 +64,22 @@ public class StatusServiceImpl implements StatusService {
             }
         }
 
-        final var entries = opsForHashPresence.keys(STATUS_COLLECTION).stream().map(user -> UserPresenceDTO.builder().email(user).build()).collect(Collectors.toSet());
+        final var entries = opsForHashPresence.keys(STATUS_COLLECTION).stream()
+                .map(user -> {
+                    final var userEntry = opsForHashPresence.get(STATUS_COLLECTION, user);
+
+                    if (userEntry == null) {
+                        return null;
+                    }
+
+                    return UserPresenceDTO.builder()
+                            .email(userEntry.getEmail())
+                            .lastSeen(userEntry.getLastSeen())
+                            .lastName(userEntry.getLastName())
+                            .firstName(userEntry.getFirstName())
+                            .build();
+                })
+                .collect(Collectors.toSet());
 
         opsForValueLastModified.set(STATUS_ACTIVE_LAST_MODIFIED, currDate);
         return entries;
@@ -75,7 +90,6 @@ public class StatusServiceImpl implements StatusService {
     public void putActive(UserPresenceDTO userDTO) {
         log.info("Putting {} as active", userDTO.getEmail());
 
-        userDTO.setLastSeen(new Date());
         opsForHashPresence.put(STATUS_COLLECTION, userDTO.getEmail(), userDTO);
     }
 

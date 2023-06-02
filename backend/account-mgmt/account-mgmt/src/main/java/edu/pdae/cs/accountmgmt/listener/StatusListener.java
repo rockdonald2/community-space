@@ -59,7 +59,11 @@ public class StatusListener {
             client.joinRoom(userData.get().getEmail());
 
             log.info("Client[{}] - Approved connection - {}", client.getSessionId().toString(), userData.get().getEmail());
-            statusService.putActive(UserPresenceDTO.builder().email(userData.get().getEmail()).build());
+            statusService.putActive(UserPresenceDTO.builder()
+                    .email(userData.get().getEmail())
+                    .firstName(userData.get().getFirstName())
+                    .lastName(userData.get().getLastName())
+                    .build());
             broadcast();
         };
     }
@@ -98,7 +102,11 @@ public class StatusListener {
     }
 
     private void updateStatus(UserPresenceNotificationDTO presenceNotificationDTO) {
-        final var userPresenceDTO = UserPresenceDTO.builder().email(presenceNotificationDTO.getEmail()).build();
+        final var userPresenceDTO = UserPresenceDTO.builder()
+                .email(presenceNotificationDTO.getEmail())
+                .firstName(presenceNotificationDTO.getFirstName())
+                .lastName(presenceNotificationDTO.getLastName())
+                .build();
 
         switch (presenceNotificationDTO.getStatus()) { // NOSONAR
             case ONLINE -> statusService.putActive(userPresenceDTO);

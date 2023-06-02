@@ -1,4 +1,4 @@
-import { Alert, Avatar, Button, Divider, Stack, Typography } from '@mui/material';
+import { Alert, Avatar, Button, Chip, Divider, Stack, Typography } from '@mui/material';
 import Head from 'next/head';
 import { useState, useCallback, Dispatch, SetStateAction } from 'react';
 import { useRouter } from 'next/router';
@@ -136,7 +136,9 @@ function Register() {
                     Something went wrong — some fields are not filled or contain invalid data!
                 </Alert>
             )}
-            <Divider flexItem className={styles['form__divider']} />
+            <Divider flexItem className={styles['form__divider']}>
+                <Chip label='OR' />
+            </Divider>
             <Button href='/login' LinkComponent={Link} variant='text' className={styles['register__button']}>
                 Already have an account? Login!
             </Button>

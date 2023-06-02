@@ -1,14 +1,17 @@
 package edu.pdae.cs.accountmgmt.service.impl;
 
+import edu.pdae.cs.accountmgmt.config.MessagingConfiguration;
 import edu.pdae.cs.accountmgmt.model.Token;
 import edu.pdae.cs.accountmgmt.model.User;
 import edu.pdae.cs.accountmgmt.model.dto.*;
 import edu.pdae.cs.accountmgmt.repository.UserRepository;
 import edu.pdae.cs.accountmgmt.service.UserService;
+import edu.pdae.cs.common.model.dto.UserMutationDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.modelmapper.ModelMapper;
+import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -26,6 +29,7 @@ public class UserServiceImpl implements UserService {
     private final PasswordEncoder passwordEncoder;
     private final UserRepository userRepository;
     private final JwtServiceExtended jwtService;
+    private final KafkaTemplate<String, UserMutationDTO> userMutationDTOKafkaTemplate;
 
     @Override
     public UserCreationResponseDTO register(UserCreationDTO creationDTO) throws NoSuchElementException {
@@ -37,7 +41,7 @@ public class UserServiceImpl implements UserService {
         final Token jwtToken = Token.builder().data(jwtService.generateToken(Map.of("FirstName", creationDTO.getFirstName(), "LastName", creationDTO.getLastName()), reqUser.getEmail())).build();
         final User createdUser = userRepository.save(reqUser);
 
-        return UserCreationResponseDTO
+        final var resp = UserCreationResponseDTO
                 .builder()
                 .email(createdUser.getEmail())
                 .id(createdUser.getId().toString())
@@ -45,6 +49,16 @@ public class UserServiceImpl implements UserService {
                 .firstName(createdUser.getFirstname())
                 .token(jwtToken)
                 .build();
+
+        userMutationDTOKafkaTemplate.send(MessagingConfiguration.USERS_TOPIC, UserMutationDTO.builder()
+                .id(createdUser.getId().toHexString())
+                .email(createdUser.getEmail())
+                .firstName(createdUser.getFirstname())
+                .lastName(createdUser.getLastname())
+                .state(UserMutationDTO.State.ADDED)
+                .build());
+
+        return resp;
     }
 
     @Override
@@ -85,6 +99,11 @@ public class UserServiceImpl implements UserService {
     @Override
     public void deleteById(ObjectId id) {
         userRepository.deleteById(id);
+
+        userMutationDTOKafkaTemplate.send(MessagingConfiguration.USERS_TOPIC, UserMutationDTO.builder()
+                .id(id.toHexString())
+                .state(UserMutationDTO.State.REMOVED)
+                .build());
     }
 
 }

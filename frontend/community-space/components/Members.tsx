@@ -48,7 +48,7 @@ const Members = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBER
                     throw new Error('Failed to delete member', { cause: res });
                 }
 
-                mutate({ key: 'members', token: user.token, hubId: hubId });
+                await mutate({ key: 'members', token: user.token, hubId: hubId });
             } catch (err) {
                 console.debug('Failed to delete member', err);
                 if (err instanceof Error) {
@@ -112,8 +112,8 @@ const Members = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBER
                             mt: 1.5,
                         },
                     }}
-                    transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-                    anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                    transformOrigin={{ horizontal: 'center', vertical: 'top' }}
+                    anchorOrigin={{ horizontal: 'center', vertical: 'bottom' }}
                 >
                     <Typography
                         sx={{ padding: 1, textAlign: 'left', mb: 0.5 }}
@@ -125,9 +125,9 @@ const Members = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBER
                     <Divider sx={{ mb: 0.5 }} />
                     {menuAnchorEl?.dataset.user && menuAnchorEl?.dataset.user !== user.email && hubRole === 'OWNER' ? (
                         <MenuItem
-                            onClick={() => {
+                            onClick={async () => {
                                 handleClose();
-                                handleRemoveMember({ email: menuAnchorEl?.dataset.user });
+                                await handleRemoveMember({ email: menuAnchorEl?.dataset.user });
                             }}
                         >
                             <ListItemIcon>

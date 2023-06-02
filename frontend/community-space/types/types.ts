@@ -1,4 +1,4 @@
-import { User, Notification } from './db.types';
+import {Notification, User} from './db.types';
 
 export type UserSignUp = {
     email: string;
@@ -52,6 +52,8 @@ export type UserPresence = {
     email: string;
     lastSeen?: Date;
     status?: 'ONLINE' | 'OFFLINE';
+    firstName?: string;
+    lastName?: string;
 };
 
 export interface IPresenceContext {

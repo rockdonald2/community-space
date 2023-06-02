@@ -65,8 +65,8 @@ const Pendings = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBE
                     });
                 }
 
-                mutate({ key: 'pendings', token: user.token, hubId: hubId });
-                mutate({ key: 'members', token: user.token, hubId: hubId });
+                await mutate({ key: 'pendings', token: user.token, hubId: hubId });
+                await mutate({ key: 'members', token: user.token, hubId: hubId });
             } catch (err) {
                 console.debug('Failed to delete user from waiters list or add user to members list', err);
                 if (err instanceof Error) {
@@ -103,7 +103,7 @@ const Pendings = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBE
                     });
                 }
 
-                mutate({ key: 'pendings', token: user.token, hubId: hubId });
+                await mutate({ key: 'pendings', token: user.token, hubId: hubId });
             } catch (err) {
                 console.debug('Failed to delete user from waiters list', err);
                 if (err instanceof Error) {
@@ -174,8 +174,8 @@ const Pendings = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBE
                         mt: 1.5,
                     },
                 }}
-                transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-                anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                transformOrigin={{ horizontal: 'center', vertical: 'top' }}
+                anchorOrigin={{ horizontal: 'center', vertical: 'bottom' }}
             >
                 <Typography sx={{ padding: 1, textAlign: 'left', mb: 0.5 }} variant='subtitle1' color='text.secondary'>
                     {menuAnchorEl?.dataset.user || <SkeletonLoader nrOfLayers={1} />}

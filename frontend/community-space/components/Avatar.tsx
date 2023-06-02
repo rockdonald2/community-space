@@ -1,5 +1,5 @@
 import { UserShort } from '@/types/db.types';
-import { Badge, Avatar as MaterialAvatar, Tooltip, styled } from '@mui/material';
+import { Avatar as MaterialAvatar, Badge, styled, Tooltip } from '@mui/material';
 import { useState } from 'react';
 
 const StyledBadge = styled(Badge)(({ theme }) => ({
@@ -50,6 +50,7 @@ const Avatar = ({
     cursor = 'default',
     onClick = null,
     hoverText = null,
+    innerBody = null,
 }: {
     user: UserShort;
     isOnline?: boolean;
@@ -58,6 +59,7 @@ const Avatar = ({
     cursor?: 'pointer' | 'default';
     hoverText?: string | JSX.Element;
     onClick?: () => void;
+    innerBody?: JSX.Element;
 }) => {
     const [innerText, setInnerText] = useState<string | JSX.Element>(user.email?.substring(0, 2).toUpperCase());
     const [bgColor, setBgColor] = useState<string>(generateRandomColor ? stringToColor(user.email) : defaultColor);
@@ -85,7 +87,7 @@ const Avatar = ({
                 setBgColor(generateRandomColor ? stringToColor(user.email) : defaultColor);
             }}
         >
-            <Tooltip arrow title={user.email} enterTouchDelay={0}>
+            <Tooltip arrow title={innerBody ? innerBody : user.email} enterTouchDelay={0}>
                 <MaterialAvatar sx={{ bgcolor: bgColor, transition: '0.15s ease-in-out all' }} style={style}>
                     {innerText}
                 </MaterialAvatar>

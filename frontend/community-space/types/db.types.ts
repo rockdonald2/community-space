@@ -7,6 +7,8 @@ export type User = {
 
 export type UserShort = {
     email: string;
+    firstName?: string;
+    lastName?: string;
 };
 
 export type Visibility = 'PUBLIC' | 'PRIVATE' | '';

@@ -30,3 +30,5 @@ raw/*
 *.ind
 *.idx
 *.vrb
+auxil/
+out/

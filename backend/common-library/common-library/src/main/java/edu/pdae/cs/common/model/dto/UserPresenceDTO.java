@@ -16,5 +16,7 @@ public class UserPresenceDTO implements Serializable { // for some reason rediss
 
     private String email;
     private Date lastSeen;
+    private String firstName;
+    private String lastName;
 
 }

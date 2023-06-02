@@ -1,5 +1,5 @@
 /* eslint-disable react/no-unescaped-entities */
-import { Alert, AlertTitle, Avatar, Button, Divider, Stack, Typography } from '@mui/material';
+import { Alert, AlertTitle, Avatar, Button, Chip, Divider, Stack, Typography } from '@mui/material';
 import Head from 'next/head';
 import { useState, useCallback } from 'react';
 import Link from 'next/link';
@@ -84,7 +84,9 @@ function Login() {
                     </Button>
                 </Stack>
             </form>
-            <Divider flexItem className={styles['form__divider']} />
+            <Divider flexItem className={styles['form__divider']}>
+                <Chip label='OR' />
+            </Divider>
             <Button href='/register' LinkComponent={Link} variant='text' className={styles['login__button']}>
                 You don't have an account yet? Register now!
             </Button>

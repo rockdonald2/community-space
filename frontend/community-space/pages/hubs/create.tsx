@@ -1,4 +1,4 @@
-import { Alert, AlertTitle, Avatar, Button, Divider, Stack, Typography } from '@mui/material';
+import { Alert, AlertTitle, Avatar, Button, Chip, Divider, Stack, Typography } from '@mui/material';
 import TextField from '@/components/TextField';
 import Head from 'next/head';
 import styles from '@/styles/CreateHub.module.scss';
@@ -121,7 +121,9 @@ function CreateHub() {
                         </Button>
                     </Stack>
                 </form>
-                <Divider flexItem className={styles['form__divider']} />
+                <Divider flexItem className={styles['form__divider']}>
+                    <Chip label='OR' />
+                </Divider>
                 <Button href='/' LinkComponent={Link} variant='text' className={styles['create__button']}>
                     See the list of existing Hubs
                 </Button>

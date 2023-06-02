@@ -1,9 +1,11 @@
 import { usePresenceContext } from '@/utils/PresenceContext';
-import { Container, Skeleton, Stack, Tooltip, Typography } from '@mui/material';
+import { Box, Container, Skeleton, Stack, Tooltip, Typography } from '@mui/material';
 import Avatar from './Avatar';
 import { useAuthContext } from '@/utils/AuthContext';
 import CircularLoading from './CircularLoading';
 import styles from '@/styles/Presence.module.scss';
+import { green } from '@mui/material/colors';
+import { shortTimeWithNoDateFormatter } from '@/utils/Utility';
 
 const Presence = () => {
     const { presence } = usePresenceContext();
@@ -22,7 +24,35 @@ const Presence = () => {
                             .map((present, idx) => {
                                 return (
                                     <div key={idx} className={styles['avatar-wrapper']}>
-                                        <Avatar user={present} isOnline generateRandomColor />
+                                        <Avatar
+                                            user={present}
+                                            isOnline
+                                            generateRandomColor
+                                            innerBody={
+                                                <>
+                                                    <Typography fontSize={12}>{user.email}</Typography>
+                                                    <Typography
+                                                        fontSize={11}
+                                                        sx={{ color: 'text.secondary', mb: 0.5 }}
+                                                    >{`${present.firstName} ${present.lastName}`}</Typography>
+                                                    <Stack direction={'row'} alignItems={'center'}>
+                                                        <Box
+                                                            sx={{
+                                                                borderRadius: '50%',
+                                                                width: 12,
+                                                                height: 12,
+                                                                bgcolor: green[400],
+                                                                mr: 1,
+                                                            }}
+                                                        />
+                                                        Last seen at {' '}
+                                                        {shortTimeWithNoDateFormatter.format(
+                                                            new Date(present.lastSeen)
+                                                        )}
+                                                    </Stack>
+                                                </>
+                                            }
+                                        />
                                     </div>
                                 );
                             })

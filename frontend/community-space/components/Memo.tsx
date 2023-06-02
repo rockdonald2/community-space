@@ -122,7 +122,7 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                 }
 
                 setMemoOpen(false);
-                mutate((key) => key['key'] === 'memos' && key['hubId'] === memo.hubId);
+                await mutate((key) => key['key'] === 'memos' && key['hubId'] === memo.hubId);
             } catch (err) {
                 console.debug(err.message, err);
                 setUserInputError(true);
@@ -165,7 +165,7 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                     });
                 }
 
-                mutate((key) => key['key'] === 'memos' && key['hubId'] === memo.hubId);
+                await mutate((key) => key['key'] === 'memos' && key['hubId'] === memo.hubId);
             } catch (err) {
                 console.debug(err.message, err);
                 if (err instanceof Error) {
@@ -223,7 +223,7 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                             justifyContent: 'flex-end',
                         }}
                     >
-                        <Tooltip title='See more' enterTouchDelay={0}>
+                        <Tooltip title='See more' enterTouchDelay={0} arrow>
                             <IconButton onClick={handleCloseTrigger}>
                                 <ArrowOutwardIcon />
                             </IconButton>
@@ -285,7 +285,7 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                     )}
                 </DialogContent>
                 {user.email === memo.author && (
-                    <DialogContent sx={{ maxWidth: '85%' }}>
+                    <DialogContent sx={{ maxWidth: '90%' }}>
                         {completionsError ? (
                             <Alert severity='error'>
                                 <AlertTitle>Oops!</AlertTitle>

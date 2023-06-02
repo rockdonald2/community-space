@@ -404,6 +404,11 @@ export const longDateShortTimeDateFormatter = new Intl.DateTimeFormat('en-gb', {
     timeStyle: 'short',
 });
 
+export const shortTimeWithNoDateFormatter = new Intl.DateTimeFormat('en-gb', {
+    formatMatcher: 'best fit',
+    timeStyle: 'short',
+});
+
 /**
  * Checks if a returned payload is of type ErrorResponse
  * @param data
