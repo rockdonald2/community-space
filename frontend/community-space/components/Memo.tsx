@@ -189,7 +189,7 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
         <>
             <Item>
                 <Grid container alignItems={'center'} justifyContent={'center'}>
-                    <Grid item xs={11}>
+                    <Grid item md={11} xs={12}>
                         <Typography
                             variant='h6'
                             sx={{ mb: 1, mr: 1 }}
@@ -200,19 +200,25 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                             {memo.title}
                             <Chip sx={{ ml: 2 }} label={memo.visibility.toLowerCase()} />
                         </Typography>
-                        <Stack direction={'row'} alignItems={'center'}>
+                        <Stack direction={{ md: 'row', xs: 'column' }} alignItems={{ xs: 'flex-start', md: 'center' }}>
                             <Typography sx={{ fontSize: 14, mb: 0 }} color='text.secondary' gutterBottom>
                                 Posted by&nbsp;<strong>{memo.author}</strong>&nbsp;on{' '}
                                 {longDateShortTimeDateFormatter.format(new Date(memo.createdOn))}
                             </Typography>
-                            <Divider variant='middle' orientation='vertical' flexItem style={{ margin: '0 .5rem' }} />
+                            <Divider variant='middle' orientation='vertical' flexItem sx={{ mx: 1, my: 0 }} />
                             <Typography sx={{ fontSize: 14, mb: 0 }} color='text.secondary' gutterBottom>
                                 Urgency:&nbsp;
                                 <strong style={{ color: 'var(--mui-palette-primary-light)' }}>{memo.urgency}</strong>
                             </Typography>
                         </Stack>
                     </Grid>
-                    <Grid item xs={1} justifySelf={'flex-end'}>
+                    <Grid
+                        item
+                        md={1}
+                        xs={12}
+                        justifySelf={{ md: 'flex-end', xs: 'flex-start' }}
+                        sx={{ mt: { xs: 2, md: 0 }, display: { xs: 'flex', md: 'none' }, justifyContent: 'flex-end' }}
+                    >
                         <Tooltip title='See more'>
                             <IconButton onClick={handleCloseTrigger}>
                                 <ArrowOutwardIcon />

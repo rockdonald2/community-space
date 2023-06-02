@@ -12,12 +12,22 @@ export default function Home() {
             </Head>
             <main>
                 <Grid container>
-                    <Grid item xs={4}>
+                    <Grid
+                        item
+                        md={4}
+                        xs={12}
+                        sx={{
+                            mb: {
+                                xs: 2,
+                                md: 0
+                            },
+                        }}
+                    >
                         <Presence />
                         <Divider sx={{ mt: 2, mr: 2, mb: 2 }} />
                         <Activity />
                     </Grid>
-                    <Grid item xs={8}>
+                    <Grid item md={8} xs={12}>
                         <Hubs />
                     </Grid>
                 </Grid>

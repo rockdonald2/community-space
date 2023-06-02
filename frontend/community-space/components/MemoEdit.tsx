@@ -292,9 +292,21 @@ const MemoEdit = ({
                 )}
             </div>
             <Divider sx={{ mb: 2 }} />
-            <Stack direction={'row'} justifyContent={'space-between'} alignItems={'center'}>
+            <Stack
+                direction={{ md: 'row', xs: 'column' }}
+                justifyContent={{ md: 'space-between', xs: 'center' }}
+                alignItems={{ md: 'center', xs: 'stretch' }}
+            >
                 <div>
-                    <FormControl sx={{ mr: 1, minWidth: 120 }} size='small'>
+                    <FormControl
+                        sx={{
+                            mr: { xs: 0, md: 1 },
+                            mb: { xs: 1, md: 0 },
+                            minWidth: 120,
+                            width: { xs: '100%', md: 'unset' },
+                        }}
+                        size='small'
+                    >
                         <InputLabel>Urgency</InputLabel>
                         <Select
                             sx={{ fontSize: 'medium' }}
@@ -309,7 +321,15 @@ const MemoEdit = ({
                             <MenuItem value={'URGENT'}>Urgent</MenuItem>
                         </Select>
                     </FormControl>
-                    <FormControl sx={{ mr: 1, minWidth: 120 }} size='small'>
+                    <FormControl
+                        sx={{
+                            mr: { xs: 0, md: 1 },
+                            mb: { xs: 1, md: 0 },
+                            minWidth: 120,
+                            width: { xs: '100%', md: 'unset' },
+                        }}
+                        size='small'
+                    >
                         <InputLabel>Visibility</InputLabel>
                         <Select
                             sx={{ fontSize: 'medium' }}
@@ -330,6 +350,7 @@ const MemoEdit = ({
                         aria-label='send memo'
                         type='button'
                         onClick={handleSubmit}
+                        sx={{ mt: { xs: 2, md: 0 } }}
                     >
                         {isUpdateMode ? 'Edit' : 'Send'}
                     </Button>

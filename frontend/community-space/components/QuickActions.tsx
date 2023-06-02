@@ -56,10 +56,9 @@ const QuickActions = () => {
     );
 
     return (
-        <Box sx={{ transform: 'translateZ(0px)', flexGrow: 1 }}>
+        <Box sx={{ flexGrow: 1, position: 'fixed', bottom: '5%', right: '15%' }}>
             <SpeedDial
                 ariaLabel='Quick actions dial'
-                sx={{ position: 'absolute', bottom: 0, right: '-10%' }}
                 icon={<SpeedDialIcon icon={<MenuIcon />} openIcon={<CloseIcon />} />}
                 onClose={handleClose}
                 onOpen={handleOpen}

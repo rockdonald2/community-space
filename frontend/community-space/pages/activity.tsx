@@ -40,7 +40,16 @@ const Activity = () => {
                     {activities?.content
                         ?.map((activity, idx) => (
                             <Item
-                                sx={{ mb: 1, display: 'flex', alignItems: 'center', justifyContent: 'space-between' }}
+                                sx={{
+                                    mb: 1,
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'space-between',
+                                    flexDirection: {
+                                        xs: 'column',
+                                        md: 'row',
+                                    },
+                                }}
                                 key={idx}
                             >
                                 <Typography>

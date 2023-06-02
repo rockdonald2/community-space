@@ -33,7 +33,7 @@ const Hubs = () => {
                 <Grid container spacing={2}>
                     {hubs.length > 0 ? (
                         hubs.map((hub: Hub) => (
-                            <Grid item key={hub.id} xs={12} sm={8} md={6}>
+                            <Grid item key={hub.id} xs={12} md={6}>
                                 <HubCard hub={hub} mutateCallback={mutateCallback} />
                             </Grid>
                         ))

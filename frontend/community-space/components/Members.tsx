@@ -112,24 +112,16 @@ const Members = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBER
                             overflow: 'visible',
                             filter: 'drop-shadow(0px 2px 6px rgba(0,0,0,0.18))',
                             mt: 1.5,
-                            '&:before': {
-                                content: '""',
-                                display: 'block',
-                                position: 'absolute',
-                                top: 0,
-                                right: 20,
-                                width: 12,
-                                height: 12,
-                                bgcolor: 'background.paper',
-                                transform: 'translateY(-45%) rotate(45deg)',
-                                zIndex: 0,
-                            },
                         },
                     }}
                     transformOrigin={{ horizontal: 'right', vertical: 'top' }}
                     anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
                 >
-                    <Typography sx={{ padding: 1, textAlign: 'left', mb: 0.5 }} variant='subtitle1' color='text.secondary'>
+                    <Typography
+                        sx={{ padding: 1, textAlign: 'left', mb: 0.5 }}
+                        variant='subtitle1'
+                        color='text.secondary'
+                    >
                         {menuAnchorEl?.dataset.user || <SkeletonLoader nrOfLayers={1} />}
                     </Typography>
                     <Divider sx={{ mb: 0.5 }} />

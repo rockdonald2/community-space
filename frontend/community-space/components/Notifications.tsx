@@ -69,7 +69,6 @@ const Notifications = () => {
             <Tooltip title='Notifications'>
                 <IconButton
                     size='small'
-                    sx={{ ml: 2 }}
                     aria-controls={open ? 'notifications-menu' : undefined}
                     aria-haspopup='true'
                     aria-expanded={open ? 'true' : undefined}
@@ -90,18 +89,6 @@ const Notifications = () => {
                         overflow: 'visible',
                         filter: 'drop-shadow(0px 2px 6px rgba(0,0,0,0.18))',
                         mt: 1.5,
-                        '&:before': {
-                            content: '""',
-                            display: 'block',
-                            position: 'absolute',
-                            top: 0,
-                            right: 12,
-                            width: 12,
-                            height: 12,
-                            bgcolor: 'background.paper',
-                            transform: 'translateY(-45%) rotate(45deg)',
-                            zIndex: 0,
-                        },
                     },
                 }}
                 transformOrigin={{ horizontal: 'right', vertical: 'top' }}
@@ -119,7 +106,18 @@ const Notifications = () => {
                     notifications
                         ?.filter((notification) => notification.isRead !== true)
                         .map((notification, idx) => (
-                            <Grid container key={idx} sx={{ maxWidth: '60vw' }} direction='row' alignItems='center'>
+                            <Grid
+                                container
+                                key={idx}
+                                sx={{
+                                    maxWidth: {
+                                        xs: '90vw',
+                                        md: '60vw',
+                                    },
+                                }}
+                                direction='row'
+                                alignItems='center'
+                            >
                                 <Grid item xs={10}>
                                     <Stack>
                                         <Typography

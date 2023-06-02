@@ -33,7 +33,7 @@ const Explore = () => {
             </Head>
             <Breadcrumbs prevRoutes={[{ name: hub?.name, href: `/hubs/${hub?.id}` }]} currRoute={{ name: 'Explore' }} />
             <Grid container spacing={2}>
-                <Grid item xs={4}>
+                <Grid item md={4} xs={12}>
                     <Container>
                         <Members hubId={hub?.id} hubRole={hub?.role} />
                         <Divider sx={{ mt: 2, mb: 2 }} />
@@ -54,7 +54,7 @@ const Explore = () => {
                         </Container>
                     </Container>
                 </Grid>
-                <Grid item xs={8}>
+                <Grid item md={8} xs={12}>
                     {!hubIsLoading && !hubIsValidating && !hubError ? (
                         <>
                             <Container sx={{ marginBottom: '1rem' }}>

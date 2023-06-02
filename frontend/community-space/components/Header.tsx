@@ -8,16 +8,44 @@ const Header = () => {
 
     return (
         <>
-            <Stack direction={'row'} alignItems={'center'} justifyContent={'flex-start'} mb={'1rem'}>
+            <Stack
+                direction={{ md: 'row', xs: 'column' }}
+                alignItems={'center'}
+                justifyContent={'flex-start'}
+                mb={'1rem'}
+            >
                 <Typography variant='h4' component='h1'>
                     Community Space
                 </Typography>
-                <Divider variant='middle' orientation='vertical' flexItem style={{ margin: '0 1rem' }} />
-                <Avatar user={user} style={{ marginRight: '1rem' }} />
-                <Typography color='text.secondary'>
+                <Divider variant='middle' orientation='vertical' flexItem sx={{ ml: 2, mr: 2 }} />
+                <Avatar user={user} />
+                <Typography
+                    color='text.secondary'
+                    sx={{
+                        mt: {
+                            xs: 1,
+                            md: 0,
+                        },
+                        ml: {
+                            xs: 0,
+                            md: 2
+                        }
+                    }}
+                >
                     logged in as <strong>{`${user.firstName} ${user.lastName}`}</strong> ({user.email})
                 </Typography>
-                <Box sx={{ ml: 'auto' }}>
+                <Box
+                    sx={{
+                        ml: {
+                            xs: 'unset',
+                            md: 'auto',
+                        },
+                        mt: {
+                            xs: 1,
+                            md: 0,
+                        },
+                    }}
+                >
                     <Notifications />
                 </Box>
             </Stack>

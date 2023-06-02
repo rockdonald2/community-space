@@ -174,18 +174,6 @@ const Pendings = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBE
                         overflow: 'visible',
                         filter: 'drop-shadow(0px 2px 6px rgba(0,0,0,0.18))',
                         mt: 1.5,
-                        '&:before': {
-                            content: '""',
-                            display: 'block',
-                            position: 'absolute',
-                            top: 0,
-                            right: 20,
-                            width: 12,
-                            height: 12,
-                            bgcolor: 'background.paper',
-                            transform: 'translateY(-45%) rotate(45deg)',
-                            zIndex: 0,
-                        },
                     },
                 }}
                 transformOrigin={{ horizontal: 'right', vertical: 'top' }}
