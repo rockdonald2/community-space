@@ -33,7 +33,7 @@ public class NotificationController {
         final var generalNotifications = notificationService.getNotifications(Notification.GroupTargets.GENERAL.getValue(), user, from, to);
 
         usersNotifications.addAll(generalNotifications);
-        usersNotifications.sort((o1, o2) -> o2.getCreatedAt().compareTo(o1.getCreatedAt()));
+//        usersNotifications.sort((o1, o2) -> o2.getCreatedAt().compareTo(o1.getCreatedAt()));
         return usersNotifications;
     }
 

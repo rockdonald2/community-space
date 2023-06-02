@@ -84,7 +84,7 @@ const AuthContextProvider = ({ children }) => {
                     setIsAuthenticated(true);
                     enqueueSnackbar('Welcome back', { variant: 'success' });
                 } else {
-                    enqueueSnackbar('Session has expired, please sign in', { variant: 'error' });
+                    enqueueSnackbar('Session has expired, please sign in', { variant: 'warning' });
                     signOut();
                 }
             } catch (err) {
