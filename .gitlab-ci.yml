@@ -25,7 +25,7 @@ build:
         - backend/**/Dockerfile
         - frontend/**/*.{js,jsx,ts,tsx}
         - frontend/**/Dockerfile
-    - if: '$CI_COMMIT_REF_NAME == "main"'
+      if: '$CI_COMMIT_REF_NAME == "main"'
 
 deploy:
   stage: deploy
@@ -43,7 +43,7 @@ deploy:
         - backend/**/Dockerfile
         - frontend/**/*.{js,jsx,ts,tsx}
         - frontend/**/Dockerfile
-    - if: '$CI_COMMIT_REF_NAME == "main"'
+      if: '$CI_COMMIT_REF_NAME == "main"'
 
 after_script:
   - echo "End CI"
