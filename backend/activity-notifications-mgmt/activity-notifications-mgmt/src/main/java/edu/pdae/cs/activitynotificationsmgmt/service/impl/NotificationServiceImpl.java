@@ -16,7 +16,6 @@ import lombok.extern.slf4j.Slf4j;
 import org.bson.types.ObjectId;
 import org.modelmapper.ModelMapper;
 import org.springframework.cache.annotation.CacheEvict;
-import org.springframework.cache.annotation.Cacheable;
 import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
@@ -115,7 +114,7 @@ public class NotificationServiceImpl implements NotificationService {
     }
 
     @Override
-    @Cacheable("notifications")
+//    @Cacheable("notifications")
     public List<NotificationDTO> getNotifications(String target, String asUser, Date from, Date to) {
         return notificationRepository.findAllByOwnerAndReadsNotContainsAndCreatedAtBetweenOrderByCreatedAtDesc(target, asUser, from, to, Pageable.ofSize(HARD_RETURN_LIMIT)).getContent()
                 .stream()

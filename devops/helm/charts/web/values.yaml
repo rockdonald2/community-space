@@ -1,5 +1,5 @@
 image:
-  name: registry.digitalocean.com/cs-dev-registry/community-space
+  name: registry.gitlab.com/rockdonald2/community-space
   tag: web-latest
   pullSecrets: repository-credentials
   pullPolicy: Always
