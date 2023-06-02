@@ -2,6 +2,7 @@ image: gitlab/gitlab-runner:latest
 
 stages:
   - build
+  - deploy
 
 before_script:
   - echo "Start CI"
@@ -18,6 +19,15 @@ build:
     paths:
       - backend/**/build/libs/*.jar
     expire_in: 3 days
+  only:
+    - main
+
+deploy:
+  stage: deploy
+  script:
+    - chmod +x devops/ci/deploy.sh
+    - cd devops/ci
+    - bash deploy.sh
   only:
     - main
 

@@ -3,7 +3,7 @@
 cd ../../backend || exit 1 # failed to change directory
 
 # login to registry
-# docker login registry.gitlab.com
+docker login -u "$DOCKER_REGISTRY_USER" -p "$DOCKER_REGISTRY_PASSWORD"
 
 # Deploy account-mgmt
 echo
