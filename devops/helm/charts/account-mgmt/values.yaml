@@ -1,7 +1,7 @@
 image:
   name: registry.digitalocean.com/cs-dev-registry/community-space
   tag: account-mgmt-latest
-  pullSecrets: do-repository-credentials
+  pullSecrets: repository-credentials
   pullPolicy: Always
 
 service:
