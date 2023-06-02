@@ -33,13 +33,12 @@ public class NotificationController {
         final var generalNotifications = notificationService.getNotifications(Notification.GroupTargets.GENERAL.getValue(), user, from, to);
 
         usersNotifications.addAll(generalNotifications);
-//        usersNotifications.sort((o1, o2) -> o2.getCreatedAt().compareTo(o1.getCreatedAt()));
         return usersNotifications;
     }
 
     @PatchMapping("/{id}")
     public void read(@PathVariable String id, @RequestHeader("X-AUTH-TOKEN-SUBJECT") String user) {
-        log.info("Marking notification {} as read", id);
+        log.info("Marking notification {} as read as user {}", id, user);
         notificationService.readNotification(new ObjectId(id), user);
     }
 

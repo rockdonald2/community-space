@@ -31,9 +31,7 @@ const Pendings = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBE
         error: hubPendingsError,
         isLoading: hubPendingsIsLoading,
         isValidating: hubPendingsIsValidating,
-    } = useSWR<UserShort[]>({ key: 'pendings', token: user.token, hubId: hubId }, swrWaitersFetcherWithAuth, {
-        revalidateOnFocus: false,
-    });
+    } = useSWR<UserShort[]>({ key: 'pendings', token: user.token, hubId: hubId }, swrWaitersFetcherWithAuth);
 
     const handleJoinHub = useCallback(
         async ({ pendingMember }: { pendingMember: UserShort }) => {

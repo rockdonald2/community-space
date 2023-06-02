@@ -450,3 +450,23 @@ export const calculateRelativeTimeFromNow = (date: Date) => {
 
     return formatter.format(-1 * Math.floor(diff / (1000 * 60)), 'minute');
 };
+
+export const getCurrentMonthName = () => {
+    const monthNames = [
+        'January',
+        'February',
+        'March',
+        'April',
+        'May',
+        'June',
+        'July',
+        'August',
+        'September',
+        'October',
+        'November',
+        'December',
+    ];
+
+    const d = new Date();
+    return monthNames[d.getMonth()];
+};

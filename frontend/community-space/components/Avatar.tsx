@@ -85,7 +85,7 @@ const Avatar = ({
                 setBgColor(generateRandomColor ? stringToColor(user.email) : defaultColor);
             }}
         >
-            <Tooltip arrow title={user.email}>
+            <Tooltip arrow title={user.email} enterTouchDelay={0}>
                 <MaterialAvatar sx={{ bgcolor: bgColor, transition: '0.15s ease-in-out all' }} style={style}>
                     {innerText}
                 </MaterialAvatar>

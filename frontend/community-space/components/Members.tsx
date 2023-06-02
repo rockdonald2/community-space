@@ -23,9 +23,7 @@ const Members = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBER
         error: hubMembersError,
         isLoading: hubMembersIsLoading,
         isValidating: hubMembersIsValidating,
-    } = useSWR<UserShort[]>({ key: 'members', token: user.token, hubId: hubId }, swrMembersFetcherWithAuth, {
-        revalidateOnFocus: false,
-    });
+    } = useSWR<UserShort[]>({ key: 'members', token: user.token, hubId: hubId }, swrMembersFetcherWithAuth);
 
     const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
     const open = useMemo(() => Boolean(menuAnchorEl), [menuAnchorEl]);

@@ -1,4 +1,9 @@
-import { getCurrentDay, getDaysInCurrentMonth, swrActivitiesGroupedFetcherWithAuth } from '@/utils/Utility';
+import {
+    getCurrentDay,
+    getCurrentMonthName,
+    getDaysInCurrentMonth,
+    swrActivitiesGroupedFetcherWithAuth,
+} from '@/utils/Utility';
 import { Box, Container, Tooltip, Typography } from '@mui/material';
 import styles from '@/styles/Activity.module.scss';
 import { useAuthContext } from '@/utils/AuthContext';
@@ -9,6 +14,7 @@ import { useEffect, useState } from 'react';
 
 const currDaysInMonth = getDaysInCurrentMonth();
 const currDay = getCurrentDay();
+const currMonthName = getCurrentMonthName();
 
 const Activity = () => {
     const { user } = useAuthContext();
@@ -49,9 +55,10 @@ const Activity = () => {
                             <Tooltip
                                 key={idx}
                                 arrow
-                                title={`${idx + 1} (${
+                                title={`${currMonthName} ${idx + 1} (${
                                     activities.has(idx + 1) ? activities.get(idx + 1) : 0
                                 } activities)`}
+                                enterTouchDelay={0}
                             >
                                 <Box
                                     className={`${styles.block} ${idx + 1 === currDay && styles['block--today']}`}

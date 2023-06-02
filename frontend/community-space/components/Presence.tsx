@@ -27,7 +27,7 @@ const Presence = () => {
                                 );
                             })
                     ) : (
-                        <Tooltip title={'Looks like none is here'} arrow>
+                        <Tooltip title={'Looks like none is here'} arrow enterTouchDelay={0}>
                             <Skeleton variant='circular' width={43} height={43} />
                         </Tooltip>
                     )

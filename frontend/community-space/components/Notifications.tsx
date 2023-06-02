@@ -66,7 +66,7 @@ const Notifications = () => {
 
     return (
         <>
-            <Tooltip title='Notifications'>
+            <Tooltip title='Notifications' enterTouchDelay={0}>
                 <IconButton
                     size='small'
                     aria-controls={open ? 'notifications-menu' : undefined}
@@ -149,7 +149,7 @@ const Notifications = () => {
                                     </Stack>
                                 </Grid>
                                 <Grid item xs={2}>
-                                    <Tooltip arrow title='Mark as read'>
+                                    <Tooltip arrow title='Mark as read' enterTouchDelay={0}>
                                         <IconButton
                                             size='small'
                                             color='primary'

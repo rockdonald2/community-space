@@ -223,7 +223,7 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                             justifyContent: 'flex-end',
                         }}
                     >
-                        <Tooltip title='See more'>
+                        <Tooltip title='See more' enterTouchDelay={0}>
                             <IconButton onClick={handleCloseTrigger}>
                                 <ArrowOutwardIcon />
                             </IconButton>
