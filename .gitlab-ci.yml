@@ -1,11 +1,10 @@
-image: java:17-jdk
+image: gitlab/gitlab-runner:latest
 
 stages:
   - build
 
 before_script:
   - echo "Start CI"
-  - apt-get install openjdk-17-jdk -y
   - java --version
   - export GRADLE_USER_HOME=`pwd`/.gradle
 
