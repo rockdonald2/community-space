@@ -53,8 +53,8 @@ echo
 
 cd activity-notifications-mgmt/activity-notifications-mgmt || exit 1
 docker build -t activity-notifications-mgmt .
-docker tag activity-notifications:latest registry.gitlab.com/rockdonald2/community-space:activity-notifications-latest
-docker push registry.gitlab.com/rockdonald2/community-space:activity-notifications-latest
+docker tag activity-notifications-mgmt:latest registry.gitlab.com/rockdonald2/community-space:activity-notifications-mgmt-latest
+docker push registry.gitlab.com/rockdonald2/community-space:activity-notifications-mgmt-latest
 cd ../..
 
 # Deploy front-end
