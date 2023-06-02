@@ -442,9 +442,9 @@ export const calculateRelativeTimeFromNow = (date: Date) => {
     const totalDaysBetween: number = Math.floor(diff / (1000 * 3600 * 24));
     const totalHoursBetween: number = Math.floor(diff / (1000 * 3600));
 
-    if (totalDaysBetween > 1) {
+    if (totalDaysBetween >= 1) {
         return formatter.format(-1 * totalDaysBetween, 'day');
-    } else if (totalHoursBetween > 1) {
+    } else if (totalHoursBetween >= 1) {
         return formatter.format(-1 * totalHoursBetween, 'hour');
     }
 
