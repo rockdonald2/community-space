@@ -217,7 +217,11 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                         md={1}
                         xs={12}
                         justifySelf={{ md: 'flex-end', xs: 'flex-start' }}
-                        sx={{ mt: { xs: 2, md: 0 }, display: { xs: 'flex', md: 'none' }, justifyContent: 'flex-end' }}
+                        sx={{
+                            mt: { xs: 2, md: 0 },
+                            display: { xs: 'flex', md: 'inline-flex' },
+                            justifyContent: 'flex-end',
+                        }}
                     >
                         <Tooltip title='See more'>
                             <IconButton onClick={handleCloseTrigger}>

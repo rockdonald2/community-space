@@ -56,24 +56,23 @@ const QuickActions = () => {
     );
 
     return (
-        <Box sx={{ flexGrow: 1, position: 'fixed', bottom: '5%', right: '10%' }}>
-            <SpeedDial
-                ariaLabel='Quick actions dial'
-                icon={<SpeedDialIcon icon={<MenuIcon />} openIcon={<CloseIcon />} />}
-                onClose={handleClose}
-                onOpen={handleOpen}
-                open={open}
-            >
-                {quickActions.map((action) => (
-                    <SpeedDialAction
-                        key={action.name}
-                        icon={action.icon}
-                        tooltipTitle={action.name}
-                        onClick={(e: React.MouseEvent<HTMLDivElement>) => handleAction(e, action.action)}
-                    />
-                ))}
-            </SpeedDial>
-        </Box>
+        <SpeedDial
+            ariaLabel='Quick actions dial'
+            icon={<SpeedDialIcon icon={<MenuIcon />} openIcon={<CloseIcon />} />}
+            onClose={handleClose}
+            onOpen={handleOpen}
+            open={open}
+            sx={{ flexGrow: 1, position: 'fixed', bottom: '5%', right: '10%' }}
+        >
+            {quickActions.map((action) => (
+                <SpeedDialAction
+                    key={action.name}
+                    icon={action.icon}
+                    tooltipTitle={action.name}
+                    onClick={(e: React.MouseEvent<HTMLDivElement>) => handleAction(e, action.action)}
+                />
+            ))}
+        </SpeedDial>
     );
 };
 

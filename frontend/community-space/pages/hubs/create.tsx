@@ -27,7 +27,9 @@ function CreateHub() {
 
             try {
                 if (name == null || name?.length < 3) {
-                    throw new Error('Name must be at least 3 characters long');
+                    throw new Error('Name must be at least 3 characters long', {
+                        cause: {},
+                    });
                 }
 
                 const res = await fetch(`${GATEWAY_URL}/api/v1/hubs`, {
@@ -56,7 +58,7 @@ function CreateHub() {
                 setError({ msg: err.message });
                 console.debug('Failed to create hub', err);
                 if (err instanceof Error) {
-                    if ('res' in (err.cause as any)) {
+                    if ('res' in (err?.cause as any)) {
                         const res = (err.cause as any).res;
                         if (res.status === 409) {
                             enqueueSnackbar('Hub with the same name already exists', { variant: 'warning' });
