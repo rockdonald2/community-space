@@ -15,10 +15,10 @@ const Header = () => {
                 mb={'1rem'}
             >
                 <Typography variant='h4' component='h1'>
-                    Community Space
+                    Community Space 💬
                 </Typography>
                 <Divider variant='middle' orientation='vertical' flexItem sx={{ ml: 2, mr: 2 }} />
-                <Avatar user={user} />
+                <Avatar user={user} generateRandomColor />
                 <Typography
                     color='text.secondary'
                     sx={{
@@ -32,7 +32,7 @@ const Header = () => {
                         }
                     }}
                 >
-                    logged in as <strong>{`${user.firstName} ${user.lastName}`}</strong> ({user.email})
+                    logged in as <strong>{`${user.firstName} ${user.lastName}`}</strong>
                 </Typography>
                 <Box
                     sx={{

@@ -9,24 +9,6 @@ import { useSnackbar } from 'notistack';
 import { useNotifications } from '@/utils/UseNotifications';
 import { calculateRelativeTimeFromNow } from '@/utils/Utility';
 
-const StyledBadge = styled(Badge)(({ theme }) => ({
-    '& .MuiBadge-badge': {
-        backgroundColor: 'var(--mui-palette-primary-dark)',
-        color: 'var(--mui-palette-primary-dark)',
-        boxShadow: `0 0 0 2px ${theme.palette.background.paper}`,
-        '&::after': {
-            position: 'absolute',
-            top: 0,
-            right: 0,
-            width: '100%',
-            height: '100%',
-            borderRadius: '50%',
-            border: '1px solid currentColor',
-            content: '""',
-        },
-    },
-}));
-
 const Notifications = () => {
     const { signOut } = useAuthContext();
     const { enqueueSnackbar } = useSnackbar();
@@ -68,15 +50,19 @@ const Notifications = () => {
         <>
             <Tooltip title='Notifications' enterTouchDelay={0}>
                 <IconButton
-                    size='small'
                     aria-controls={open ? 'notifications-menu' : undefined}
                     aria-haspopup='true'
                     aria-expanded={open ? 'true' : undefined}
                     onClick={handleClick}
                 >
-                    <StyledBadge variant={notifications?.length > 0 ? 'dot' : 'standard'}>
+                    <Badge
+                        variant='standard'
+                        color='primary'
+                        badgeContent={notifications?.filter((notification) => notification.isRead !== true).length}
+                        max={15}
+                    >
                         <NotificationsIcon />
-                    </StyledBadge>
+                    </Badge>
                 </IconButton>
             </Tooltip>
             <Menu
@@ -148,7 +134,11 @@ const Notifications = () => {
                                         </Typography>
                                     </Stack>
                                 </Grid>
-                                <Grid item xs={2}>
+                                <Grid
+                                    item
+                                    xs={2}
+                                    sx={{ display: 'flex', alignContent: 'center', justifyContent: 'center' }}
+                                >
                                     <Tooltip arrow title='Mark as read' enterTouchDelay={0}>
                                         <IconButton
                                             size='small'
