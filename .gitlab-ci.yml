@@ -24,8 +24,11 @@ build:
 
 deploy:
   stage: deploy
+  needs:
+    - job: build
+      artifacts: true
   script:
-    - docker login -u $DOCKER_REGISTRY_USER -p $DOCKER_REGISTRY_PASSWORD
+    - docker login registry.gitlab.com -u $DOCKER_REGISTRY_USER -p $DOCKER_REGISTRY_PASSWORD
     - chmod +x devops/ci/deploy.sh
     - cd devops/ci
     - bash deploy.sh
