@@ -19,14 +19,13 @@ build:
     paths:
       - backend/**/build/libs/*.jar
     expire_in: 3 days
-  only:
-    - main
   rules:
     - changes:
         - backend/**/*.{java}
         - backend/**/Dockerfile
         - frontend/**/*.{js,jsx,ts,tsx}
         - frontend/**/Dockerfile
+    - if: '$CI_COMMIT_REF_NAME == "main"'
 
 deploy:
   stage: deploy
@@ -38,14 +37,13 @@ deploy:
     - chmod +x devops/ci/deploy.sh
     - cd devops/ci
     - bash deploy.sh
-  only:
-    - main
   rules:
     - changes:
         - backend/**/*.{java}
         - backend/**/Dockerfile
         - frontend/**/*.{js,jsx,ts,tsx}
         - frontend/**/Dockerfile
+    - if: '$CI_COMMIT_REF_NAME == "main"'
 
 after_script:
   - echo "End CI"
