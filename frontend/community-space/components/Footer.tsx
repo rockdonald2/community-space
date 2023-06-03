@@ -2,7 +2,7 @@ import { Grid, Typography, Link as MaterialLink } from '@mui/material';
 import Link from 'next/link';
 
 const links: { name: string; href: string }[] = [
-    { name: 'Explore', href: '/hubs/explore' },
+    { name: 'Explore Hubs', href: '/hubs/explore' },
     { name: 'Activity', href: '/activity' },
     { name: 'Create Hub', href: '/hubs/create' },
 ];
