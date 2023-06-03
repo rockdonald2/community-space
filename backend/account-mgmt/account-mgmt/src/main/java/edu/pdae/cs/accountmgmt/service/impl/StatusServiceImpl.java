@@ -90,6 +90,7 @@ public class StatusServiceImpl implements StatusService {
     public void putActive(UserPresenceDTO userDTO) {
         log.info("Putting {} as active", userDTO.getEmail());
 
+        userDTO.setLastSeen(new Date());
         opsForHashPresence.put(STATUS_COLLECTION, userDTO.getEmail(), userDTO);
     }
 
