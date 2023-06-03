@@ -1,7 +1,6 @@
 package edu.pdae.cs.activitynotificationsmgmt.listener;
 
 import edu.pdae.cs.activitynotificationsmgmt.config.MessagingConfiguration;
-import edu.pdae.cs.activitynotificationsmgmt.model.Activity;
 import edu.pdae.cs.activitynotificationsmgmt.model.dto.NotificationMessageDTO;
 import edu.pdae.cs.activitynotificationsmgmt.service.ActivityService;
 import edu.pdae.cs.common.model.Visibility;
@@ -29,32 +28,21 @@ public class ActivityListener {
     public void activityListener(@Payload ActivityFiredDTO activityFiredDTO) {
         log.info("Caught internal message for activity update: {}", activityFiredDTO);
 
-        Activity.Type type;
-        if (activityFiredDTO.getType().equals(ActivityFiredDTO.Type.MEMO_CREATED)) {
-            type = Activity.Type.MEMO_CREATED;
-        } else if (activityFiredDTO.getType().equals(ActivityFiredDTO.Type.HUB_CREATED)) {
-            type = Activity.Type.HUB_CREATED;
-        } else if (activityFiredDTO.getType().equals(ActivityFiredDTO.Type.MEMO_COMPLETED)) {
-            type = Activity.Type.MEMO_COMPLETED;
-        } else {
-            log.error("Unknown activity type: {}", activityFiredDTO.getType());
-            return;
-        }
-
         if (activityFiredDTO.getMemoId() == null) {
-            activityService.addActivity(activityFiredDTO.getUser(), new ObjectId(activityFiredDTO.getHubId()), activityFiredDTO.getHubName(), activityFiredDTO.getDate(), type, activityFiredDTO.getVisibility());
+            activityService.addActivity(activityFiredDTO.getUser(), activityFiredDTO.getUserName(), new ObjectId(activityFiredDTO.getHubId()), activityFiredDTO.getHubName(), activityFiredDTO.getDate(), activityFiredDTO.getType(), activityFiredDTO.getVisibility());
         } else {
-            activityService.addActivity(activityFiredDTO.getUser(), new ObjectId(activityFiredDTO.getHubId()), activityFiredDTO.getHubName(), new ObjectId(activityFiredDTO.getMemoId()), activityFiredDTO.getMemoTitle(), activityFiredDTO.getDate(), type, activityFiredDTO.getVisibility());
+            activityService.addActivity(activityFiredDTO.getUser(), activityFiredDTO.getUserName(), new ObjectId(activityFiredDTO.getHubId()), activityFiredDTO.getHubName(), new ObjectId(activityFiredDTO.getMemoId()), activityFiredDTO.getMemoTitle(), activityFiredDTO.getDate(), activityFiredDTO.getType(), activityFiredDTO.getVisibility());
         }
 
         if (activityFiredDTO.getVisibility().equals(Visibility.PUBLIC)) {
             notificationDTOKafkaTemplate.send(MessagingConfiguration.NOTIFICATIONS_TOPIC, NotificationMessageDTO.builder()
                     .user(activityFiredDTO.getUser())
+                    .userName(activityFiredDTO.getUserName())
                     .hubId(activityFiredDTO.getHubId())
                     .hubName(activityFiredDTO.getHubName())
                     .memoId(activityFiredDTO.getMemoId())
                     .memoTitle(activityFiredDTO.getMemoTitle())
-                    .type(NotificationMessageDTO.Type.valueOf(activityFiredDTO.getType().name()))
+                    .type(activityFiredDTO.getType())
                     .build());
         }
     }

@@ -14,6 +14,7 @@ import {
     InputLabel,
     MenuItem,
     OutlinedInput,
+    Pagination,
     Select,
     SelectChangeEvent,
     Stack,
@@ -26,13 +27,12 @@ import Memo from './Memo';
 import SearchIcon from '@mui/icons-material/Search';
 import { ChangeEvent, useState } from 'react';
 import Alerter from './Alerter';
-import Pagination from './Pagination';
 
 const Memos = ({ hubId, scope = 'RECENT' }: { hubId?: string | string[]; scope?: 'RECENT' | 'ALL' }) => {
     const theme = useTheme();
     const { user } = useAuthContext();
 
-    const [currPage, setCurrPage] = useState<number>(0);
+    const [currPage, setCurrPage] = useState<number>(1);
 
     const {
         data: memos,
@@ -40,7 +40,7 @@ const Memos = ({ hubId, scope = 'RECENT' }: { hubId?: string | string[]; scope?:
         isLoading,
         isValidating,
     } = useSWR<{ totalCount: number; totalPages: number; content: MemoType[] }>(
-        { key: 'memos', token: user.token, hubId: hubId, page: currPage },
+        { key: 'memos', token: user.token, hubId: hubId, page: currPage - 1 },
         scope === 'RECENT' ? swrRecentMemosFetcherWithAuth : swrMemosFetcherWithAuth,
         {
             revalidateOnFocus: false,
@@ -131,7 +131,16 @@ const Memos = ({ hubId, scope = 'RECENT' }: { hubId?: string | string[]; scope?:
             ) : (
                 <Alerter isValidating={isValidating} isLoading={isLoading} data={memos} error={error} />
             )}
-            <Pagination currPage={currPage} setPage={setCurrPage} totalPages={memos?.totalPages} />
+            <Pagination
+                count={memos?.totalPages}
+                page={currPage}
+                onChange={(_e, page) => setCurrPage(page)}
+                sx={{ display: 'flex', alignContent: 'center', justifyContent: 'center', mt: 1 }}
+                shape='rounded'
+                variant='outlined'
+                showFirstButton
+                showLastButton
+            />
         </Stack>
     );
 };

@@ -10,6 +10,7 @@ import edu.pdae.cs.activitynotificationsmgmt.repository.NotificationRepository;
 import edu.pdae.cs.activitynotificationsmgmt.service.HubService;
 import edu.pdae.cs.activitynotificationsmgmt.service.MemoService;
 import edu.pdae.cs.activitynotificationsmgmt.service.NotificationService;
+import edu.pdae.cs.common.model.Type;
 import edu.pdae.cs.common.model.dto.NotificationDTO;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -69,39 +70,39 @@ public class NotificationServiceImpl implements NotificationService {
 
         final var notificationType = notificationMessageDTO.getType();
 
-        if (notificationType.equals(NotificationMessageDTO.Type.HUB_CREATED)) {
-            final var notification = addNotification(Notification.GroupTargets.GENERAL.getValue(), Notification.TargetType.GROUP, String.format("New hub created: %s", notificationMessageDTO.getHubName()));
+        if (Type.HUB_CREATED.equals(notificationType)) {
+            final var notification = addNotification(Notification.GroupTargets.GENERAL.getValue(), Notification.TargetType.GROUP, String.format("New hub created %s by %s", notificationMessageDTO.getHubName(), notificationMessageDTO.getUserName()));
 
             readNotification(notification.getId(), notificationMessageDTO.getUser());
             broadcastNotification(Notification.GroupTargets.GENERAL.getValue(), modelMapper.map(notification, NotificationDTO.class));
-        } else if (notificationType.equals(NotificationMessageDTO.Type.MEMO_COMPLETED)) {
+        } else if (Type.MEMO_COMPLETED.equals(notificationType)) {
             Objects.requireNonNull(notificationMessageDTO.getMemoId());
             final Memo memo = memoService.getMemo(new ObjectId(notificationMessageDTO.getMemoId()));
 
-            final var notification = addNotification(memo.getOwner(), Notification.TargetType.USER, String.format("%s has completed your memo %s", notificationMessageDTO.getUser(), memo.getTitle()));
+            final var notification = addNotification(memo.getOwner(), Notification.TargetType.USER, String.format("%s has completed your memo %s", notificationMessageDTO.getUserName(), memo.getTitle()));
             broadcastNotification(memo.getOwner(), NotificationDTO.builder()
                     .id(notification.getId().toHexString())
-                    .msg(String.format("%s has completed your memo %s", notificationMessageDTO.getUser(), memo.getTitle()))
+                    .msg(String.format("%s has completed your memo %s", notificationMessageDTO.getUserName(), memo.getTitle()))
                     .createdAt(notification.getCreatedAt())
                     .build());
-        } else if (notificationType.equals(NotificationMessageDTO.Type.MEMO_CREATED)) {
+        } else if (Type.MEMO_CREATED.equals(notificationType)) {
             Objects.requireNonNull(notificationMessageDTO.getHubId());
             final var hub = hubService.getHub(new ObjectId(notificationMessageDTO.getHubId()));
 
             // notify everyone, except the action taker
             hub.getMembers().stream().filter(member -> !member.equals(notificationMessageDTO.getUser())).forEach(member -> {
-                final var notification = addNotification(member, Notification.TargetType.USER, String.format("%s has created a new memo in your hub %s", notificationMessageDTO.getUser(), hub.getName()));
+                final var notification = addNotification(member, Notification.TargetType.USER, String.format("%s has created a new memo in your hub %s", notificationMessageDTO.getUserName(), hub.getName()));
                 broadcastNotification(member, NotificationDTO.builder()
                         .id(notification.getId().toHexString())
-                        .msg(String.format("%s has created a new memo in your hub %s", notificationMessageDTO.getUser(), hub.getName()))
+                        .msg(String.format("%s has created a new memo in your hub %s", notificationMessageDTO.getUserName(), hub.getName()))
                         .createdAt(notification.getCreatedAt())
                         .build());
             });
             if (!notificationMessageDTO.getUser().equals(hub.getOwner())) {
-                final var notification = addNotification(hub.getOwner(), Notification.TargetType.USER, String.format("%s has created a new memo in your hub %s", notificationMessageDTO.getUser(), hub.getName()));
+                final var notification = addNotification(hub.getOwner(), Notification.TargetType.USER, String.format("%s has created a new memo in your hub %s", notificationMessageDTO.getUserName(), hub.getName()));
                 broadcastNotification(hub.getOwner(), NotificationDTO.builder()
                         .id(notification.getId().toHexString())
-                        .msg(String.format("%s has created a new memo in your hub %s", notificationMessageDTO.getUser(), hub.getName()))
+                        .msg(String.format("%s has created a new memo in your hub %s", notificationMessageDTO.getUserName(), hub.getName()))
                         .createdAt(notification.getCreatedAt())
                         .build());
             }

@@ -6,6 +6,7 @@ import edu.pdae.cs.activitynotificationsmgmt.model.dto.ActivityDTO;
 import edu.pdae.cs.activitynotificationsmgmt.model.dto.ActivityGroupedDTO;
 import edu.pdae.cs.activitynotificationsmgmt.repository.ActivityRepository;
 import edu.pdae.cs.activitynotificationsmgmt.service.ActivityService;
+import edu.pdae.cs.common.model.Type;
 import edu.pdae.cs.common.model.Visibility;
 import edu.pdae.cs.common.util.PageWrapper;
 import lombok.RequiredArgsConstructor;
@@ -35,14 +36,14 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Override
     @CacheEvict(value = {"activities", "activities-grouped"}, allEntries = true)
-    public void addActivity(String user, ObjectId hubId, String hubName, Date date, Activity.Type type, Visibility visibility) {
-        activityRepository.save(Activity.builder().user(user).visibility(visibility).hubId(hubId).date(date).type(type).hubName(hubName).build());
+    public void addActivity(String user, String userName, ObjectId hubId, String hubName, Date date, Type type, Visibility visibility) {
+        activityRepository.save(Activity.builder().user(user).userName(userName).visibility(visibility).hubId(hubId).date(date).type(type).hubName(hubName).build());
     }
 
     @Override
     @CacheEvict(value = {"activities", "activities-grouped"}, allEntries = true)
-    public void addActivity(String user, ObjectId hubId, String hubName, ObjectId memoId, String memoTitle, Date date, Activity.Type type, Visibility visibility) {
-        activityRepository.save(Activity.builder().user(user).hubId(hubId).visibility(visibility).date(date).type(type).hubName(hubName).memoId(memoId).memoTitle(memoTitle).build());
+    public void addActivity(String user, String userName, ObjectId hubId, String hubName, ObjectId memoId, String memoTitle, Date date, Type type, Visibility visibility) {
+        activityRepository.save(Activity.builder().user(user).userName(userName).hubId(hubId).visibility(visibility).date(date).type(type).hubName(hubName).memoId(memoId).memoTitle(memoTitle).build());
     }
 
     @Override

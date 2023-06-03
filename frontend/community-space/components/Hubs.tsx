@@ -2,7 +2,7 @@ import { Hub } from '@/types/db.types';
 import { useAuthContext } from '@/utils/AuthContext';
 import { swrHubsFetcherWithAuth } from '@/utils/Utility';
 import useSWR from 'swr';
-import { Button, Grid, Typography } from '@mui/material';
+import { Grid, Typography, Link as MaterialLink } from '@mui/material';
 import HubCard from './HubCard';
 import Alerter from './Alerter';
 import { useCallback } from 'react';
@@ -40,9 +40,9 @@ const Hubs = () => {
                     ) : (
                         <Typography variant='body1' sx={{ mt: 2 }}>
                             No hubs yet,{' '}
-                            <Button href='/hubs/create' LinkComponent={Link} variant='text'>
+                            <MaterialLink component={Link} sx={{ mx: 0.5 }} href='/hubs/create'>
                                 create one
-                            </Button>
+                            </MaterialLink>
                             .
                         </Typography>
                     )}

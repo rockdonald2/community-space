@@ -3,6 +3,7 @@ package edu.pdae.cs.activitynotificationsmgmt.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import edu.pdae.cs.common.model.Type;
 import edu.pdae.cs.common.model.Visibility;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -35,12 +36,7 @@ public class Activity {
     private String memoTitle;
     private Type type;
     private String user;
+    private String userName;
     private Visibility visibility;
-
-    public enum Type {
-        MEMO_CREATED,
-        HUB_CREATED,
-        MEMO_COMPLETED,
-    }
 
 }

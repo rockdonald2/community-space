@@ -1,5 +1,6 @@
 package edu.pdae.cs.hubmgmt.service;
 
+import edu.pdae.cs.common.util.UserWrapper;
 import edu.pdae.cs.hubmgmt.model.Role;
 import edu.pdae.cs.hubmgmt.model.dto.*;
 import org.bson.types.ObjectId;
@@ -9,7 +10,7 @@ import java.util.Optional;
 
 public interface HubService {
 
-    HubCreationResponseDTO create(HubCreationDTO hubCreationDTO, String asUser);
+    HubCreationResponseDTO create(HubCreationDTO hubCreationDTO, UserWrapper userWrapper);
 
     HubDetailsDTO getById(ObjectId id, String asUser);
 

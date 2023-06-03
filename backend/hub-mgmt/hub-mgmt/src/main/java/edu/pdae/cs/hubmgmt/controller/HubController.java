@@ -1,6 +1,7 @@
 package edu.pdae.cs.hubmgmt.controller;
 
 import com.mongodb.MongoWriteException;
+import edu.pdae.cs.common.util.UserWrapper;
 import edu.pdae.cs.hubmgmt.controller.exception.ConflictingOperationException;
 import edu.pdae.cs.hubmgmt.controller.exception.ForbiddenOperationException;
 import edu.pdae.cs.hubmgmt.model.Role;
@@ -29,10 +30,10 @@ public class HubController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public HubCreationResponseDTO create(@RequestBody HubCreationDTO hubCreationDTO, @RequestHeader("X-AUTH-TOKEN-SUBJECT") String user) {
+    public HubCreationResponseDTO create(@RequestBody HubCreationDTO hubCreationDTO, @RequestHeader("X-AUTH-TOKEN-SUBJECT") String user, @RequestHeader("X-USER-NAME") String userName) {
         Objects.requireNonNull(user);
         log.info("Creating new hub {}", hubCreationDTO.getName());
-        return hubService.create(hubCreationDTO, user);
+        return hubService.create(hubCreationDTO, UserWrapper.builder().email(user).name(userName).build());
     }
 
     @GetMapping("/{id}")

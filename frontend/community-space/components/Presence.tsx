@@ -30,10 +30,10 @@ const Presence = () => {
                                             generateRandomColor
                                             innerBody={
                                                 <>
-                                                    <Typography fontSize={12}>{user.email}</Typography>
+                                                    <Typography fontSize={12}>{present.email}</Typography>
                                                     <Typography
                                                         fontSize={11}
-                                                        sx={{ color: 'text.secondary', mb: 0.5 }}
+                                                        sx={{ mb: 0.5 }}
                                                     >{`${present.firstName} ${present.lastName}`}</Typography>
                                                     <Stack direction={'row'} alignItems={'center'}>
                                                         <Box
@@ -47,7 +47,7 @@ const Presence = () => {
                                                         />
                                                         Last seen at {' '}
                                                         {shortTimeWithNoDateFormatter.format(
-                                                            new Date(present.lastSeen)
+                                                            new Date(present?.lastSeen ?? new Date())
                                                         )}
                                                     </Stack>
                                                 </>

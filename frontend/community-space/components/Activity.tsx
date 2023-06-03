@@ -46,7 +46,7 @@ const Activity = () => {
     return (
         <Container style={{ paddingRight: '.5rem' }}>
             <Typography mb={2} color='text.secondary' variant='h6'>
-                Activity
+                Activity in {getCurrentMonthName()}
             </Typography>
             {!isLoadingActivities && !isValidatingActivities && !activitiesError ? (
                 <>

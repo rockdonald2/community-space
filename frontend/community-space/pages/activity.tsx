@@ -5,16 +5,15 @@ import { longDateShortTimeDateFormatter, swrActivitiesFetcherWithAuth } from '@/
 import Head from 'next/head';
 import Item from '@/components/Item';
 import Alerter from '@/components/Alerter';
-import { Button, Chip, Typography } from '@mui/material';
+import { Chip, Typography, Link as MaterialLink, Pagination } from '@mui/material';
 import Link from 'next/link';
 import { useState } from 'react';
-import Pagination from '@/components/Pagination';
 import Breadcrumbs from '@/components/Breadcrumbs';
 
 const Activity = () => {
     const { user } = useAuthContext();
 
-    const [currPage, setPage] = useState<number>(0);
+    const [currPage, setCurrPage] = useState<number>(1);
 
     const {
         data: activities,
@@ -22,7 +21,7 @@ const Activity = () => {
         isLoading: activitiesIsLoading,
         isValidating: activitiesIsValidating,
     } = useSWR<{ totalPages: number; totalCount: number; content: Activity[] }>(
-        { key: 'activities', token: user.token, page: currPage },
+        { key: 'activities', token: user.token, page: currPage - 1 },
         swrActivitiesFetcherWithAuth
     );
 
@@ -53,17 +52,12 @@ const Activity = () => {
                                 key={idx}
                             >
                                 <Typography>
-                                    <strong>{activity.user}</strong>{' '}
+                                    <strong>{activity.userName}</strong> ({activity.user}){' '}
                                     {activity.type.toLocaleLowerCase().split('_').reverse().join(' a ')} (
                                     {activity.type.includes('MEMO') && `${activity.memoTitle} in `}
-                                    <Button
-                                        type='button'
-                                        LinkComponent={Link}
-                                        size='small'
-                                        href={`/hubs/${activity.hubId}`}
-                                    >
+                                    <MaterialLink component={Link} href={`/hubs/${activity.hubId}`} sx={{ mx: 0.5 }}>
                                         {activity.hubName}
-                                    </Button>
+                                    </MaterialLink>
                                     )
                                 </Typography>
                                 <Chip
@@ -74,7 +68,16 @@ const Activity = () => {
                             </Item>
                         ))
                         .reverse()}
-                    <Pagination currPage={currPage} setPage={setPage} totalPages={activities?.totalPages} />
+                    <Pagination
+                        count={activities?.totalPages}
+                        page={currPage}
+                        onChange={(_e, page) => setCurrPage(page)}
+                        sx={{ display: 'flex', alignContent: 'center', justifyContent: 'center', mt: 1 }}
+                        shape='rounded'
+                        variant='outlined'
+                        showFirstButton
+                        showLastButton
+                    />
                 </>
             ) : (
                 <Alerter

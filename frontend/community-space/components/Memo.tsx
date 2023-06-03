@@ -202,7 +202,7 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                         </Typography>
                         <Stack direction={{ md: 'row', xs: 'column' }} alignItems={{ xs: 'flex-start', md: 'center' }}>
                             <Typography sx={{ fontSize: 14, mb: 0 }} color='text.secondary' gutterBottom>
-                                Posted by&nbsp;<strong>{memo.author}</strong>&nbsp;on{' '}
+                                Posted by&nbsp;<strong>{memo.authorName}</strong>&nbsp;on{' '}
                                 {longDateShortTimeDateFormatter.format(new Date(memo.createdOn))}
                             </Typography>
                             <Divider variant='middle' orientation='vertical' flexItem sx={{ mx: 1, my: 0 }} />
@@ -248,7 +248,7 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                 </DialogTitle>
                 <DialogContent sx={{ overflow: 'initial' }}>
                     <Typography sx={{ mb: 0 }} color='text.secondary'>
-                        Memo posted on {longDateShortTimeDateFormatter.format(memo.createdOn)} by {memo.author}
+                        Memo posted on {longDateShortTimeDateFormatter.format(memo.createdOn)} by {memo.authorName} ({memo.author})
                     </Typography>
                     <Chip label={memo.urgency.toLowerCase()} variant='filled' sx={{ mt: 1, mr: 1 }} />
                     <Chip label={memo.visibility.toLowerCase()} variant='filled' sx={{ mt: 1 }} />

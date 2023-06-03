@@ -13,19 +13,19 @@ import { RouteGuard } from '@/utils/RouteGuard';
 import CrossContextProvider from '@/utils/CrossContext';
 import { CookiesProvider } from 'react-cookie';
 import SnackbarProvider from '@/utils/SnackbarProvider';
-import { Nunito, Roboto } from 'next/font/google';
+import { Roboto, Inter } from 'next/font/google';
 
-const nunito = Nunito({
-    subsets: ['latin-ext'],
-});
 const roboto = Roboto({
     subsets: ['latin-ext'],
     weight: ['300', '400', '500', '700'],
 });
+const inter = Inter({
+    subsets: ['latin-ext'],
+});
 
 const theme = extendTheme({
     typography: {
-        fontFamily: `${roboto.style.fontFamily}, ${nunito.style.fontFamily}, sans-serif`,
+        fontFamily: `${inter.style.fontFamily}, ${roboto.style.fontFamily}, sans-serif`,
     },
 });
 

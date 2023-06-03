@@ -1,6 +1,6 @@
 package edu.pdae.cs.activitynotificationsmgmt.model.dto;
 
-import edu.pdae.cs.activitynotificationsmgmt.model.Activity;
+import edu.pdae.cs.common.model.Type;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,11 +15,12 @@ import java.util.Date;
 public class ActivityDTO {
 
     private Date date;
-    private Activity.Type type;
+    private Type type;
     private String hubId;
     private String hubName;
     private String memoId;
     private String memoTitle;
     private String user;
+    private String userName;
 
 }

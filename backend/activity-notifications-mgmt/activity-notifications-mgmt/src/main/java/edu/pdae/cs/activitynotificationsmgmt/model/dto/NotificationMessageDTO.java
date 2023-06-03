@@ -1,5 +1,6 @@
 package edu.pdae.cs.activitynotificationsmgmt.model.dto;
 
+import edu.pdae.cs.common.model.Type;
 import jakarta.annotation.Nullable;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -13,6 +14,7 @@ import lombok.NoArgsConstructor;
 public class NotificationMessageDTO {
 
     private String user;
+    private String userName;
 
     @Nullable
     private String hubId;
@@ -25,11 +27,5 @@ public class NotificationMessageDTO {
     private String memoTitle;
 
     private Type type;
-
-    public enum Type {
-        MEMO_CREATED,
-        HUB_CREATED,
-        MEMO_COMPLETED,
-    }
 
 }

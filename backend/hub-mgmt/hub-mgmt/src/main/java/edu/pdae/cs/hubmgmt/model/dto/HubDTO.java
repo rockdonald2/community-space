@@ -18,6 +18,7 @@ public class HubDTO {
     private String name;
     private Date createdOn;
     private String owner;
+    private String ownerName;
     private Role role;
 
 }

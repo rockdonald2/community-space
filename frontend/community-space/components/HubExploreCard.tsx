@@ -52,8 +52,11 @@ const HubExploreCard = ({ hub }: { hub: Hub }) => {
                         <Typography variant='h5' component='div' align='center'>
                             {hub.name}
                         </Typography>
-                        <Typography sx={{ mb: 1.5 }} color='text.secondary' align='center'>
-                            {hub.owner}
+                        <Typography color='text.secondary' align='center'>
+                            {hub.ownerName}
+                        </Typography>
+                        <Typography sx={{ mb: 1.5 }} color='text.secondary' variant='body2' align='center'>
+                            ({hub.owner})
                         </Typography>
                         <Box alignItems={'center'} justifyContent={'center'} display={'flex'}>
                             <Avatar
@@ -153,7 +156,6 @@ const HubExploreCard = ({ hub }: { hub: Hub }) => {
                     </Typography>
                     <Divider />
                     <Button
-                        size='small'
                         fullWidth
                         type='button'
                         variant='text'

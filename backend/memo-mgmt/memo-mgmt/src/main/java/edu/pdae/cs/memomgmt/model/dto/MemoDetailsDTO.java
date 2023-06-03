@@ -18,6 +18,7 @@ public class MemoDetailsDTO {
     private String id;
     private String title;
     private String author;
+    private String authorName;
     private Date createdOn;
     private String content;
     private Visibility visibility;

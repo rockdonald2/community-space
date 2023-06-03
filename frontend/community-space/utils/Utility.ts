@@ -430,16 +430,16 @@ export const handleInput = (e: React.ChangeEvent<HTMLInputElement>, setState: Di
     setState(e.target.value);
 };
 
-export const getDaysInCurrentMonth = () => {
-    const now = new Date();
+export const getDaysInCurrentMonth = (): number => {
+    const now: Date = new Date();
     return new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
 };
 
-export const getCurrentDay = () => {
+export const getCurrentDay = (): number => {
     return new Date().getDate();
 };
 
-export const calculateRelativeTimeFromNow = (date: Date) => {
+export const calculateRelativeTimeFromNow = (date: Date): string => {
     const formatter = new Intl.RelativeTimeFormat(`en`, { style: `narrow` });
 
     const currDate: Date = new Date();
@@ -456,8 +456,8 @@ export const calculateRelativeTimeFromNow = (date: Date) => {
     return formatter.format(-1 * Math.floor(diff / (1000 * 60)), 'minute');
 };
 
-export const getCurrentMonthName = () => {
-    const monthNames = [
+export const getCurrentMonthName = (): string => {
+    const monthNames: string[] = [
         'January',
         'February',
         'March',
@@ -472,6 +472,6 @@ export const getCurrentMonthName = () => {
         'December',
     ];
 
-    const d = new Date();
+    const d: Date = new Date();
     return monthNames[d.getMonth()];
 };

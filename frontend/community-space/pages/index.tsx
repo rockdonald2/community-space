@@ -3,6 +3,7 @@ import { Divider, Grid } from '@mui/material';
 import Head from 'next/head';
 import Activity from '@/components/Activity';
 import Hubs from '@/components/Hubs';
+import Footer from '@/components/Footer';
 
 export default function Home() {
     return (
@@ -19,7 +20,7 @@ export default function Home() {
                         sx={{
                             mb: {
                                 xs: 2,
-                                md: 0
+                                md: 0,
                             },
                         }}
                     >
@@ -31,6 +32,8 @@ export default function Home() {
                         <Hubs />
                     </Grid>
                 </Grid>
+                <Divider sx={{ mt: 2, mr: 2, mb: 2 }} />
+                <Footer />
             </main>
         </>
     );

@@ -3,6 +3,7 @@ package edu.pdae.cs.memomgmt.controller;
 import edu.pdae.cs.common.model.Visibility;
 import edu.pdae.cs.common.model.dto.MemoMutationDTO;
 import edu.pdae.cs.common.util.PageWrapper;
+import edu.pdae.cs.common.util.UserWrapper;
 import edu.pdae.cs.memomgmt.config.MessagingConfiguration;
 import edu.pdae.cs.memomgmt.controller.exception.ConflictingOperationException;
 import edu.pdae.cs.memomgmt.controller.exception.ForbiddenOperationException;
@@ -34,10 +35,10 @@ public class MemoController {
 
     @PostMapping
     @ResponseStatus(HttpStatus.CREATED)
-    public MemoCreationResponseDTO create(@RequestBody MemoCreationDTO memoCreationDTO, @RequestHeader("X-AUTH-TOKEN-SUBJECT") String user) {
+    public MemoCreationResponseDTO create(@RequestBody MemoCreationDTO memoCreationDTO, @RequestHeader("X-AUTH-TOKEN-SUBJECT") String user, @RequestHeader("X-USER-NAME") String userName) {
         log.info("Creating new memo from author {}", user);
         Objects.requireNonNull(user);
-        final var createdDto = memoService.create(memoCreationDTO, user);
+        final var createdDto = memoService.create(memoCreationDTO, UserWrapper.builder().name(userName).email(user).build());
 
         // send a message to Kafka about the creation
         memoMutationDTOKafkaTemplate.send(MessagingConfiguration.MEMO_MUTATION_TOPIC, MemoMutationDTO.builder()
@@ -118,9 +119,9 @@ public class MemoController {
 
     @PostMapping("/{id}/completions")
     @ResponseStatus(HttpStatus.CREATED)
-    public MemoCompletionResponseDTO handleCompletion(@PathVariable("id") ObjectId id, @RequestBody MemoCompletionDTO memoCompletionDTO, @RequestHeader("X-AUTH-TOKEN-SUBJECT") String asUser) {
+    public MemoCompletionResponseDTO handleCompletion(@PathVariable("id") ObjectId id, @RequestBody MemoCompletionDTO memoCompletionDTO, @RequestHeader("X-AUTH-TOKEN-SUBJECT") String asUser, @RequestHeader("X-USER-NAME") String userName) {
         // add completion to a specific memo
-        return memoService.completeMemo(id, memoCompletionDTO.getUser(), asUser);
+        return memoService.completeMemo(id, memoCompletionDTO.getUser(), UserWrapper.builder().name(userName).email(asUser).build());
     }
 
     @GetMapping("/{id}/completions")

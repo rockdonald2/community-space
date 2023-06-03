@@ -42,11 +42,11 @@ public class JwtService {
         return claimsResolver.apply(claims);
     }
 
-    protected Date extractExpiration(String token) {
+    public Date extractExpiration(String token) {
         return extractClaim(token, Claims::getExpiration);
     }
 
-    protected Claims extractAllClaims(String token) {
+    public Claims extractAllClaims(String token) {
         try {
             return Jwts
                     .parserBuilder()

@@ -1,8 +1,10 @@
 package edu.pdae.cs.memomgmt.service.impl;
 
+import edu.pdae.cs.common.model.Type;
 import edu.pdae.cs.common.model.Visibility;
 import edu.pdae.cs.common.model.dto.ActivityFiredDTO;
 import edu.pdae.cs.common.util.PageWrapper;
+import edu.pdae.cs.common.util.UserWrapper;
 import edu.pdae.cs.memomgmt.config.MessagingConfiguration;
 import edu.pdae.cs.memomgmt.controller.exception.ConflictingOperationException;
 import edu.pdae.cs.memomgmt.controller.exception.ForbiddenOperationException;
@@ -40,8 +42,8 @@ public class MemoServiceImpl implements MemoService {
 
     @Override
     @CacheEvict(value = {"memo", "memos"}, allEntries = true)
-    public MemoCreationResponseDTO create(MemoCreationDTO memoCreationDTO, String asUser) throws ForbiddenOperationException {
-        if (!hubService.isMember(memoCreationDTO.getHubId(), asUser)) {
+    public MemoCreationResponseDTO create(MemoCreationDTO memoCreationDTO, UserWrapper userWrapper) throws ForbiddenOperationException {
+        if (!hubService.isMember(memoCreationDTO.getHubId(), userWrapper.getEmail())) {
             throw new ForbiddenOperationException("You are not a member of this hub");
         }
 
@@ -50,17 +52,19 @@ public class MemoServiceImpl implements MemoService {
         final Memo reqMemo = modelMapper.map(memoCreationDTO, Memo.class);
         reqMemo.setCreatedOn(new Date());
         reqMemo.setId(null);
-        reqMemo.setAuthor(asUser);
+        reqMemo.setAuthor(userWrapper.getEmail());
+        reqMemo.setAuthorName(userWrapper.getName());
         reqMemo.setCompletions(new ArrayList<>());
 
         final Memo createdMemo = memoRepository.save(reqMemo);
         // send message to activity topic
         activityFiredDTOKafkaTemplate.send(MessagingConfiguration.ACTIVITY_TOPIC, ActivityFiredDTO.builder()
-                .user(asUser)
+                .user(userWrapper.getEmail())
+                .userName(userWrapper.getName())
                 .hubId(memoCreationDTO.getHubId().toHexString())
                 .hubName(hub.getName())
                 .date(new Date())
-                .type(ActivityFiredDTO.Type.MEMO_CREATED)
+                .type(Type.MEMO_CREATED)
                 .memoId(createdMemo.getId().toHexString())
                 .memoTitle(createdMemo.getTitle())
                 .visibility(createdMemo.getVisibility())
@@ -202,10 +206,10 @@ public class MemoServiceImpl implements MemoService {
 
     @Override
     @CacheEvict(value = {"completion", "completions", "memo", "memos"}, allEntries = true)
-    public MemoCompletionResponseDTO completeMemo(ObjectId memoId, String user, String asUser) throws NoSuchElementException, ForbiddenOperationException, ConflictingOperationException {
+    public MemoCompletionResponseDTO completeMemo(ObjectId memoId, String user, UserWrapper actionTakerUserWrapper) throws NoSuchElementException, ForbiddenOperationException, ConflictingOperationException {
         final Memo memo = memoRepository.findById(memoId).orElseThrow();
 
-        if (!hubService.isMember(memo.getHubId(), asUser)) {
+        if (!hubService.isMember(memo.getHubId(), actionTakerUserWrapper.getEmail())) {
             throw new ForbiddenOperationException("You are not a member of this hub");
         }
 
@@ -215,11 +219,11 @@ public class MemoServiceImpl implements MemoService {
 
         final Hub hub = hubService.getHub(memo.getHubId());
 
-        if (asUser.equals(memo.getAuthor())) {
+        if (actionTakerUserWrapper.getEmail().equals(memo.getAuthor())) {
             throw new ConflictingOperationException("The author cannot complete its own memo");
         }
 
-        if (!user.equals(asUser)) {
+        if (!user.equals(actionTakerUserWrapper.getEmail())) {
             throw new ForbiddenOperationException("You cannot complete a memo for another user");
         }
 
@@ -231,9 +235,10 @@ public class MemoServiceImpl implements MemoService {
         memoRepository.save(memo);
 
         activityFiredDTOKafkaTemplate.send(MessagingConfiguration.ACTIVITY_TOPIC, ActivityFiredDTO.builder()
-                .user(asUser)
+                .user(actionTakerUserWrapper.getEmail())
+                .userName(actionTakerUserWrapper.getName())
                 .date(new Date())
-                .type(ActivityFiredDTO.Type.MEMO_COMPLETED)
+                .type(Type.MEMO_COMPLETED)
                 .hubId(memo.getHubId().toHexString())
                 .hubName(hub.getName())
                 .memoId(memoId.toHexString())

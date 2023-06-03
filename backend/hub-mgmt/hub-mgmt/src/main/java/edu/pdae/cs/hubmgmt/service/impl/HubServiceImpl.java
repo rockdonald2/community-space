@@ -1,9 +1,11 @@
 package edu.pdae.cs.hubmgmt.service.impl;
 
+import edu.pdae.cs.common.model.Type;
 import edu.pdae.cs.common.model.Visibility;
 import edu.pdae.cs.common.model.dto.ActivityFiredDTO;
 import edu.pdae.cs.common.model.dto.HubMemberMutationDTO;
 import edu.pdae.cs.common.model.dto.HubMutationDTO;
+import edu.pdae.cs.common.util.UserWrapper;
 import edu.pdae.cs.hubmgmt.config.MessagingConfiguration;
 import edu.pdae.cs.hubmgmt.controller.exception.ConflictingOperationException;
 import edu.pdae.cs.hubmgmt.controller.exception.ForbiddenOperationException;
@@ -36,15 +38,16 @@ public class HubServiceImpl implements HubService {
 
     @Override
     @CacheEvict(value = {"hub", "hubs"}, allEntries = true)
-    public HubCreationResponseDTO create(HubCreationDTO hubCreationDTO, String asUser) throws IllegalArgumentException {
+    public HubCreationResponseDTO create(HubCreationDTO hubCreationDTO, UserWrapper userWrapper) throws IllegalArgumentException {
         if (hubCreationDTO.getName() == null || hubCreationDTO.getName().length() < 3) {
             throw new IllegalArgumentException("Hub name must be at least 3 characters long");
         }
 
         final Hub reqHub = modelMapper.map(hubCreationDTO, Hub.class);
         reqHub.setCreatedOn(new Date());
-        reqHub.setOwner(asUser);
-        reqHub.setMembers(new HashSet<>(Collections.singletonList(asUser))); // add owner as first member
+        reqHub.setOwner(userWrapper.getEmail());
+        reqHub.setOwnerName(userWrapper.getName());
+        reqHub.setMembers(new HashSet<>(Collections.singletonList(userWrapper.getEmail()))); // add owner as first member
 
         final Hub createdHub = hubRepository.save(reqHub);
 
@@ -52,16 +55,17 @@ public class HubServiceImpl implements HubService {
         hubMutationDTOKafkaTemplate.send(MessagingConfiguration.HUB_MUTATION_TOPIC, HubMutationDTO.builder()
                 .hubId(createdHub.getId().toHexString())
                 .hubName(createdHub.getName())
-                .owner(asUser)
+                .owner(userWrapper.getEmail())
                 .state(HubMutationDTO.State.CREATED)
                 .build());
         // send message to activity
         activityFiredDTOKafkaTemplate.send(MessagingConfiguration.ACTIVITY_TOPIC, ActivityFiredDTO.builder()
-                .user(asUser)
+                .user(userWrapper.getEmail())
+                .userName(userWrapper.getName())
                 .hubId(createdHub.getId().toHexString())
                 .hubName(createdHub.getName())
                 .date(new Date())
-                .type(ActivityFiredDTO.Type.HUB_CREATED)
+                .type(Type.HUB_CREATED)
                 .visibility(Visibility.PUBLIC)
                 .build());
 

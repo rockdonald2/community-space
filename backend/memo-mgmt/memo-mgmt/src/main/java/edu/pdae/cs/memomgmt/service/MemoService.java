@@ -1,17 +1,17 @@
 package edu.pdae.cs.memomgmt.service;
 
+import edu.pdae.cs.common.model.Visibility;
 import edu.pdae.cs.common.util.PageWrapper;
-import edu.pdae.cs.memomgmt.model.Memo;
+import edu.pdae.cs.common.util.UserWrapper;
 import edu.pdae.cs.memomgmt.model.dto.*;
 import org.bson.types.ObjectId;
-import edu.pdae.cs.common.model.Visibility;
 
 import java.util.Date;
 import java.util.List;
 
 public interface MemoService {
 
-    MemoCreationResponseDTO create(MemoCreationDTO memoCreationDTO, String asUser);
+    MemoCreationResponseDTO create(MemoCreationDTO memoCreationDTO, UserWrapper userWrapper);
 
     MemoCreationResponseDTO update(ObjectId id, MemoUpdateDTO memoUpdateDTO, String asUser);
 
@@ -37,7 +37,7 @@ public interface MemoService {
 
     PageWrapper<MemoDTO> getAllByHubId(ObjectId hubId, String asUser, int currPage, int pageSize);
 
-    MemoCompletionResponseDTO completeMemo(ObjectId memoId, String user, String asUser);
+    MemoCompletionResponseDTO completeMemo(ObjectId memoId, String user, UserWrapper userWrapper);
 
     List<MemoCompletionResponseDTO> getCompletions(ObjectId memoId, String asUser);
 

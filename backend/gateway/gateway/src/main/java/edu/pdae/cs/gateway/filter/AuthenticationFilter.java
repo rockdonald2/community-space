@@ -2,6 +2,7 @@ package edu.pdae.cs.gateway.filter;
 
 import edu.pdae.cs.common.service.JwtService;
 import edu.pdae.cs.gateway.config.GatewayRouteCategorizer;
+import io.jsonwebtoken.Claims;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.cloud.gateway.filter.GatewayFilterChain;
@@ -35,10 +36,14 @@ public class AuthenticationFilter implements GlobalFilter, Ordered {
                 return onError(exchange, HttpStatus.UNAUTHORIZED);
             }
 
-            final String subject = jwtService.extractSubject(token);
+            final Claims claims = jwtService.extractAllClaims(token);
+            final String subject = claims.getSubject();
+            final String firstName = claims.get("FirstName", String.class);
+            final String lastName = claims.get("LastName", String.class);
+
             request = request.mutate()
                     .header("X-AUTH-TOKEN-SUBJECT", subject)
-                    .header("X-AUTH-TOKEN", token)
+                    .header("X-USER-NAME", String.format("%s %s", firstName, lastName))
                     .build();
             exchange = exchange.mutate().request(request).build();
         }

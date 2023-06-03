@@ -21,6 +21,7 @@ export type Memo = {
     id?: string;
     title: string;
     author: string;
+    authorName: string;
     content?: string;
     createdOn: Date;
     visibility: Visibility;
@@ -33,6 +34,7 @@ export type MemoShort = {
     id?: string;
     title: string;
     author: string;
+    authorName: string;
     createdOn: Date;
     visibility: Visibility;
     urgency: Urgency;
@@ -45,6 +47,7 @@ export type Hub = {
     description: string;
     createdOn: Date;
     owner: string;
+    ownerName: string;
     members?: string[];
     waiters?: string[];
     role?: 'OWNER' | 'MEMBER' | 'PENDING' | 'NONE';
@@ -56,6 +59,7 @@ export type HubShort = {
     description: string;
     createdOn: Date;
     owner: string;
+    ownerName: string;
 };
 
 export type Activity = {
@@ -66,6 +70,7 @@ export type Activity = {
     memoId?: string;
     memoTitle?: string;
     user: string;
+    userName: string;
     date: Date;
 };
 
