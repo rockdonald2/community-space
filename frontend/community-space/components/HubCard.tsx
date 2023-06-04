@@ -16,7 +16,7 @@ const HubCard = ({ hub, mutateCallback }: { hub: HubType; mutateCallback: (hub: 
         try {
             const resp = await fetch(`${GATEWAY_URL}/api/v1/hubs/${hub.id}/waiters`, {
                 method: 'POST',
-                body: JSON.stringify({ email: user.email }),
+                body: JSON.stringify({ email: user.email, name: `${user.firstName} ${user.lastName}` }),
                 headers: {
                     'Content-Type': 'application/json',
                     Authorization: `Bearer ${user.token}`,
@@ -48,7 +48,7 @@ const HubCard = ({ hub, mutateCallback }: { hub: HubType; mutateCallback: (hub: 
                 }
             }
         }
-    }, [enqueueSnackbar, hub, mutateCallback, signOut, user.email, user.token]);
+    }, [enqueueSnackbar, hub, mutateCallback, signOut, user.email, user.firstName, user.lastName, user.token]);
 
     return (
         <Card variant='elevation' elevation={1}>

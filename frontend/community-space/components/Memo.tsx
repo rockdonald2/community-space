@@ -190,14 +190,14 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
             <Item>
                 <Grid container alignItems={'center'} justifyContent={'center'}>
                     <Grid item md={11} xs={12}>
-                        <Typography
-                            variant='h6'
-                            sx={{ mb: 1, mr: 1 }}
-                            color='text.primary'
-                            display='flex'
-                            alignItems='center'
-                        >
-                            {memo.title}
+                        <Typography sx={{ mb: 1, mr: 1 }} color='text.primary' display='flex' alignItems='center'>
+                            <Typography
+                                variant='h6'
+                                component='span'
+                                sx={{ textDecoration: memo.completed ? 'line-through' : 'none' }}
+                            >
+                                {memo.title}
+                            </Typography>
                             <Chip sx={{ ml: 2 }} label={memo.visibility.toLowerCase()} />
                         </Typography>
                         <Stack direction={{ md: 'row', xs: 'column' }} alignItems={{ xs: 'flex-start', md: 'center' }}>
@@ -248,7 +248,8 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                 </DialogTitle>
                 <DialogContent sx={{ overflow: 'initial' }}>
                     <Typography sx={{ mb: 0 }} color='text.secondary'>
-                        Memo posted on {longDateShortTimeDateFormatter.format(memo.createdOn)} by {memo.authorName} ({memo.author})
+                        Memo posted on {longDateShortTimeDateFormatter.format(memo.createdOn)} by {memo.authorName} (
+                        {memo.author})
                     </Typography>
                     <Chip label={memo.urgency.toLowerCase()} variant='filled' sx={{ mt: 1, mr: 1 }} />
                     <Chip label={memo.visibility.toLowerCase()} variant='filled' sx={{ mt: 1 }} />

@@ -1,4 +1,4 @@
-import { Hub, Memo, UserShort } from '@/types/db.types';
+import { Hub, Memo, UserShortCombined } from '@/types/db.types';
 import { useAuthContext } from '@/utils/AuthContext';
 import {
     mediumDateWithNoTimeFormatter,
@@ -32,7 +32,7 @@ const HubExploreCard = ({ hub }: { hub: Hub }) => {
         error: hubPendingsError,
         isLoading: hubPendingsIsLoading,
         isValidating: hubPendingsIsValidating,
-    } = useSWR<UserShort[]>(
+    } = useSWR<UserShortCombined[]>(
         hub.role === 'OWNER' ? { key: 'pendings', token: user.token, hubId: hub.id } : null,
         swrWaitersFetcherWithAuth
     );
@@ -42,7 +42,7 @@ const HubExploreCard = ({ hub }: { hub: Hub }) => {
         error: hubMembersError,
         isLoading: hubMembersIsLoading,
         isValidating: hubMembersIsValidating,
-    } = useSWR<UserShort[]>({ key: 'members', token: user.token, hubId: hub.id }, swrMembersFetcherWithAuth);
+    } = useSWR<UserShortCombined[]>({ key: 'members', token: user.token, hubId: hub.id }, swrMembersFetcherWithAuth);
 
     return (
         <>

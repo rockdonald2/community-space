@@ -26,6 +26,7 @@ public class Notification {
     private ObjectId id;
 
     private String owner; // target
+    private String taker; // user
     private String msg;
     private Set<String> reads;
     private Date createdAt;

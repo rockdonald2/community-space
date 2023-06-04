@@ -12,7 +12,7 @@ public interface NotificationService {
 
     void readNotification(ObjectId notificationId, String user);
 
-    Notification addNotification(String target, Notification.TargetType targetType, String msg);
+    Notification addNotification(String target, Notification.TargetType targetType, String msg, String taker);
 
     void handleNotification(NotificationMessageDTO notificationMessageDTO);
 

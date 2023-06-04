@@ -19,5 +19,6 @@ public class NotificationDTO implements Serializable {
     private String id;
     private String msg;
     private Date createdAt;
+    private String taker; // user
 
 }

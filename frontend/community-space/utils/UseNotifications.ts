@@ -39,10 +39,12 @@ export function useNotifications() {
 
     const onNotification = useCallback(
         async (notification: Notification) => {
-            await mutate([notification, ...data], false);
-            enqueueSnackbar('You have a new notification!');
+            if (notification.taker !== user.email) {
+                await mutate([notification, ...data], false);
+                enqueueSnackbar('You have a new notification!');
+            }
         },
-        [data, enqueueSnackbar, mutate]
+        [data, enqueueSnackbar, mutate, user.email]
     );
 
     useEffect(() => {

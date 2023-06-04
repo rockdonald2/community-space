@@ -1,4 +1,4 @@
-import { UserShort } from '@/types/db.types';
+import { UserShortCombined } from '@/types/db.types';
 import { swrMembersFetcherWithAuth } from '@/utils/Utility';
 import { Typography, IconButton, Menu, Divider, MenuItem, ListItemIcon } from '@mui/material';
 import Alerter from './Alerter';
@@ -23,7 +23,7 @@ const Members = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBER
         error: hubMembersError,
         isLoading: hubMembersIsLoading,
         isValidating: hubMembersIsValidating,
-    } = useSWR<UserShort[]>({ key: 'members', token: user.token, hubId: hubId }, swrMembersFetcherWithAuth);
+    } = useSWR<UserShortCombined[]>({ key: 'members', token: user.token, hubId: hubId }, swrMembersFetcherWithAuth);
 
     const [menuAnchorEl, setMenuAnchorEl] = useState<null | HTMLElement>(null);
     const open = useMemo(() => Boolean(menuAnchorEl), [menuAnchorEl]);
@@ -35,7 +35,7 @@ const Members = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBER
     }, []);
 
     const handleRemoveMember = useCallback(
-        async (memberUser: UserShort) => {
+        async (memberUser: UserShortCombined) => {
             try {
                 const res = await fetch(`${GATEWAY_URL}/api/v1/hubs/${hubId}/members/${memberUser.email}`, {
                     method: 'DELETE',
@@ -80,7 +80,8 @@ const Members = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBER
                         size='small'
                         onClick={handleClick}
                         sx={{ cursor: 'pointer' }}
-                        data-user={user.email}
+                        data-email={user.email}
+                        data-user={user.name}
                     >
                         <Avatar
                             style={{ cursor: 'pointer' }}
@@ -116,18 +117,29 @@ const Members = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBER
                     anchorOrigin={{ horizontal: 'center', vertical: 'bottom' }}
                 >
                     <Typography
-                        sx={{ padding: 1, textAlign: 'left', mb: 0.5 }}
+                        sx={{ padding: 1, textAlign: 'left', pb: 0 }}
                         variant='subtitle1'
                         color='text.secondary'
                     >
                         {menuAnchorEl?.dataset.user || <SkeletonLoader nrOfLayers={1} />}
                     </Typography>
+                    <Typography
+                        sx={{ padding: 1, textAlign: 'left', mb: 0.5 }}
+                        variant='caption'
+                        color='text.secondary'
+                        component={'p'}
+                    >
+                        {menuAnchorEl?.dataset.email || <SkeletonLoader nrOfLayers={1} />}
+                    </Typography>
                     <Divider sx={{ mb: 0.5 }} />
-                    {menuAnchorEl?.dataset.user && menuAnchorEl?.dataset.user !== user.email && hubRole === 'OWNER' ? (
+                    {menuAnchorEl?.dataset.email && menuAnchorEl?.dataset.email !== user.email && hubRole === 'OWNER' ? (
                         <MenuItem
                             onClick={async () => {
                                 handleClose();
-                                await handleRemoveMember({ email: menuAnchorEl?.dataset.user });
+                                await handleRemoveMember({
+                                    email: menuAnchorEl?.dataset.email,
+                                    name: menuAnchorEl?.dataset.user,
+                                });
                             }}
                         >
                             <ListItemIcon>

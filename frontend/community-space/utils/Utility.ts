@@ -446,6 +446,7 @@ export const calculateRelativeTimeFromNow = (date: Date): string => {
     const diff: number = currDate.getTime() - date.getTime();
     const totalDaysBetween: number = Math.floor(diff / (1000 * 3600 * 24));
     const totalHoursBetween: number = Math.floor(diff / (1000 * 3600));
+    const totalMinsBetween: number = Math.floor(diff / (1000 * 60));
 
     if (totalDaysBetween >= 1) {
         return formatter.format(-1 * totalDaysBetween, 'day');
@@ -453,7 +454,11 @@ export const calculateRelativeTimeFromNow = (date: Date): string => {
         return formatter.format(-1 * totalHoursBetween, 'hour');
     }
 
-    return formatter.format(-1 * Math.floor(diff / (1000 * 60)), 'minute');
+    if (totalMinsBetween >= 1) {
+        return formatter.format(-1 * totalMinsBetween, 'minute');
+    } else {
+        return 'just now';
+    }
 };
 
 export const getCurrentMonthName = (): string => {

@@ -47,7 +47,7 @@ public class HubServiceImpl implements HubService {
         reqHub.setCreatedOn(new Date());
         reqHub.setOwner(userWrapper.getEmail());
         reqHub.setOwnerName(userWrapper.getName());
-        reqHub.setMembers(new HashSet<>(Collections.singletonList(userWrapper.getEmail()))); // add owner as first member
+        reqHub.setMembers(new HashSet<>(Collections.singletonList(UserWrapper.builder().email(userWrapper.getEmail()).name(userWrapper.getName()).build()))); // add owner as first member
 
         final Hub createdHub = hubRepository.save(reqHub);
 
@@ -80,9 +80,9 @@ public class HubServiceImpl implements HubService {
 
         if (hub.getOwner().equals(asUser)) {
             hubDetailsDTO.setRole(Role.OWNER);
-        } else if (hub.getMembers().contains(asUser)) {
+        } else if (hub.getMembers().stream().anyMatch(member -> member.getEmail().equals(asUser))) {
             hubDetailsDTO.setRole(Role.MEMBER);
-        } else if (hub.getWaiting().contains(asUser)) {
+        } else if (hub.getWaiting().stream().anyMatch(member -> member.getEmail().equals(asUser))) {
             hubDetailsDTO.setRole(Role.PENDING);
         } else {
             hubDetailsDTO.setRole(Role.NONE);
@@ -103,9 +103,9 @@ public class HubServiceImpl implements HubService {
 
             if (hub.getOwner().equals(asUser)) {
                 hubDTO.setRole(Role.OWNER);
-            } else if (hub.getMembers().contains(asUser)) {
+            } else if (hub.getMembers().stream().anyMatch(member -> member.getEmail().equals(asUser))) {
                 hubDTO.setRole(Role.MEMBER);
-            } else if (hub.getWaiting().contains(asUser)) {
+            } else if (hub.getWaiting().stream().anyMatch(member -> member.getEmail().equals(asUser))) {
                 hubDTO.setRole(Role.PENDING);
             } else {
                 hubDTO.setRole(Role.NONE);
@@ -171,12 +171,12 @@ public class HubServiceImpl implements HubService {
     public List<MemberDTO> getMembers(ObjectId hubId, String asUser) throws ForbiddenOperationException {
         final Hub hub = hubRepository.findById(hubId).orElseThrow();
 
-        if (!hub.getMembers().contains(asUser)) {
+        if (hub.getMembers().stream().noneMatch(m -> m.getEmail().equals(asUser))) {
             log.warn("User {} is not a member of hub {}", asUser, hubId);
             throw new ForbiddenOperationException("You are not a member of this hub");
         }
 
-        return hub.getMembers().stream().map(MemberDTO::new).toList();
+        return hub.getMembers().stream().map(member -> MemberDTO.builder().email(member.getEmail()).name(member.getName()).build()).toList();
     }
 
     @Override
@@ -184,12 +184,13 @@ public class HubServiceImpl implements HubService {
     public MemberDTO getMember(ObjectId hubId, String email, String asUser) throws ForbiddenOperationException {
         final Hub hub = hubRepository.findById(hubId).orElseThrow();
 
-        if (!hub.getMembers().contains(asUser)) {
+        if (hub.getMembers().stream().noneMatch(m -> m.getEmail().equals(asUser) || m.getEmail().equals(email))) {
             log.warn("User {} is not a member of hub {}", asUser, hubId);
             throw new ForbiddenOperationException("You are not a member of this hub");
         }
 
-        return new MemberDTO(hub.getMembers().stream().filter(email::equals).findFirst().orElseThrow());
+        final UserWrapper member = hub.getMembers().stream().filter(m -> m.getEmail().equals(email)).findFirst().orElseThrow();
+        return MemberDTO.builder().email(member.getEmail()).name(member.getName()).build();
     }
 
     @Override
@@ -203,12 +204,12 @@ public class HubServiceImpl implements HubService {
             throw new ForbiddenOperationException("You are not the owner of this hub");
         }
 
-        if (hub.getMembers().contains(memberDTO.getEmail())) {
+        if (hub.getMembers().stream().anyMatch(member -> member.getEmail().equals(memberDTO.getEmail()))) {
             log.warn("User {} is already a member of hub {}", memberDTO.getEmail(), hubId);
             throw new ConflictingOperationException("This user is already a member of this hub");
         }
 
-        hub.getMembers().add(memberDTO.getEmail());
+        hub.getMembers().add(UserWrapper.builder().email(memberDTO.getEmail()).name(memberDTO.getName()).build());
         hubRepository.save(hub);
         memberMutationDTOKafkaTemplate.send(MessagingConfiguration.MEMBER_MUTATION_TOPIC, HubMemberMutationDTO.builder().hubId(hubId.toHexString()).email(memberDTO.getEmail()).state(HubMemberMutationDTO.State.ADDED).build());
     }
@@ -223,7 +224,7 @@ public class HubServiceImpl implements HubService {
             throw new ForbiddenOperationException("You are not the owner of this hub");
         }
 
-        if (!hub.getMembers().contains(email)) {
+        if (hub.getMembers().stream().noneMatch(member -> member.getEmail().equals(email))) {
             log.warn("User {} is not a member of hub {}", email, hubId);
             throw new ConflictingOperationException("This user is not a member of this hub");
         }
@@ -233,7 +234,7 @@ public class HubServiceImpl implements HubService {
             throw new ConflictingOperationException("You cannot remove the owner of this hub");
         }
 
-        hub.getMembers().remove(email);
+        hub.getMembers().removeIf(member -> member.getEmail().equals(email));
         hubRepository.save(hub);
         memberMutationDTOKafkaTemplate.send(MessagingConfiguration.MEMBER_MUTATION_TOPIC, HubMemberMutationDTO.builder().hubId(hubId.toHexString()).email(email).state(HubMemberMutationDTO.State.REMOVED).build());
     }
@@ -248,7 +249,7 @@ public class HubServiceImpl implements HubService {
             throw new ForbiddenOperationException("You are not the owner of this hub");
         }
 
-        return hub.getWaiting().stream().map(MemberDTO::new).toList();
+        return hub.getWaiting().stream().map(waiter -> MemberDTO.builder().email(waiter.getEmail()).name(waiter.getName()).build()).toList();
     }
 
     @Override
@@ -257,18 +258,17 @@ public class HubServiceImpl implements HubService {
         Objects.requireNonNull(memberDTO.getEmail(), "Email must not be null");
         final Hub hub = hubRepository.findById(hubId).orElseThrow();
 
-        if (hub.getWaiting().contains(memberDTO.getEmail())) {
+        if (hub.getWaiting().stream().anyMatch(member -> member.getEmail().equals(memberDTO.getEmail()))) {
             log.warn("User {} is already waiting for hub {}", memberDTO.getEmail(), hubId);
             throw new ConflictingOperationException("This user is already waiting for this hub");
         }
 
-        if (hub.getMembers().contains(memberDTO.getEmail())) {
+        if (hub.getMembers().stream().anyMatch(member -> member.getEmail().equals(memberDTO.getEmail()))) {
             log.warn("User {} is already a member of hub {}", memberDTO.getEmail(), hubId);
             throw new ConflictingOperationException("This user is already a member of this hub");
         }
 
-        hub.getWaiting().add(memberDTO.getEmail());
-
+        hub.getWaiting().add(UserWrapper.builder().email(memberDTO.getEmail()).name(memberDTO.getName()).build());
         hubRepository.save(hub);
     }
 
@@ -282,12 +282,12 @@ public class HubServiceImpl implements HubService {
             throw new ForbiddenOperationException("You are not the owner of this hub");
         }
 
-        if (!hub.getWaiting().contains(email)) {
+        if (hub.getWaiting().stream().noneMatch(waiter -> waiter.getEmail().equals(email))) {
             log.warn("User {} is not waiting for hub {}", email, hubId);
             throw new ConflictingOperationException("This user is not waiting for this hub");
         }
 
-        hub.getWaiting().remove(email);
+        hub.getWaiting().removeIf(waiter -> waiter.getEmail().equals(email));
         hubRepository.save(hub);
     }
 

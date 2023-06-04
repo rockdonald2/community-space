@@ -1,6 +1,5 @@
 import { Container, Divider, IconButton, ListItemIcon, Menu, MenuItem, Typography } from '@mui/material';
 import Alerter from './Alerter';
-import { UserShort } from '@/types/db.types';
 import { swrWaitersFetcherWithAuth } from '@/utils/Utility';
 import Avatar from './Avatar';
 import useSWR, { useSWRConfig } from 'swr';
@@ -11,6 +10,7 @@ import SkeletonLoader from './SkeletonLoader';
 import PersonAddIcon from '@mui/icons-material/PersonAdd';
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove';
 import { useSnackbar } from 'notistack';
+import { UserShortCombined } from '@/types/db.types';
 
 const Pendings = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBER' | 'PENDING' | 'NONE' }) => {
     const { user, signOut } = useAuthContext();
@@ -31,10 +31,10 @@ const Pendings = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBE
         error: hubPendingsError,
         isLoading: hubPendingsIsLoading,
         isValidating: hubPendingsIsValidating,
-    } = useSWR<UserShort[]>({ key: 'pendings', token: user.token, hubId: hubId }, swrWaitersFetcherWithAuth);
+    } = useSWR<UserShortCombined[]>({ key: 'pendings', token: user.token, hubId: hubId }, swrWaitersFetcherWithAuth);
 
     const handleJoinHub = useCallback(
-        async ({ pendingMember }: { pendingMember: UserShort }) => {
+        async ({ pendingMember }: { pendingMember: UserShortCombined }) => {
             // we need to make 2 calls, one to delete it from the waiters club and add it to the members of a hub
             try {
                 const waiterResp = await fetch(`${GATEWAY_URL}/api/v1/hubs/${hubId}/waiters/${pendingMember.email}`, {
@@ -56,7 +56,7 @@ const Pendings = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBE
                         Authorization: `Bearer ${user.token}`,
                         'Content-Type': 'application/json',
                     },
-                    body: JSON.stringify({ email: pendingMember.email }),
+                    body: JSON.stringify({ email: pendingMember.email, name: `${pendingMember.name}` }),
                 });
 
                 if (!membersResp.ok) {
@@ -88,7 +88,7 @@ const Pendings = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBE
     );
 
     const handleDecline = useCallback(
-        async ({ pendingMember }: { pendingMember: UserShort }) => {
+        async ({ pendingMember }: { pendingMember: UserShortCombined }) => {
             try {
                 const res = await fetch(`${GATEWAY_URL}/api/v1/hubs/${hubId}/waiters/${pendingMember.email}`, {
                     method: 'DELETE',
@@ -138,7 +138,8 @@ const Pendings = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBE
                                     size='small'
                                     onClick={handleClick}
                                     sx={{ cursor: 'pointer' }}
-                                    data-user={user.email}
+                                    data-user={user.name}
+                                    data-email={user.email}
                                 >
                                     <Avatar user={user} generateRandomColor cursor='pointer' />
                                 </IconButton>
@@ -177,16 +178,28 @@ const Pendings = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBE
                 transformOrigin={{ horizontal: 'center', vertical: 'top' }}
                 anchorOrigin={{ horizontal: 'center', vertical: 'bottom' }}
             >
-                <Typography sx={{ padding: 1, textAlign: 'left', mb: 0.5 }} variant='subtitle1' color='text.secondary'>
+                <Typography sx={{ padding: 1, textAlign: 'left', pb: 0 }} variant='subtitle1' color='text.secondary'>
                     {menuAnchorEl?.dataset.user || <SkeletonLoader nrOfLayers={1} />}
                 </Typography>
-                <Divider sx={{ mb: 0.5 }} />
+                <Typography
+                    sx={{ padding: 1, textAlign: 'left', mb: 0.5 }}
+                    variant='caption'
+                    color='text.secondary'
+                    component={'p'}
+                >
+                    {menuAnchorEl?.dataset.email || <SkeletonLoader nrOfLayers={1} />}
+                </Typography>
                 {menuAnchorEl?.dataset.user && menuAnchorEl?.dataset.user !== user.email && hubRole === 'OWNER' ? (
                     <div>
                         <MenuItem
                             onClick={() => {
                                 handleClose();
-                                handleJoinHub({ pendingMember: { email: menuAnchorEl?.dataset.user } });
+                                handleJoinHub({
+                                    pendingMember: {
+                                        email: menuAnchorEl?.dataset.email,
+                                        name: menuAnchorEl?.dataset.user,
+                                    },
+                                });
                             }}
                         >
                             <ListItemIcon>
@@ -197,7 +210,12 @@ const Pendings = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBE
                         <MenuItem
                             onClick={() => {
                                 handleClose();
-                                handleDecline({ pendingMember: { email: menuAnchorEl?.dataset.user } });
+                                handleDecline({
+                                    pendingMember: {
+                                        email: menuAnchorEl?.dataset.email,
+                                        name: menuAnchorEl?.dataset.user,
+                                    },
+                                });
                             }}
                         >
                             <ListItemIcon>

@@ -23,5 +23,6 @@ public class MemoDTO {
     private Visibility visibility;
     private Memo.Urgency urgency;
     private String hubId;
+    private boolean completed;
 
 }

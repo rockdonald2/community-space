@@ -5,10 +5,11 @@ import { longDateShortTimeDateFormatter, swrActivitiesFetcherWithAuth } from '@/
 import Head from 'next/head';
 import Item from '@/components/Item';
 import Alerter from '@/components/Alerter';
-import { Chip, Typography, Link as MaterialLink, Pagination } from '@mui/material';
+import { Chip, Typography, Link as MaterialLink, Pagination, Stack } from '@mui/material';
 import Link from 'next/link';
 import { useState } from 'react';
 import Breadcrumbs from '@/components/Breadcrumbs';
+import Avatar from '@/components/Avatar';
 
 const Activity = () => {
     const { user } = useAuthContext();
@@ -51,15 +52,24 @@ const Activity = () => {
                                 }}
                                 key={idx}
                             >
-                                <Typography>
-                                    <strong>{activity.userName}</strong> ({activity.user}){' '}
-                                    {activity.type.toLocaleLowerCase().split('_').reverse().join(' a ')} (
-                                    {activity.type.includes('MEMO') && `${activity.memoTitle} in `}
-                                    <MaterialLink component={Link} href={`/hubs/${activity.hubId}`} sx={{ mx: 0.5 }}>
-                                        {activity.hubName}
-                                    </MaterialLink>
-                                    )
-                                </Typography>
+                                <Stack>
+                                    <Typography variant='body1' sx={{ mb: 1.5 }}>
+                                        <Avatar user={{ email: activity.user }} generateRandomColor />
+                                        <strong style={{ marginLeft: '.5rem' }}>{activity.userName}</strong>
+                                    </Typography>
+                                    <Typography>
+                                        {activity.type.toLocaleLowerCase().split('_').reverse().join(' a ')} (
+                                        {activity.type.includes('MEMO') && `${activity.memoTitle} in `}
+                                        <MaterialLink
+                                            component={Link}
+                                            href={`/hubs/${activity.hubId}`}
+                                            sx={{ mx: 0.5 }}
+                                        >
+                                            {activity.hubName}
+                                        </MaterialLink>
+                                        )
+                                    </Typography>
+                                </Stack>
                                 <Chip
                                     label={longDateShortTimeDateFormatter.format(new Date(activity.date))}
                                     variant='filled'

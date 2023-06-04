@@ -3,6 +3,7 @@ package edu.pdae.cs.hubmgmt.model;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
+import edu.pdae.cs.common.util.UserWrapper;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -40,8 +41,8 @@ public class Hub {
     private String ownerName;
 
     @Builder.Default
-    private Set<String> members = new HashSet<>();
+    private Set<UserWrapper> members = new HashSet<>();
     @Builder.Default
-    private Set<String> waiting = new HashSet<>();
+    private Set<UserWrapper> waiting = new HashSet<>();
 
 }

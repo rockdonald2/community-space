@@ -11,6 +11,11 @@ export type UserShort = {
     lastName?: string;
 };
 
+export type UserShortCombined = {
+    email: string;
+    name?: string;
+};
+
 export type Visibility = 'PUBLIC' | 'PRIVATE' | '';
 export const visibilities: Visibility[] = ['PRIVATE', 'PUBLIC'];
 
@@ -39,6 +44,7 @@ export type MemoShort = {
     visibility: Visibility;
     urgency: Urgency;
     hubId: string;
+    completed?: boolean;
 };
 
 export type Hub = {
@@ -91,4 +97,5 @@ export type Notification = {
     msg: string;
     createdAt: Date;
     isRead?: boolean;
+    taker: string;
 };

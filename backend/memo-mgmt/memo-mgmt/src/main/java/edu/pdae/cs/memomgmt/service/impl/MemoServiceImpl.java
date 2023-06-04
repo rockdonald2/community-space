@@ -319,7 +319,11 @@ public class MemoServiceImpl implements MemoService {
         memos = filterForUser(memos, asUser);
 
         final var memoDTOs = memos.stream()
-                .map(memo -> modelMapper.map(memo, MemoDTO.class))
+                .map(memo -> {
+                    final var m = modelMapper.map(memo, MemoDTO.class);
+                    m.setCompleted(memo.getCompletions().contains(asUser));
+                    return m;
+                })
                 .toList();
 
         return PageWrapper.<MemoDTO>builder()
