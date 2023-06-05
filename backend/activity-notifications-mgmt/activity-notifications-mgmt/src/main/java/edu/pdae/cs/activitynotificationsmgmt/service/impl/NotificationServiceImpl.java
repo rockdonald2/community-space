@@ -127,10 +127,10 @@ public class NotificationServiceImpl implements NotificationService {
 
         // notify everyone, except the action taker
         members.forEach(member -> {
-            final var notification = addNotification(member, Notification.TargetType.USER, String.format("You have a memo %s due in %s", memo.getTitle(), diffString), memo.getOwner());
+            final var notification = addNotification(member, Notification.TargetType.USER, String.format("You have a memo %s in %s due in %s", memo.getTitle(), hub.getName(), diffString), memo.getOwner());
             broadcastNotification(member, NotificationDTO.builder()
                     .id(notification.getId().toHexString())
-                    .msg(String.format("You have a memo %s due in %s", memo.getTitle(), diffString))
+                    .msg(String.format("You have a memo %s in %s due in %s", memo.getTitle(), hub.getName(), diffString))
                     .createdAt(notification.getCreatedAt())
                     .taker(memo.getOwner())
                     .build());
