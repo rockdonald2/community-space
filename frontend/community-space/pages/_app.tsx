@@ -13,22 +13,19 @@ import { RouteGuard } from '@/utils/RouteGuard';
 import CrossContextProvider from '@/utils/CrossContext';
 import { CookiesProvider } from 'react-cookie';
 import SnackbarProvider from '@/utils/SnackbarProvider';
-import { Roboto, Inter } from 'next/font/google';
+import { Open_Sans } from 'next/font/google';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import 'dayjs/locale/en-gb';
 
-const roboto = Roboto({
-    subsets: ['latin-ext'],
+const openSans = Open_Sans({
     weight: ['300', '400', '500', '700'],
-});
-const inter = Inter({
-    subsets: ['latin-ext'],
+    subsets: ['latin'],
 });
 
 const theme = extendTheme({
     typography: {
-        fontFamily: `${inter.style.fontFamily}, ${roboto.style.fontFamily}, sans-serif`,
+        fontFamily: `${openSans.style.fontFamily}, sans-serif`,
     },
 });
 

@@ -205,7 +205,7 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                             >
                                 {memo.title}
                             </Typography>
-                            <Chip sx={{ ml: 2 }} label={memo.visibility.toLowerCase()} />
+                            <Chip size='small' sx={{ ml: 2 }} label={memo.visibility.toLowerCase()} />
                         </Typography>
                         <Stack direction={{ md: 'row', xs: 'column' }} alignItems={{ xs: 'flex-start', md: 'center' }}>
                             <Typography sx={{ fontSize: 14, mb: 0 }} color='text.secondary' gutterBottom>
@@ -258,8 +258,8 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                         Memo posted on {longDateShortTimeDateFormatter.format(memo.createdOn)} by {memo.authorName} (
                         {memo.author})
                     </Typography>
-                    <Chip label={memo.urgency.toLowerCase()} variant='filled' sx={{ mt: 1, mr: 1 }} />
-                    <Chip label={memo.visibility.toLowerCase()} variant='filled' sx={{ mt: 1 }} />
+                    <Chip size='small' label={memo.urgency.toLowerCase()} variant='filled' sx={{ mt: 1, mr: 1 }} />
+                    <Chip size='small' label={memo.visibility.toLowerCase()} variant='filled' sx={{ mt: 1 }} />
                     {prevMemoData?.dueDate && (
                         <Typography sx={{ mb: 0, mt: 2, display: 'flex', alignContent: 'center' }}>
                             <EventIcon sx={{ mr: 1 }} /> Due on{' '}
