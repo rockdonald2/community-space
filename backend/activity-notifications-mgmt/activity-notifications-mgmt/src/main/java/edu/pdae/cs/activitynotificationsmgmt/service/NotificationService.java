@@ -1,6 +1,7 @@
 package edu.pdae.cs.activitynotificationsmgmt.service;
 
 import edu.pdae.cs.activitynotificationsmgmt.model.Notification;
+import edu.pdae.cs.activitynotificationsmgmt.model.dto.DueMemoDTO;
 import edu.pdae.cs.activitynotificationsmgmt.model.dto.NotificationMessageDTO;
 import edu.pdae.cs.common.model.dto.NotificationDTO;
 import org.bson.types.ObjectId;
@@ -19,5 +20,9 @@ public interface NotificationService {
     void broadcastNotification(String target, NotificationDTO notificationDTO);
 
     List<NotificationDTO> getNotifications(String target, String asUser, Date from, Date to);
+
+    void queryDueMemos();
+
+    void handleDueMemo(DueMemoDTO dueMemoDTO);
 
 }

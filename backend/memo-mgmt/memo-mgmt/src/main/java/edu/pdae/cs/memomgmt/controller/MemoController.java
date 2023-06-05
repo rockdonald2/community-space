@@ -42,11 +42,11 @@ public class MemoController {
 
         // send a message to Kafka about the creation
         memoMutationDTOKafkaTemplate.send(MessagingConfiguration.MEMO_MUTATION_TOPIC, MemoMutationDTO.builder()
+                .state(MemoMutationDTO.State.CREATED)
                 .hubId(createdDto.getHubId())
                 .memoId(createdDto.getId())
                 .title(createdDto.getTitle())
                 .owner(user)
-                .state(MemoMutationDTO.State.CREATED)
                 .visibility(createdDto.getVisibility())
                 .dueDate(createdDto.getDueDate())
                 .build());
@@ -100,7 +100,18 @@ public class MemoController {
     public MemoCreationResponseDTO update(@PathVariable("id") ObjectId id, @Valid @RequestBody MemoUpdateDTO memoUpdateDTO, @RequestHeader("X-AUTH-TOKEN-SUBJECT") String user) {
         log.info("Modifying existing memo {}", id);
         Objects.requireNonNull(user);
-        return memoService.update(id, memoUpdateDTO, user);
+        final var memo = memoService.update(id, memoUpdateDTO, user);
+
+        // send a message to Kafka about the update
+        memoMutationDTOKafkaTemplate.send(MessagingConfiguration.MEMO_MUTATION_TOPIC, MemoMutationDTO.builder()
+                .memoId(memo.getId())
+                .state(MemoMutationDTO.State.UPDATED)
+                .title(memo.getTitle())
+                .visibility(memo.getVisibility())
+                .dueDate(memo.getDueDate())
+                .build());
+
+        return memo;
     }
 
     @DeleteMapping("/{id}")

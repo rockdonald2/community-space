@@ -10,8 +10,9 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.NoSuchElementException;
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
+import java.util.*;
 
 @Service
 @RequiredArgsConstructor
@@ -29,6 +30,7 @@ public class MemoServiceImpl implements MemoService {
                 .hubId(hubId)
                 .visibility(visibility)
                 .dueDate(dueDate)
+                .completions(new HashSet<>())
                 .build();
         memoRepository.save(memo);
     }
@@ -49,6 +51,31 @@ public class MemoServiceImpl implements MemoService {
     @CacheEvict("memo")
     public void deleteAllByHubId(ObjectId hubId) {
         memoRepository.deleteAllByHubId(hubId);
+    }
+
+    @Override
+    public void addCompletion(ObjectId memoId, String userEmail) {
+        final Memo memo = memoRepository.findById(memoId).orElseThrow();
+
+        memo.getCompletions().add(userEmail);
+
+        memoRepository.save(memo);
+    }
+
+    @Override
+    public void updateMemo(ObjectId memoId, String memoTitle, Visibility visibility, Date dueDate) {
+        final Memo memo = memoRepository.findById(memoId).orElseThrow();
+
+        memo.setTitle(memoTitle);
+        memo.setVisibility(visibility);
+        memo.setDueDate(dueDate);
+
+        memoRepository.save(memo);
+    }
+
+    @Override
+    public List<Memo> getDueMemos() {
+        return memoRepository.findAllByDueDateBetweenAndVisibility(new Date(), new Date(Instant.now().plus(1, ChronoUnit.DAYS).toEpochMilli()), Visibility.PUBLIC);
     }
 
 }

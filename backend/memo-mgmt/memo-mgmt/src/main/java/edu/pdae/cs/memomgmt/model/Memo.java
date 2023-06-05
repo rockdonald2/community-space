@@ -14,7 +14,7 @@ import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
 import java.util.Date;
-import java.util.List;
+import java.util.Set;
 
 @Data
 @Builder
@@ -36,7 +36,7 @@ public class Memo {
     private Date createdOn;
     private Visibility visibility;
     private Urgency urgency;
-    private List<String> completions;
+    private Set<String> completions;
     private Date dueDate;
 
     @JsonSerialize(using = ToStringSerializer.class)

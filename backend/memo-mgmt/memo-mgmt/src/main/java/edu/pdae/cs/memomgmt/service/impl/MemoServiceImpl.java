@@ -25,8 +25,8 @@ import org.springframework.data.domain.PageRequest;
 import org.springframework.kafka.core.KafkaTemplate;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -55,7 +55,7 @@ public class MemoServiceImpl implements MemoService {
         reqMemo.setId(null);
         reqMemo.setAuthor(userWrapper.getEmail());
         reqMemo.setAuthorName(userWrapper.getName());
-        reqMemo.setCompletions(new ArrayList<>());
+        reqMemo.setCompletions(new HashSet<>());
 
         if (memoCreationDTO.getDueDate() != null) {
             reqMemo.setDueDate(memoCreationDTO.getDueDate());

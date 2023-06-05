@@ -1,5 +1,6 @@
 package edu.pdae.cs.activitynotificationsmgmt.config;
 
+import edu.pdae.cs.activitynotificationsmgmt.model.dto.DueMemoDTO;
 import edu.pdae.cs.activitynotificationsmgmt.model.dto.NotificationMessageDTO;
 import edu.pdae.cs.common.model.dto.ActivityFiredDTO;
 import edu.pdae.cs.common.model.dto.HubMemberMutationDTO;
@@ -33,6 +34,7 @@ import java.util.Map;
 public class MessagingConfiguration {
 
     public static final String ACTIVITY_TOPIC = "cs.activity-mgmt.activity-topic";
+    public static final String DUE_MEMO_TOPIC = "cs.activity-mgmt.due-memo-topic";
     public static final String MEMBER_MUTATION_TOPIC = "cs.hub-mgmt.hub-member-mutation-topic";
     public static final String HUB_MUTATION_TOPIC = "cs.hub-mgmt.hub-mutation-topic";
     public static final String MEMO_MUTATION_TOPIC = "cs.memo-mgmt.memo-mutation-topic";
@@ -138,6 +140,36 @@ public class MessagingConfiguration {
     }
 
     @Bean
+    public ProducerFactory<String, DueMemoDTO> dueMemoDTOProducerFactory() {
+        final Map<String, Object> configs = new HashMap<>(kafkaProperties.buildProducerProperties());
+
+        configs.put(ProducerConfig.KEY_SERIALIZER_CLASS_CONFIG, StringSerializer.class);
+        configs.put(ProducerConfig.VALUE_SERIALIZER_CLASS_CONFIG, JsonSerializer.class);
+
+        return new DefaultKafkaProducerFactory<>(configs);
+    }
+
+    @Bean
+    public KafkaTemplate<String, DueMemoDTO> dueMemoDTOKafkaTemplate() {
+        return new KafkaTemplate<>(dueMemoDTOProducerFactory());
+    }
+
+    @Bean
+    public ConsumerFactory<String, DueMemoDTO> dueMemoDTOConsumerFactory() {
+        final Map<String, Object> props = new HashMap<>(kafkaProperties.buildConsumerProperties());
+        final var jsonDeserializer = new JsonDeserializer<>(DueMemoDTO.class);
+
+        return new DefaultKafkaConsumerFactory<>(props, new StringDeserializer(), jsonDeserializer);
+    }
+
+    @Bean
+    public ConcurrentKafkaListenerContainerFactory<String, DueMemoDTO> dueMemoDTOConcurrentKafkaListenerContainerFactory() {
+        ConcurrentKafkaListenerContainerFactory<String, DueMemoDTO> factory = new ConcurrentKafkaListenerContainerFactory<>();
+        factory.setConsumerFactory(dueMemoDTOConsumerFactory());
+        return factory;
+    }
+
+    @Bean
     public RecordMessageConverter messageConverter() {
         return new ByteArrayJsonMessageConverter();
     }
@@ -145,6 +177,10 @@ public class MessagingConfiguration {
     @Bean
     public NewTopic activityTopic() {
         return TopicBuilder.name(ACTIVITY_TOPIC).build();
+    }
+
+    public NewTopic dueMemoTopic() {
+        return TopicBuilder.name(DUE_MEMO_TOPIC).build();
     }
 
 }

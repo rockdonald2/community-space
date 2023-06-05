@@ -108,7 +108,6 @@ const Notifications = () => {
                                     <Stack>
                                         <Typography
                                             variant='body2'
-                                            color='text.secondary'
                                             sx={{
                                                 paddingLeft: 1.5,
                                                 paddingRight: 1.5,

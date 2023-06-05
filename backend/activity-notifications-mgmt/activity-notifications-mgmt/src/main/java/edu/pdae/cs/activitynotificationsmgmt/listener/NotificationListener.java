@@ -9,6 +9,7 @@ import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.pdae.cs.activitynotificationsmgmt.config.MessagingConfiguration;
 import edu.pdae.cs.activitynotificationsmgmt.model.Notification;
+import edu.pdae.cs.activitynotificationsmgmt.model.dto.DueMemoDTO;
 import edu.pdae.cs.activitynotificationsmgmt.model.dto.NotificationMessageDTO;
 import edu.pdae.cs.activitynotificationsmgmt.service.NotificationService;
 import edu.pdae.cs.common.model.dto.UserDataDTO;
@@ -55,6 +56,17 @@ public class NotificationListener {
     public void notificationListener(@Payload NotificationMessageDTO notificationMessageDTO) {
         log.info("Caught internal message for notification: {}", notificationMessageDTO);
         notificationService.handleNotification(notificationMessageDTO);
+    }
+
+    @KafkaListener(
+            topics = MessagingConfiguration.DUE_MEMO_TOPIC,
+            groupId = "cs-activity-notifications-mgmt:due-memo-listener-group",
+            autoStartup = "true",
+            containerFactory = "dueMemoDTOConcurrentKafkaListenerContainerFactory"
+    )
+    public void dueMemoListener(@Payload DueMemoDTO dueMemoDTO) {
+        log.info("Caught internal message for due memo: {}", dueMemoDTO);
+        notificationService.handleDueMemo(dueMemoDTO);
     }
 
     private ConnectListener onConnected() {

@@ -33,7 +33,8 @@ public class MemoMutationDTO {
 
     public enum State {
         CREATED,
-        DELETED
+        DELETED,
+        UPDATED
     }
 
 }

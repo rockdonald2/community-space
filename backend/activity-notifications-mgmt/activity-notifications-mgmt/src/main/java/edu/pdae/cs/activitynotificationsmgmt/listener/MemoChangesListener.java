@@ -28,6 +28,7 @@ public class MemoChangesListener {
             case CREATED ->
                     memoService.createMemo(new ObjectId(memoMutationDTO.getMemoId()), memoMutationDTO.getTitle(), memoMutationDTO.getOwner(), new ObjectId(memoMutationDTO.getHubId()), memoMutationDTO.getVisibility(), memoMutationDTO.getDueDate());
             case DELETED -> memoService.deleteMemo(new ObjectId(memoMutationDTO.getMemoId()));
+            case UPDATED -> memoService.updateMemo(new ObjectId(memoMutationDTO.getMemoId()), memoMutationDTO.getTitle(), memoMutationDTO.getVisibility(), memoMutationDTO.getDueDate());
         }
     }
 

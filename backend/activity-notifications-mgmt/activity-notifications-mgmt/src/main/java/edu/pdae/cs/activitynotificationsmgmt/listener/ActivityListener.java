@@ -3,6 +3,8 @@ package edu.pdae.cs.activitynotificationsmgmt.listener;
 import edu.pdae.cs.activitynotificationsmgmt.config.MessagingConfiguration;
 import edu.pdae.cs.activitynotificationsmgmt.model.dto.NotificationMessageDTO;
 import edu.pdae.cs.activitynotificationsmgmt.service.ActivityService;
+import edu.pdae.cs.activitynotificationsmgmt.service.MemoService;
+import edu.pdae.cs.common.model.Type;
 import edu.pdae.cs.common.model.Visibility;
 import edu.pdae.cs.common.model.dto.ActivityFiredDTO;
 import lombok.RequiredArgsConstructor;
@@ -20,6 +22,7 @@ public class ActivityListener {
 
     private final ActivityService activityService;
     private final KafkaTemplate<String, NotificationMessageDTO> notificationDTOKafkaTemplate;
+    private final MemoService memoService;
 
     @KafkaListener(topics = MessagingConfiguration.ACTIVITY_TOPIC,
             groupId = "cs-activity-mgmt:activity-listener-group",
@@ -32,6 +35,10 @@ public class ActivityListener {
             activityService.addActivity(activityFiredDTO.getUser(), activityFiredDTO.getUserName(), new ObjectId(activityFiredDTO.getHubId()), activityFiredDTO.getHubName(), activityFiredDTO.getDate(), activityFiredDTO.getType(), activityFiredDTO.getVisibility());
         } else {
             activityService.addActivity(activityFiredDTO.getUser(), activityFiredDTO.getUserName(), new ObjectId(activityFiredDTO.getHubId()), activityFiredDTO.getHubName(), new ObjectId(activityFiredDTO.getMemoId()), activityFiredDTO.getMemoTitle(), activityFiredDTO.getDate(), activityFiredDTO.getType(), activityFiredDTO.getVisibility());
+        }
+
+        if (activityFiredDTO.getType().equals(Type.MEMO_COMPLETED)) {
+            memoService.addCompletion(new ObjectId(activityFiredDTO.getMemoId()), activityFiredDTO.getUser());
         }
 
         if (activityFiredDTO.getVisibility().equals(Visibility.PUBLIC)) {
