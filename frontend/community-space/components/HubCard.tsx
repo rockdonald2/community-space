@@ -2,11 +2,12 @@ import { Hub, Hub as HubType } from '@/types/db.types';
 import { useAuthContext } from '@/utils/AuthContext';
 import { GATEWAY_URL } from '@/utils/Constants';
 import { mediumDateWithNoTimeFormatter } from '@/utils/Utility';
-import { Avatar, Box, Button, Card, CardContent, Chip, Divider, Typography } from '@mui/material';
-import { teal } from '@mui/material/colors';
+import { Avatar as MaterialAvatar, Box, Button, Card, CardContent, Chip, Divider, Typography } from '@mui/material';
+import { blue } from '@mui/material/colors';
 import Link from 'next/link';
 import { useSnackbar } from 'notistack';
 import { useCallback } from 'react';
+import Avatar from './Avatar';
 
 const HubCard = ({ hub, mutateCallback }: { hub: HubType; mutateCallback: (hub: Hub) => void }) => {
     const { user, signOut } = useAuthContext();
@@ -58,22 +59,29 @@ const HubCard = ({ hub, mutateCallback }: { hub: HubType; mutateCallback: (hub: 
                         {hub.name}
                     </Typography>
                     <Typography color='text.secondary' align='center'>
-                        {hub.ownerName}
-                    </Typography>
-                    <Typography sx={{ mb: 1.5 }} color='text.secondary' variant='body2' align='center'>
-                        ({hub.owner})
+                        <Chip
+                            avatar={
+                                <Avatar
+                                    generateRandomColor
+                                    style={{ width: '26px', height: '26px', margin: '.25rem', fontSize: '14px' }}
+                                    user={{ email: hub.owner }}
+                                />
+                            }
+                            label={hub.ownerName}
+                            sx={{ my: 1.5 }}
+                        />
                     </Typography>
                     <Box alignItems={'center'} justifyContent={'center'} display={'flex'}>
-                        <Avatar
+                        <MaterialAvatar
                             sx={{
-                                bgcolor: teal[Object.keys(teal).at(Math.random() * Object.keys(teal).length)],
+                                bgcolor: blue[Object.keys(blue).at(Math.random() * Object.keys(blue).length)],
                                 width: 56,
                                 height: 56,
                             }}
                             variant='square'
                         >
                             {hub.name.substring(0, 3).toUpperCase()}
-                        </Avatar>
+                        </MaterialAvatar>
                     </Box>
                     <Typography sx={{ mt: 1.5 }} color='text.secondary' align='center'>
                         Since {mediumDateWithNoTimeFormatter.format(new Date(hub.createdOn))}

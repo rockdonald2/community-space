@@ -254,16 +254,28 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                     </Stack>
                 </DialogTitle>
                 <DialogContent sx={{ overflow: 'initial' }}>
+                    <Typography sx={{ mb: 1 }} color='text.primary'>
+                        <Avatar
+                            user={{ email: memo.author }}
+                            generateRandomColor
+                            style={{ width: '36px', height: '36px', fontSize: '16px', marginRight: '.5rem' }}
+                        />
+                        {memo.authorName}
+                    </Typography>
                     <Typography sx={{ mb: 0 }} color='text.secondary'>
-                        Memo posted on {longDateShortTimeDateFormatter.format(memo.createdOn)} by {memo.authorName} (
-                        {memo.author})
+                        Memo posted on {longDateShortTimeDateFormatter.format(memo.createdOn)}
                     </Typography>
                     <Chip size='small' label={memo.urgency.toLowerCase()} variant='filled' sx={{ mt: 1, mr: 1 }} />
                     <Chip size='small' label={memo.visibility.toLowerCase()} variant='filled' sx={{ mt: 1 }} />
                     {prevMemoData?.dueDate && (
                         <Typography sx={{ mb: 0, mt: 2, display: 'flex', alignContent: 'center' }}>
-                            <EventIcon sx={{ mr: 1 }} /> Due on{' '}
-                            {longDateShortTimeDateFormatter.format(new Date(prevMemoData?.dueDate))}
+                            <Chip
+                                icon={<EventIcon />}
+                                label={`Due on ${longDateShortTimeDateFormatter.format(
+                                    new Date(prevMemoData?.dueDate)
+                                )}`}
+                                variant='filled'
+                            />
                         </Typography>
                     )}
                 </DialogContent>

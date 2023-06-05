@@ -6,12 +6,13 @@ import {
     swrRecentMemosFetcherWithAuth,
     swrWaitersFetcherWithAuth,
 } from '@/utils/Utility';
-import { Card, CardContent, Typography, Box, Avatar, Divider, Chip, Button } from '@mui/material';
-import { teal } from '@mui/material/colors';
+import { Card, CardContent, Typography, Box, Avatar as MaterialAvatar, Divider, Chip, Button } from '@mui/material';
+import { blue } from '@mui/material/colors';
 import Link from 'next/link';
 import useSWR from 'swr';
 import Alerter from './Alerter';
 import { usePresenceContext } from '@/utils/PresenceContext';
+import Avatar from './Avatar';
 
 const HubExploreCard = ({ hub }: { hub: Hub }) => {
     const { user } = useAuthContext();
@@ -53,22 +54,29 @@ const HubExploreCard = ({ hub }: { hub: Hub }) => {
                             {hub.name}
                         </Typography>
                         <Typography color='text.secondary' align='center'>
-                            {hub.ownerName}
-                        </Typography>
-                        <Typography sx={{ mb: 1.5 }} color='text.secondary' variant='body2' align='center'>
-                            ({hub.owner})
+                            <Chip
+                                avatar={
+                                    <Avatar
+                                        generateRandomColor
+                                        style={{ width: '26px', height: '26px', margin: '.25rem', fontSize: '14px' }}
+                                        user={{ email: hub.owner }}
+                                    />
+                                }
+                                label={hub.ownerName}
+                                sx={{ my: 1.5 }}
+                            />
                         </Typography>
                         <Box alignItems={'center'} justifyContent={'center'} display={'flex'}>
-                            <Avatar
+                            <MaterialAvatar
                                 sx={{
-                                    bgcolor: teal[Object.keys(teal).at(Math.random() * Object.keys(teal).length)],
+                                    bgcolor: blue[Object.keys(blue).at(Math.random() * Object.keys(blue).length)],
                                     width: 56,
                                     height: 56,
                                 }}
                                 variant='square'
                             >
                                 {hub.name.substring(0, 3).toUpperCase()}
-                            </Avatar>
+                            </MaterialAvatar>
                         </Box>
                         <Typography sx={{ mt: 1.5 }} color='text.secondary' align='center'>
                             Since {mediumDateWithNoTimeFormatter.format(new Date(hub.createdOn))}
