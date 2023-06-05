@@ -26,7 +26,7 @@ public class MemoChangesListener {
 
         switch (memoMutationDTO.getState()) { // NOSONAR
             case CREATED ->
-                    memoService.createMemo(new ObjectId(memoMutationDTO.getMemoId()), memoMutationDTO.getTitle(), memoMutationDTO.getOwner(), new ObjectId(memoMutationDTO.getHubId()));
+                    memoService.createMemo(new ObjectId(memoMutationDTO.getMemoId()), memoMutationDTO.getTitle(), memoMutationDTO.getOwner(), new ObjectId(memoMutationDTO.getHubId()), memoMutationDTO.getVisibility(), memoMutationDTO.getDueDate());
             case DELETED -> memoService.deleteMemo(new ObjectId(memoMutationDTO.getMemoId()));
         }
     }

@@ -13,6 +13,8 @@ import org.springframework.data.annotation.Id;
 import org.springframework.data.mongodb.core.mapping.Document;
 import org.springframework.data.mongodb.core.mapping.Field;
 
+import java.util.Date;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -29,6 +31,7 @@ public class Memo {
     private String title;
     private String owner;
     private Visibility visibility;
+    private Date dueDate;
 
     @JsonSerialize(using = ToStringSerializer.class)
     private ObjectId hubId;

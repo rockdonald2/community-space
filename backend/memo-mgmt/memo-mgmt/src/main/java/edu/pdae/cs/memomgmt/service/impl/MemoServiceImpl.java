@@ -14,6 +14,7 @@ import edu.pdae.cs.memomgmt.model.dto.*;
 import edu.pdae.cs.memomgmt.repository.MemoRepository;
 import edu.pdae.cs.memomgmt.service.HubService;
 import edu.pdae.cs.memomgmt.service.MemoService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.modelmapper.ModelMapper;
@@ -42,7 +43,7 @@ public class MemoServiceImpl implements MemoService {
 
     @Override
     @CacheEvict(value = {"memo", "memos"}, allEntries = true)
-    public MemoCreationResponseDTO create(MemoCreationDTO memoCreationDTO, UserWrapper userWrapper) throws ForbiddenOperationException {
+    public MemoCreationResponseDTO create(@Valid MemoCreationDTO memoCreationDTO, UserWrapper userWrapper) throws ForbiddenOperationException {
         if (!hubService.isMember(memoCreationDTO.getHubId(), userWrapper.getEmail())) {
             throw new ForbiddenOperationException("You are not a member of this hub");
         }
@@ -55,6 +56,10 @@ public class MemoServiceImpl implements MemoService {
         reqMemo.setAuthor(userWrapper.getEmail());
         reqMemo.setAuthorName(userWrapper.getName());
         reqMemo.setCompletions(new ArrayList<>());
+
+        if (memoCreationDTO.getDueDate() != null) {
+            reqMemo.setDueDate(memoCreationDTO.getDueDate());
+        }
 
         final Memo createdMemo = memoRepository.save(reqMemo);
         // send message to activity topic
@@ -75,7 +80,7 @@ public class MemoServiceImpl implements MemoService {
 
     @Override
     @CacheEvict(value = {"memo", "memos"}, allEntries = true)
-    public MemoCreationResponseDTO update(ObjectId id, MemoUpdateDTO memoUpdateDTO, String asUser) throws ForbiddenOperationException {
+    public MemoCreationResponseDTO update(ObjectId id, @Valid MemoUpdateDTO memoUpdateDTO, String asUser) throws ForbiddenOperationException {
         final Memo memo = memoRepository.findById(id).orElseThrow();
 
         if (!hubService.isMember(memo.getHubId(), asUser)) {
@@ -84,6 +89,10 @@ public class MemoServiceImpl implements MemoService {
 
         if (!asUser.equals(memo.getAuthor())) {
             throw new ForbiddenOperationException("The requester is not the author");
+        }
+
+        if (memoUpdateDTO.getDueDate() != null && memoUpdateDTO.getDueDate().before(new Date())) {
+            throw new ConflictingOperationException("Due date cannot be in the past");
         }
 
         boolean hasChanged = false;
@@ -105,6 +114,14 @@ public class MemoServiceImpl implements MemoService {
 
         if (memoUpdateDTO.getUrgency() != null) {
             memo.setUrgency(memoUpdateDTO.getUrgency());
+            hasChanged = true;
+        }
+
+        if (memoUpdateDTO.getDueDate() != null && memoUpdateDTO.getDueDate().after(new Date())) {
+            memo.setDueDate(memoUpdateDTO.getDueDate());
+            hasChanged = true;
+        } else if (memoUpdateDTO.getDueDate() == null) {
+            memo.setDueDate(null); // this is the clear due date action
             hasChanged = true;
         }
 
@@ -217,6 +234,10 @@ public class MemoServiceImpl implements MemoService {
             throw new ConflictingOperationException("The memo is private");
         }
 
+        if (memo.getDueDate() != null && memo.getDueDate().before(new Date())) {
+            throw new ConflictingOperationException("The memo is overdue");
+        }
+
         final Hub hub = hubService.getHub(memo.getHubId());
 
         if (actionTakerUserWrapper.getEmail().equals(memo.getAuthor())) {
@@ -264,7 +285,6 @@ public class MemoServiceImpl implements MemoService {
         }
 
         return memo.getCompletions().stream()
-                .limit(HARD_RETURN_LIMIT)
                 .map(completion -> MemoCompletionResponseDTO.builder()
                         .memoId(memoId.toHexString())
                         .hubId(memo.getHubId().toHexString())

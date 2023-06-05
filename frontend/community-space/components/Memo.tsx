@@ -33,6 +33,7 @@ import { longDateShortTimeDateFormatter, swrCompletionsFetcherWithAuth, swrMemoF
 import { useSnackbar } from 'notistack';
 import DoneIcon from '@mui/icons-material/Done';
 import Avatar from '@/components/Avatar';
+import EventIcon from '@mui/icons-material/Event';
 
 const MemoDialog = styled(Dialog)(({ theme }) => ({
     '& .MuiPaper-root': {
@@ -190,7 +191,13 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
             <Item>
                 <Grid container alignItems={'center'} justifyContent={'center'}>
                     <Grid item md={11} xs={12}>
-                        <Typography sx={{ mb: 1, mr: 1 }} color='text.primary' display='flex' alignItems='center'>
+                        <Typography
+                            sx={{ mb: 1, mr: 1 }}
+                            color='text.primary'
+                            display='flex'
+                            alignItems='center'
+                            component={'div'}
+                        >
                             <Typography
                                 variant='h6'
                                 component='span'
@@ -253,6 +260,12 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                     </Typography>
                     <Chip label={memo.urgency.toLowerCase()} variant='filled' sx={{ mt: 1, mr: 1 }} />
                     <Chip label={memo.visibility.toLowerCase()} variant='filled' sx={{ mt: 1 }} />
+                    {prevMemoData?.dueDate && (
+                        <Typography sx={{ mb: 0, mt: 2, display: 'flex', alignContent: 'center' }}>
+                            <EventIcon sx={{ mr: 1 }} /> Due on{' '}
+                            {longDateShortTimeDateFormatter.format(new Date(prevMemoData?.dueDate))}
+                        </Typography>
+                    )}
                 </DialogContent>
                 <DialogContent dividers>
                     {isMemoModificationError || memoError ? (
@@ -267,6 +280,7 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                                 visibility: memo.visibility,
                                 urgency: memo.urgency,
                                 content: memoData?.content,
+                                dueDate: memoData?.dueDate,
                             }}
                             memoId={memo.id}
                             hubId={memo.hubId}
@@ -297,7 +311,7 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                         ) : (
                             <>
                                 <Typography variant='subtitle1' sx={{ mb: 1 }}>
-                                    Completions
+                                    Completions ({completionsData?.length || 0})
                                 </Typography>
                                 {completionsData?.map((completion, idx) => (
                                     <Avatar
@@ -334,8 +348,18 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                 )}
                 {user.email !== memo.author && !prevMemoData?.completed ? (
                     <DialogActions>
-                        <Button variant='outlined' color='primary' endIcon={<DoneIcon />} onClick={handleCompletion}>
-                            Mark as Completed
+                        <Button
+                            variant='outlined'
+                            color='primary'
+                            endIcon={<DoneIcon />}
+                            onClick={handleCompletion}
+                            disabled={prevMemoData?.dueDate && new Date(prevMemoData?.dueDate) <= new Date()}
+                        >
+                            {!prevMemoData?.dueDate
+                                ? 'Mark as completed'
+                                : new Date(prevMemoData?.dueDate) > new Date()
+                                ? 'Mark as completed'
+                                : 'Due is over'}
                         </Button>
                     </DialogActions>
                 ) : (

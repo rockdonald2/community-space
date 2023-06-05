@@ -37,6 +37,7 @@ public class Memo {
     private Visibility visibility;
     private Urgency urgency;
     private List<String> completions;
+    private Date dueDate;
 
     @JsonSerialize(using = ToStringSerializer.class)
     private ObjectId hubId;

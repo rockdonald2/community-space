@@ -33,6 +33,7 @@ export type Memo = {
     urgency: Urgency;
     hubId: string;
     completed?: boolean;
+    dueDate?: Date;
 };
 
 export type MemoShort = {

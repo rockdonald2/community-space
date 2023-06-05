@@ -12,6 +12,7 @@ import {
     SelectChangeEvent,
     ButtonGroup,
     Tooltip,
+    Grid,
 } from '@mui/material';
 import Item from './Item';
 import { ChangeEvent, Dispatch, SetStateAction, useCallback, useMemo, useState } from 'react';
@@ -29,6 +30,8 @@ import Filter1Icon from '@mui/icons-material/Filter1';
 import Filter2Icon from '@mui/icons-material/Filter2';
 import Filter3Icon from '@mui/icons-material/Filter3';
 import { useSnackbar } from 'notistack';
+import { DateTimePicker } from '@mui/x-date-pickers';
+import dayjs, { Dayjs } from 'dayjs';
 
 const MemoEdit = ({
     initialState,
@@ -42,6 +45,7 @@ const MemoEdit = ({
         content: string;
         visibility: Visibility;
         urgency: Urgency;
+        dueDate: Date;
     };
     isUpdateMode?: boolean;
     memoId?: string;
@@ -56,6 +60,7 @@ const MemoEdit = ({
     const [urgency, setUrgency] = useState<Urgency>(initialState?.urgency ?? '');
     const [title, setTitle] = useState<string>(initialState?.title ?? '');
     const [msg, setMsg] = useState<string>(initialState?.content ?? '');
+    const [dueDate, setDueDate] = useState<Dayjs | null>(initialState?.dueDate ? dayjs(initialState.dueDate) : null);
     const [isError, setError] = useState<boolean>(false);
     const [errMsg, setErrMsg] = useState<string>('');
 
@@ -167,6 +172,11 @@ const MemoEdit = ({
         []
     );
     const handleSubmit = useCallback(() => {
+        if (errMsg.includes('due date') && isError) {
+            // if there's a problem with the set due date, don't submit
+            return;
+        }
+
         setError(false);
 
         if (title.trim().length === 0 || msg.trim().length === 0 || urgency === '') {
@@ -187,6 +197,7 @@ const MemoEdit = ({
                         visibility,
                         urgency,
                         title,
+                        dueDate: dueDate?.toDate().toISOString() ?? null,
                     };
                     url = `${GATEWAY_URL}/api/v1/memos/${memoId}`;
                 } else {
@@ -196,6 +207,7 @@ const MemoEdit = ({
                         visibility,
                         urgency,
                         hubId,
+                        dueDate: dueDate?.toDate().toISOString() ?? null,
                     };
                     url = `${GATEWAY_URL}/api/v1/memos`;
                 }
@@ -243,6 +255,8 @@ const MemoEdit = ({
 
         handleAsync();
     }, [
+        errMsg,
+        isError,
         title,
         msg,
         urgency,
@@ -250,9 +264,10 @@ const MemoEdit = ({
         user.token,
         cleanupCallback,
         mutate,
-        hubId,
         visibility,
+        dueDate,
         memoId,
+        hubId,
         enqueueSnackbar,
         signOut,
     ]);
@@ -286,7 +301,12 @@ const MemoEdit = ({
                     onChange={(e: ChangeEvent<HTMLInputElement>) => handleChange(e, setMsg)}
                 />
                 {msg && (
-                    <ButtonGroup color={'inherit'} sx={{ mb: 1, display: 'flex', flexWrap: 'wrap' }} size='small' aria-label='editor button group'>
+                    <ButtonGroup
+                        color={'inherit'}
+                        sx={{ mb: 1, display: 'flex', flexWrap: 'wrap' }}
+                        size='small'
+                        aria-label='editor button group'
+                    >
                         {editorButtons}
                     </ButtonGroup>
                 )}
@@ -296,52 +316,92 @@ const MemoEdit = ({
                 direction={{ md: 'row', xs: 'column' }}
                 justifyContent={{ md: 'space-between', xs: 'center' }}
                 alignItems={{ md: 'center', xs: 'stretch' }}
+                component={'div'}
             >
-                <div>
-                    <FormControl
-                        sx={{
-                            mr: { xs: 0, md: 1.25 },
-                            mb: { xs: 1.25, md: 0 },
-                            minWidth: 120,
-                            width: { xs: '100%', md: 'unset' },
-                        }}
-                        size='small'
-                    >
-                        <InputLabel>Urgency</InputLabel>
-                        <Select
-                            sx={{ fontSize: 'medium' }}
-                            value={urgency}
-                            label='Urgency'
-                            onChange={(e: SelectChangeEvent) => handleChange(e, setUrgency)}
+                <Grid container spacing={1}>
+                    <Grid item xs={12}>
+                        <FormControl
+                            sx={{
+                                mr: { xs: 0, md: 1.25 },
+                                mb: { xs: 1.25, md: 0 },
+                                minWidth: 120,
+                                width: { xs: '100%', md: 'unset' },
+                            }}
+                            size='small'
                         >
-                            <MenuItem value='' />
-                            <MenuItem value={'LOW'}>Low</MenuItem>
-                            <MenuItem value={'MEDIUM'}>Medium</MenuItem>
-                            <MenuItem value={'HIGH'}>High</MenuItem>
-                            <MenuItem value={'URGENT'}>Urgent</MenuItem>
-                        </Select>
-                    </FormControl>
-                    <FormControl
-                        sx={{
-                            mr: { xs: 0, md: 1 },
-                            mb: { xs: 1, md: 0 },
-                            minWidth: 120,
-                            width: { xs: '100%', md: 'unset' },
-                        }}
-                        size='small'
-                    >
-                        <InputLabel>Visibility</InputLabel>
-                        <Select
-                            sx={{ fontSize: 'medium' }}
-                            value={visibility}
-                            label='Visibility'
-                            onChange={(e: SelectChangeEvent) => handleChange(e, setVisibility)}
+                            <InputLabel>Urgency</InputLabel>
+                            <Select
+                                sx={{ fontSize: 'medium' }}
+                                value={urgency}
+                                label='Urgency'
+                                onChange={(e: SelectChangeEvent) => handleChange(e, setUrgency)}
+                                error={isError}
+                            >
+                                <MenuItem value='' />
+                                <MenuItem value={'LOW'}>Low</MenuItem>
+                                <MenuItem value={'MEDIUM'}>Medium</MenuItem>
+                                <MenuItem value={'HIGH'}>High</MenuItem>
+                                <MenuItem value={'URGENT'}>Urgent</MenuItem>
+                            </Select>
+                        </FormControl>
+                        <FormControl
+                            sx={{
+                                mr: { xs: 0, md: 1 },
+                                mb: { xs: 1, md: 0 },
+                                minWidth: 120,
+                                width: { xs: '100%', md: 'unset' },
+                            }}
+                            size='small'
                         >
-                            <MenuItem value={'PUBLIC'}>Public</MenuItem>
-                            <MenuItem value={'PRIVATE'}>Only visible to you</MenuItem>
-                        </Select>
-                    </FormControl>
-                </div>
+                            <InputLabel>Visibility</InputLabel>
+                            <Select
+                                sx={{ fontSize: 'medium' }}
+                                value={visibility}
+                                label='Visibility'
+                                onChange={(e: SelectChangeEvent) => handleChange(e, setVisibility)}
+                                error={isError}
+                            >
+                                <MenuItem value={'PUBLIC'}>Public</MenuItem>
+                                <MenuItem value={'PRIVATE'}>Only visible to you</MenuItem>
+                            </Select>
+                        </FormControl>
+                    </Grid>
+                    {msg && (
+                        <Grid item xs={12}>
+                            <FormControl
+                                sx={{
+                                    mr: { xs: 0, md: 1 },
+                                    mb: { xs: 1, md: 0 },
+                                    width: { xs: '100%', md: 'unset' },
+                                }}
+                                size='small'
+                            >
+                                <DateTimePicker
+                                    views={['year', 'day', 'hours', 'minutes']}
+                                    label='Due date'
+                                    disablePast
+                                    slotProps={{
+                                        textField: { size: 'small', sx: { fontSize: 'medium' } },
+                                        actionBar: {
+                                            actions: ['clear', 'cancel', 'accept'],
+                                        },
+                                    }}
+                                    value={dueDate}
+                                    onAccept={(dateVal: Dayjs | null) => setDueDate(dateVal)}
+                                    onError={(err: unknown) => {
+                                        if (err) {
+                                            setError(true);
+                                            setErrMsg('Invalid due date given');
+                                        } else {
+                                            setError(false);
+                                            setErrMsg('');
+                                        }
+                                    }}
+                                />
+                            </FormControl>
+                        </Grid>
+                    )}
+                </Grid>
                 <Tooltip title='Submit your memo'>
                     <Button
                         variant='outlined'

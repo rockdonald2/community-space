@@ -47,6 +47,8 @@ public class MemoController {
                 .title(createdDto.getTitle())
                 .owner(user)
                 .state(MemoMutationDTO.State.CREATED)
+                .visibility(createdDto.getVisibility())
+                .dueDate(createdDto.getDueDate())
                 .build());
 
         return createdDto;

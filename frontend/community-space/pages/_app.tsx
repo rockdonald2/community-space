@@ -14,6 +14,9 @@ import CrossContextProvider from '@/utils/CrossContext';
 import { CookiesProvider } from 'react-cookie';
 import SnackbarProvider from '@/utils/SnackbarProvider';
 import { Roboto, Inter } from 'next/font/google';
+import { LocalizationProvider } from '@mui/x-date-pickers';
+import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
+import 'dayjs/locale/en-gb';
 
 const roboto = Roboto({
     subsets: ['latin-ext'],
@@ -36,22 +39,24 @@ export default function App({ Component, pageProps }: AppProps) {
                 <meta name='viewport' content='width=device-width, initial-scale=1' />
             </Head>
             <StyledEngineProvider injectFirst>
-                <CssVarsProvider theme={theme}>
-                    <CssBaseline enableColorScheme />
-                    <CookiesProvider>
-                        <SnackbarProvider>
-                            <CrossContextProvider>
-                                <AuthContextProvider>
-                                    <RouteGuard>
-                                        <Layout>
-                                            <Component {...pageProps} />
-                                        </Layout>
-                                    </RouteGuard>
-                                </AuthContextProvider>
-                            </CrossContextProvider>
-                        </SnackbarProvider>
-                    </CookiesProvider>
-                </CssVarsProvider>
+                <LocalizationProvider dateAdapter={AdapterDayjs} adapterLocale={'en-gb'}>
+                    <CssVarsProvider theme={theme}>
+                        <CssBaseline enableColorScheme />
+                        <CookiesProvider>
+                            <SnackbarProvider>
+                                <CrossContextProvider>
+                                    <AuthContextProvider>
+                                        <RouteGuard>
+                                            <Layout>
+                                                <Component {...pageProps} />
+                                            </Layout>
+                                        </RouteGuard>
+                                    </AuthContextProvider>
+                                </CrossContextProvider>
+                            </SnackbarProvider>
+                        </CookiesProvider>
+                    </CssVarsProvider>
+                </LocalizationProvider>
             </StyledEngineProvider>
         </>
     );

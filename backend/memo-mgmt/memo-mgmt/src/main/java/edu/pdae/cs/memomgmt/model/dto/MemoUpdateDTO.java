@@ -8,6 +8,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import edu.pdae.cs.common.model.Visibility;
 
+import java.util.Date;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -22,5 +24,8 @@ public class MemoUpdateDTO {
     private Memo.Urgency urgency;
     @Nullable
     private String title;
+
+    @Nullable
+    private Date dueDate;
 
 }

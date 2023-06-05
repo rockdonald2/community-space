@@ -25,5 +25,6 @@ public class MemoDetailsDTO {
     private Memo.Urgency urgency;
     private String hubId;
     private boolean completed;
+    private Date dueDate;
 
 }
