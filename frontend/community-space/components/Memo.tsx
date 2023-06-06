@@ -275,6 +275,7 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                                     new Date(prevMemoData?.dueDate)
                                 )}`}
                                 variant='filled'
+                                sx={{ textDecoration: new Date(prevMemoData?.dueDate) < new Date() ? 'line-through' : 'none' }}
                             />
                         </Typography>
                     )}
