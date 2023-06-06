@@ -12,7 +12,10 @@ import org.springframework.stereotype.Service;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.*;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.NoSuchElementException;
 
 @Service
 @RequiredArgsConstructor
@@ -75,7 +78,7 @@ public class MemoServiceImpl implements MemoService {
 
     @Override
     public List<Memo> getDueMemos() {
-        return memoRepository.findAllByDueDateBetweenAndVisibility(new Date(), new Date(Instant.now().plus(1, ChronoUnit.DAYS).toEpochMilli()), Visibility.PUBLIC);
+        return memoRepository.findAllByDueDateBetweenAndVisibility(new Date(), new Date(Instant.now().plus(3, ChronoUnit.HOURS).toEpochMilli()), Visibility.PUBLIC);
     }
 
 }

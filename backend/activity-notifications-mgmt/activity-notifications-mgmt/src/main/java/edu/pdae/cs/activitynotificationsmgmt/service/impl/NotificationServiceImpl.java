@@ -49,8 +49,8 @@ public class NotificationServiceImpl implements NotificationService {
     private final RedisTemplate<String, Date> lastSentRedisTemplate;
     private final KafkaTemplate<String, DueMemoDTO> dueMemoDTOKafkaTemplate;
 
-    @Value("${cs.notification-reminders.timeout.hours}")
-    private int reminderTimeoutHours;
+    @Value("${cs.notification-reminders.timeout.minutes}")
+    private int reminderTimeoutMins;
 
     @Override
     @CacheEvict(value = "notifications", allEntries = true)
@@ -78,8 +78,8 @@ public class NotificationServiceImpl implements NotificationService {
                 .build());
     }
 
-    @Scheduled(fixedDelayString = "${cs.notification-reminders.timeout.hours}", timeUnit = TimeUnit.HOURS)
-    @SchedulerLock(name = "handleDueMemos", lockAtMostFor = "#{${cs.notification-reminders.timeout.hours} - 1}h", lockAtLeastFor = "#{${cs.notification-reminders.timeout.hours} - 1}h")
+    @Scheduled(fixedDelayString = "${cs.notification-reminders.timeout.minutes}", timeUnit = TimeUnit.MINUTES)
+    @SchedulerLock(name = "handleDueMemos", lockAtMostFor = "#{${cs.notification-reminders.timeout.minutes} - 1}m", lockAtLeastFor = "#{${cs.notification-reminders.timeout.minutes} - 1}m")
     @Override
     public void queryDueMemos() {
         log.info("Checking due memos and broadcasting notifications");
@@ -87,10 +87,10 @@ public class NotificationServiceImpl implements NotificationService {
         final Optional<Date> lastSent = Optional.ofNullable(lastSentRedisTemplate.opsForValue().get("cs:activity-notifications-mgmt:due-memos"));
 
         if (lastSent.isPresent()) {
-            final var diffHours = Duration.between(lastSent.get().toInstant(), Instant.now()).toHours();
+            final var diffHours = Duration.between(lastSent.get().toInstant(), Instant.now()).toMinutes();
 
-            if (diffHours < (reminderTimeoutHours - 1)) {
-                log.info("Skipping due memos check, last check was {} hours ago", diffHours);
+            if (diffHours < (reminderTimeoutMins - 1)) {
+                log.info("Skipping due memos check, last check was {} minutes ago", diffHours);
                 return;
             }
         }
