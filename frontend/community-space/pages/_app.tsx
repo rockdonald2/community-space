@@ -13,19 +13,16 @@ import { RouteGuard } from '@/utils/RouteGuard';
 import CrossContextProvider from '@/utils/CrossContext';
 import { CookiesProvider } from 'react-cookie';
 import SnackbarProvider from '@/utils/SnackbarProvider';
-import { Inter } from 'next/font/google';
+import { Nunito } from 'next/font/google';
 import { LocalizationProvider } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import 'dayjs/locale/en-gb';
 
-const inter = Inter({
-    weight: ['300', '400', '500', '700'],
-    subsets: ['latin'],
-});
+const nunito = Nunito({ weight: ['300', '400', '700'], subsets: ['latin'] });
 
 const theme = extendTheme({
     typography: {
-        fontFamily: `${inter.style.fontFamily}, sans-serif`,
+        fontFamily: `${nunito.style.fontFamily}, sans-serif`,
     },
 });
 

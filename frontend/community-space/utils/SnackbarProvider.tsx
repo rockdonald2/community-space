@@ -2,6 +2,8 @@ import { IconButton } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { SnackbarProvider as SnackbarProviderInternal, MaterialDesignContent, useSnackbar } from 'notistack';
 import CloseIcon from '@mui/icons-material/Close';
+import NotificationSnackbar from '@/components/NotificationSnackbar';
+import { Notification } from '@/types/db.types';
 
 const SnackbarCloseButton = ({ snackbarKey }) => {
     const { closeSnackbar } = useSnackbar();
@@ -32,14 +34,17 @@ const SnackbarProvider = ({ children }: { children: JSX.Element }) => {
     return (
         <SnackbarProviderInternal
             preventDuplicate
-            maxSnack={10}
+            maxSnack={15}
             anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
+            transitionDuration={{ enter: 300, exit: 300 }}
+            autoHideDuration={7000}
             Components={{
                 success: StyledMaterialDesignContent,
                 error: StyledMaterialDesignContent,
                 info: StyledMaterialDesignContent,
                 warning: StyledMaterialDesignContent,
                 default: StyledMaterialDesignContent,
+                notification: NotificationSnackbar,
             }}
             action={(snackbarKey) => <SnackbarCloseButton snackbarKey={snackbarKey} />}
         >
@@ -47,5 +52,13 @@ const SnackbarProvider = ({ children }: { children: JSX.Element }) => {
         </SnackbarProviderInternal>
     );
 };
+
+declare module 'notistack' {
+    interface VariantOverrides {
+        notification: {
+            notification: Notification;
+        };
+    }
+}
 
 export default SnackbarProvider;

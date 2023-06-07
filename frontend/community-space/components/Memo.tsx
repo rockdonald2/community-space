@@ -37,7 +37,7 @@ import EventIcon from '@mui/icons-material/Event';
 
 const MemoDialog = styled(Dialog)(({ theme }) => ({
     '& .MuiPaper-root': {
-        backgroundColor: theme.palette.background.paper,
+        backgroundColor: theme.palette.background.default,
     },
     '& .MuiDialogContent-root': {
         padding: theme.spacing(2),
@@ -254,7 +254,7 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                     </Stack>
                 </DialogTitle>
                 <DialogContent sx={{ overflow: 'initial' }}>
-                    <Typography sx={{ mb: 1 }} color='text.primary'>
+                    <Typography sx={{ mb: 1 }} color='text.primary' component={'div'}>
                         <Avatar
                             user={{ email: memo.author }}
                             generateRandomColor
@@ -275,7 +275,10 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                                     new Date(prevMemoData?.dueDate)
                                 )}`}
                                 variant='filled'
-                                sx={{ textDecoration: new Date(prevMemoData?.dueDate) < new Date() ? 'line-through' : 'none' }}
+                                sx={{
+                                    textDecoration:
+                                        new Date(prevMemoData?.dueDate) < new Date() ? 'line-through' : 'none',
+                                }}
                             />
                         </Typography>
                     )}

@@ -1,4 +1,4 @@
-import { Badge, Divider, Grid, IconButton, Menu, Stack, Tooltip, Typography, styled } from '@mui/material';
+import { Badge, Divider, Grid, IconButton, Menu, Paper, Stack, Tooltip, Typography, styled } from '@mui/material';
 import { useState, useMemo, useCallback } from 'react';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { useAuthContext } from '@/utils/AuthContext';
@@ -8,6 +8,7 @@ import Alerter from './Alerter';
 import { useSnackbar } from 'notistack';
 import { useNotifications } from '@/utils/UseNotifications';
 import { calculateRelativeTimeFromNow } from '@/utils/Utility';
+import Avatar from './Avatar';
 
 const Notifications = () => {
     const { signOut } = useAuthContext();
@@ -72,22 +73,26 @@ const Notifications = () => {
                 PaperProps={{
                     elevation: 0,
                     sx: {
-                        overflow: 'visible',
-                        filter: 'drop-shadow(0px 2px 6px rgba(0,0,0,0.18))',
+                        overflow: 'auto',
+                        boxShadow: 'var(--mui-shadows-1)',
                         mt: 1.5,
+                        maxHeight: '500px',
+                        px: 1,
                     },
                 }}
                 transformOrigin={{ horizontal: 'right', vertical: 'top' }}
                 anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
             >
-                <Typography
-                    sx={{ padding: 1, paddingLeft: 2, paddingRight: 2, textAlign: 'left', mb: 0.5 }}
-                    variant='subtitle1'
-                    color='text.secondary'
-                >
-                    Notifications
-                </Typography>
-                <Divider sx={{ mb: 0.5 }} />
+                <Paper sx={{ position: 'sticky', top: 0, width: '100%', zIndex: 1 }} elevation={0}>
+                    <Typography
+                        sx={{ padding: 1, paddingLeft: 2, paddingRight: 2, textAlign: 'left', mb: 0.5 }}
+                        variant='subtitle1'
+                        color='text.secondary'
+                    >
+                        Notifications
+                    </Typography>
+                    <Divider sx={{ mb: 2 }} />
+                </Paper>
                 {!isLoading && !isValidating && !error && notifications?.length > 0 ? (
                     notifications
                         ?.filter((notification) => notification.isRead !== true)
@@ -97,41 +102,62 @@ const Notifications = () => {
                                 key={idx}
                                 sx={{
                                     maxWidth: {
-                                        xs: '90vw',
-                                        md: '60vw',
+                                        xs: '85vw',
+                                        md: '35vw',
                                     },
                                 }}
                                 direction='row'
                                 alignItems='center'
                             >
                                 <Grid item xs={10}>
-                                    <Stack>
-                                        <Typography
-                                            variant='body2'
-                                            sx={{
-                                                paddingLeft: 1.5,
-                                                paddingRight: 1.5,
-                                                paddingTop: 1.5,
-                                                textAlign: 'left',
-                                                width: '100%',
-                                            }}
+                                    <Grid container>
+                                        <Grid
+                                            item
+                                            xs={2}
+                                            alignSelf={'flex-start'}
+                                            justifySelf={'center'}
+                                            sx={{ width: '100%', pt: 0.5 }}
                                         >
-                                            {notification.msg}
-                                        </Typography>
-                                        <Typography
-                                            variant='caption'
-                                            color='text.secondary'
-                                            sx={{
-                                                paddingLeft: 1.5,
-                                                paddingRight: 1.5,
-                                                paddingTop: 0.5,
-                                                textAlign: 'left',
-                                                mb: 1,
-                                            }}
-                                        >
-                                            {calculateRelativeTimeFromNow(new Date(notification.createdAt))}
-                                        </Typography>
-                                    </Stack>
+                                            <div style={{ display: 'flex', justifyContent: 'center' }}>
+                                                <Avatar
+                                                    generateRandomColor
+                                                    style={{
+                                                        width: '30px',
+                                                        height: '30px',
+                                                        fontSize: '14px',
+                                                    }}
+                                                    user={{ email: notification.taker }}
+                                                />
+                                            </div>
+                                        </Grid>
+                                        <Grid item xs={10}>
+                                            <Stack>
+                                                <Typography
+                                                    variant='body2'
+                                                    sx={{
+                                                        paddingLeft: 0.5,
+                                                        paddingRight: 0.5,
+                                                        width: '100%',
+                                                    }}
+                                                >
+                                                    {notification.msg}
+                                                </Typography>
+                                                <Typography
+                                                    variant='caption'
+                                                    color='text.secondary'
+                                                    sx={{
+                                                        paddingLeft: 0.5,
+                                                        paddingRight: 0.5,
+                                                        paddingTop: 0.5,
+                                                        textAlign: 'left',
+                                                        mb: 1,
+                                                    }}
+                                                >
+                                                    {calculateRelativeTimeFromNow(new Date(notification.createdAt))}
+                                                </Typography>
+                                            </Stack>
+                                        </Grid>
+                                    </Grid>
                                 </Grid>
                                 <Grid
                                     item

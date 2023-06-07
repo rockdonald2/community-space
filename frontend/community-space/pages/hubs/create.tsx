@@ -89,6 +89,16 @@ function CreateHub() {
                         Create your own Hub
                     </Typography>
                 </Stack>
+                <Stack>
+                    <Typography
+                        variant='body1'
+                        component='p'
+                        className={styles['avatar-wrapper__msg']}
+                        color='text.secondary'
+                    >
+                        Create a Hub to share your memos with others
+                    </Typography>
+                </Stack>
                 {error && (
                     <div className={styles.alert}>
                         <Alert severity='error'>

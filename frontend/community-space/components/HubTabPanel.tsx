@@ -1,7 +1,7 @@
 import { Hub } from '@/types/db.types';
 import { useAuthContext } from '@/utils/AuthContext';
 import { swrExploreHubFetcherWithAuth } from '@/utils/Utility';
-import { Grid } from '@mui/material';
+import { Grid, Typography } from '@mui/material';
 import useSWR from 'swr';
 import HubExploreCard from './HubExploreCard';
 import Alerter from './Alerter';
@@ -35,13 +35,21 @@ const HubTabPanel = ({ value, index, role, ...other }: HubTabPanelProps) => {
                     {...other}
                 >
                     {value === index && (
-                        <Grid container spacing={2} sx={{ mt: 3 }}>
-                            {hubs.map((hub) => (
-                                <Grid item key={hub.id} xs={12} sm={8} md={6}>
-                                    <HubExploreCard hub={hub} />
+                        <>
+                            {hubs.length > 0 ? (
+                                <Grid container spacing={2} sx={{ mt: 3 }}>
+                                    {hubs.map((hub) => (
+                                        <Grid item key={hub.id} xs={12} sm={8} md={6}>
+                                            <HubExploreCard hub={hub} />
+                                        </Grid>
+                                    ))}
                                 </Grid>
-                            ))}
-                        </Grid>
+                            ) : (
+                                <Typography variant='body1' sx={{ mt: 2 }} color={'text.secondary'}>
+                                    No hubs yet on this panel.
+                                </Typography>
+                            )}
+                        </>
                     )}
                 </div>
             ) : (

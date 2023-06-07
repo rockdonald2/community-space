@@ -14,13 +14,13 @@ const Presence = () => {
     return (
         <Container>
             <Typography mb={2} color='text.secondary' variant='h6'>
-                Others online ({presence ? presence.length - 1 : 0})
+                Others online ({presence?.length > 0 ? presence.length - 1 : 0})
             </Typography>
             <Stack alignItems={'flex-start'} direction={'row'} flexWrap={'wrap'} sx={{ mb: 2 }}>
                 {presence ? (
                     presence.length > 1 ? (
                         presence
-                            .filter((present) => present.email !== user.email)
+                            .filter((present) => present?.email !== user.email)
                             .map((present, idx) => {
                                 return (
                                     <div key={idx} className={styles['avatar-wrapper']}>

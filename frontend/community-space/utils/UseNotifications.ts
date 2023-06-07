@@ -41,7 +41,10 @@ export function useNotifications() {
         async (notification: Notification) => {
             if (notification.taker !== user.email) {
                 await mutate([notification, ...data], false);
-                enqueueSnackbar('You have a new notification!');
+                enqueueSnackbar('You have a new notification!', {
+                    variant: 'notification',
+                    notification: notification,
+                });
             }
         },
         [data, enqueueSnackbar, mutate, user.email]

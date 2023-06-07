@@ -2,12 +2,12 @@ import { Hub, Memo, UserShortCombined } from '@/types/db.types';
 import { useAuthContext } from '@/utils/AuthContext';
 import {
     mediumDateWithNoTimeFormatter,
+    stringToColor,
     swrMembersFetcherWithAuth,
     swrRecentMemosFetcherWithAuth,
     swrWaitersFetcherWithAuth,
 } from '@/utils/Utility';
 import { Card, CardContent, Typography, Box, Avatar as MaterialAvatar, Divider, Chip, Button } from '@mui/material';
-import { blue } from '@mui/material/colors';
 import Link from 'next/link';
 import useSWR from 'swr';
 import Alerter from './Alerter';
@@ -69,9 +69,10 @@ const HubExploreCard = ({ hub }: { hub: Hub }) => {
                         <Box alignItems={'center'} justifyContent={'center'} display={'flex'}>
                             <MaterialAvatar
                                 sx={{
-                                    bgcolor: blue[Object.keys(blue).at(Math.random() * Object.keys(blue).length)],
+                                    bgcolor: stringToColor(hub?.name),
                                     width: 56,
                                     height: 56,
+                                    borderRadius: '5px',
                                 }}
                                 variant='square'
                             >
@@ -147,7 +148,7 @@ const HubExploreCard = ({ hub }: { hub: Hub }) => {
                             <Chip
                                 label={`${presence
                                     .map((present) =>
-                                        hubMembers.filter((member) => member.email === present.email) ? 1 : 0
+                                        hubMembers.filter((member) => member.email === present?.email) ? 1 : 0
                                     )
                                     .reduce((acc, curr) => acc + curr, 0)} active members at the moment`}
                                 variant='filled'

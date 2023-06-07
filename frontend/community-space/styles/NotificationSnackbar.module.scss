@@ -1,0 +1,9 @@
+@import 'mixins';
+@import 'constants';
+
+.wrapper {
+    @include responsive($screen-sm-min) {
+        min-width: 400px !important;
+        max-width: 400px !important;
+    }
+}

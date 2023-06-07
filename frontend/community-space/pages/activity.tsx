@@ -7,14 +7,25 @@ import Item from '@/components/Item';
 import Alerter from '@/components/Alerter';
 import { Chip, Typography, Link as MaterialLink, Pagination, Stack } from '@mui/material';
 import Link from 'next/link';
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import Breadcrumbs from '@/components/Breadcrumbs';
 import Avatar from '@/components/Avatar';
+import {
+    Timeline,
+    TimelineConnector,
+    TimelineContent,
+    TimelineDot,
+    TimelineItem,
+    TimelineOppositeContent,
+    TimelineSeparator,
+    timelineContentClasses,
+} from '@mui/lab';
 
 const Activity = () => {
     const { user } = useAuthContext();
 
     const [currPage, setCurrPage] = useState<number>(1);
+    const [activitiesTimeMapped, setActivitiesTimeMapped] = useState<Map<string, Activity[]>>(new Map());
 
     const {
         data: activities,
@@ -25,6 +36,23 @@ const Activity = () => {
         { key: 'activities', token: user.token, page: currPage - 1 },
         swrActivitiesFetcherWithAuth
     );
+
+    useEffect(() => {
+        const newMapping = new Map<string, Activity[]>();
+
+        activities?.content?.forEach((activity) => {
+            const currDateString = new Date(activity.date).toDateString();
+
+            if (newMapping.has(currDateString)) {
+                newMapping.get(currDateString).push(activity);
+                return;
+            } else {
+                newMapping.set(currDateString, [activity]);
+            }
+        });
+
+        setActivitiesTimeMapped(newMapping);
+    }, [activities]);
 
     return (
         <>
@@ -37,47 +65,84 @@ const Activity = () => {
             </Typography>
             {!activitiesIsLoading && !activitiesIsValidating && !activitiesError ? (
                 <>
-                    {activities?.content
-                        ?.map((activity, idx) => (
-                            <Item
-                                sx={{
-                                    mb: 1,
-                                    display: 'flex',
-                                    alignItems: { xs: 'flex-start', md: 'center' },
-                                    justifyContent: 'space-between',
-                                    flexDirection: {
-                                        xs: 'column',
-                                        md: 'row',
-                                    },
-                                }}
-                                key={idx}
-                            >
-                                <Stack>
-                                    <Typography variant='body1' sx={{ mb: 1.5 }}>
-                                        <Avatar user={{ email: activity.user }} generateRandomColor />
-                                        <strong style={{ marginLeft: '.5rem' }}>{activity.userName}</strong>
-                                    </Typography>
-                                    <Typography>
-                                        {activity.type.toLocaleLowerCase().split('_').reverse().join(' a ')} (
-                                        {activity.type.includes('MEMO') && `${activity.memoTitle} in `}
-                                        <MaterialLink
-                                            component={Link}
-                                            href={`/hubs/${activity.hubId}`}
-                                            sx={{ mx: 0.5 }}
-                                        >
-                                            {activity.hubName}
-                                        </MaterialLink>
-                                        )
-                                    </Typography>
-                                </Stack>
-                                <Chip
-                                    label={longDateShortTimeDateFormatter.format(new Date(activity.date))}
-                                    variant='filled'
-                                    sx={{ mt: { xs: 1, md: 0 } }}
-                                />
-                            </Item>
-                        ))
-                        .reverse()}
+                    <Timeline
+                        position='left'
+                        sx={{
+                            [`& .${timelineContentClasses.root}`]: {
+                                flex: 0.2,
+                            },
+                            p: 0
+                        }}
+                    >
+                        {Object.keys(Object.fromEntries(activitiesTimeMapped?.entries()))
+                            .reverse()
+                            .map((date, idx) => (
+                                <TimelineItem key={idx}>
+                                    <TimelineOppositeContent sx={{ maxWidth: '67vw' }}>
+                                        {activitiesTimeMapped
+                                            ?.get(date)
+                                            ?.map((activity, idx) => (
+                                                <Item
+                                                    sx={{
+                                                        mb: 1,
+                                                        display: 'flex',
+                                                        alignItems: { xs: 'flex-start', md: 'center' },
+                                                        justifyContent: 'space-between',
+                                                        flexDirection: {
+                                                            xs: 'column',
+                                                            md: 'row',
+                                                        },
+                                                    }}
+                                                    key={idx}
+                                                >
+                                                    <Stack>
+                                                        <Typography variant='body1' sx={{ mb: 1.5 }}>
+                                                            <Avatar
+                                                                user={{ email: activity.user }}
+                                                                generateRandomColor
+                                                            />
+                                                            <strong style={{ marginLeft: '.5rem' }}>
+                                                                {activity.userName}
+                                                            </strong>
+                                                        </Typography>
+                                                        <Typography>
+                                                            {activity.type
+                                                                .toLocaleLowerCase()
+                                                                .split('_')
+                                                                .reverse()
+                                                                .join(' a ')}{' '}
+                                                            (
+                                                            {activity.type.includes('MEMO') &&
+                                                                `${activity.memoTitle} in `}
+                                                            <MaterialLink
+                                                                component={Link}
+                                                                href={`/hubs/${activity.hubId}`}
+                                                                sx={{ mx: 0.5 }}
+                                                            >
+                                                                {activity.hubName}
+                                                            </MaterialLink>
+                                                            )
+                                                        </Typography>
+                                                    </Stack>
+                                                    <Chip
+                                                        label={longDateShortTimeDateFormatter.format(
+                                                            new Date(activity.date)
+                                                        )}
+                                                        variant='filled'
+                                                        sx={{ mt: { xs: 1, md: 0 } }}
+                                                    />
+                                                </Item>
+                                            ))
+                                            .reverse()}
+                                    </TimelineOppositeContent>
+                                    <TimelineSeparator>
+                                        <TimelineDot />
+                                        <TimelineConnector />
+                                    </TimelineSeparator>
+                                    <TimelineContent>{date}</TimelineContent>
+                                </TimelineItem>
+                            ))}
+                    </Timeline>
                     <Pagination
                         count={activities?.totalPages}
                         page={currPage}

@@ -1,9 +1,8 @@
 import { Hub, Hub as HubType } from '@/types/db.types';
 import { useAuthContext } from '@/utils/AuthContext';
 import { GATEWAY_URL } from '@/utils/Constants';
-import { mediumDateWithNoTimeFormatter } from '@/utils/Utility';
+import { mediumDateWithNoTimeFormatter, stringToColor } from '@/utils/Utility';
 import { Avatar as MaterialAvatar, Box, Button, Card, CardContent, Chip, Divider, Typography } from '@mui/material';
-import { blue } from '@mui/material/colors';
 import Link from 'next/link';
 import { useSnackbar } from 'notistack';
 import { useCallback } from 'react';
@@ -74,9 +73,10 @@ const HubCard = ({ hub, mutateCallback }: { hub: HubType; mutateCallback: (hub: 
                     <Box alignItems={'center'} justifyContent={'center'} display={'flex'}>
                         <MaterialAvatar
                             sx={{
-                                bgcolor: blue[Object.keys(blue).at(Math.random() * Object.keys(blue).length)],
+                                bgcolor: stringToColor(hub?.name),
                                 width: 56,
                                 height: 56,
+                                borderRadius: '5px',
                             }}
                             variant='square'
                         >

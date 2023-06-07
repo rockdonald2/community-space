@@ -1,6 +1,6 @@
 import { useAuthContext } from '@/utils/AuthContext';
 import Header from './Header';
-import { useColorScheme, useMediaQuery } from '@mui/material';
+import { Divider, Grid, Typography, useColorScheme, useMediaQuery } from '@mui/material';
 import { useEffect } from 'react';
 import QuickActions from './QuickActions';
 import Blob from './Blob';
@@ -8,6 +8,7 @@ import { SWRConfig } from 'swr';
 import { useSnackbar } from 'notistack';
 import PresenceContextProvider from '@/utils/PresenceContext';
 import { useRouter } from 'next/router';
+import Footer from './Footer';
 
 const Layout = ({ children }) => {
     const prefersDarkMode = useMediaQuery('(prefers-color-scheme: dark)');
@@ -55,11 +56,37 @@ const Layout = ({ children }) => {
                             <Header />
                             <>{children}</>
                             <QuickActions />
+                            <Footer />
                         </PresenceContextProvider>
                     </SWRConfig>
                 </>
             ) : (
-                <>{children}</>
+                <Grid container>
+                    <Grid
+                        item
+                        md={4}
+                        xs={12}
+                        sx={{
+                            pt: {
+                                md: 10,
+                                xs: 0,
+                            },
+                            mb: {
+                                md: 0,
+                                xs: 5,
+                            },
+                        }}
+                    >
+                        <Typography variant={'h3'}>Community Space 💬</Typography>
+                        <Divider sx={{ mt: 3, mb: 3 }} />
+                        <Typography variant={'body1'} color='text.secondary' sx={{ fontSize: 20, fontStyle: 'italic' }}>
+                            A place for all your memos
+                        </Typography>
+                    </Grid>
+                    <Grid item md={8} xs={12}>
+                        <>{children}</>
+                    </Grid>
+                </Grid>
             )}
         </>
     );

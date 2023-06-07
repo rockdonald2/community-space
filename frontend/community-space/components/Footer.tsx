@@ -1,4 +1,4 @@
-import { Grid, Typography, Link as MaterialLink } from '@mui/material';
+import { Grid, Typography, Link as MaterialLink, Divider } from '@mui/material';
 import Link from 'next/link';
 
 const links: { name: string; href: string }[] = [
@@ -10,6 +10,7 @@ const links: { name: string; href: string }[] = [
 export default function Footer() {
     return (
         <footer>
+            <Divider sx={{ mt: 2, mb: 2 }} />
             <Typography variant='h6' color='text.secondary' mb={2}>
                 Useful links
             </Typography>
