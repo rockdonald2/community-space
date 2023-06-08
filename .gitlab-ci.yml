@@ -21,7 +21,7 @@ build:
     expire_in: 3 days
   rules:
     - changes:
-        - backend/**/*.{java}
+        - backend/**/*.{java,gradle}
         - backend/**/Dockerfile
         - frontend/**/*.{js,jsx,ts,tsx}
         - frontend/**/Dockerfile
@@ -39,7 +39,7 @@ deploy:
     - bash deploy.sh
   rules:
     - changes:
-        - backend/**/*.{java}
+        - backend/**/*.{java,gradle}
         - backend/**/Dockerfile
         - frontend/**/*.{js,jsx,ts,tsx}
         - frontend/**/Dockerfile
