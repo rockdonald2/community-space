@@ -105,6 +105,12 @@ public class NotificationServiceImpl implements NotificationService {
     @Override
     public void handleDueMemo(DueMemoDTO dueMemoDTO) {
         final Memo memo = memoService.getMemo(new ObjectId(dueMemoDTO.getMemoId()));
+
+        if (memo.isArchived()) {
+            log.warn("Due memo became archived before it was handled, skipping");
+            return;
+        }
+
         final Hub hub = hubService.getHub(memo.getHubId());
 
         // get all members who haven't completed yet
