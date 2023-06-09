@@ -32,7 +32,7 @@ const Archive = () => {
             <Head>
                 <title>Community Space {!hubError ? `| ${hub?.name}` : ''}</title>
             </Head>
-            <Breadcrumbs prevRoutes={[{ name: hub?.name, href: `/hubs/${hub?.id}` }]} currRoute={{ name: 'Explore' }} />
+            <Breadcrumbs prevRoutes={[{ name: hub?.name, href: `/hubs/${hub?.id}` }]} currRoute={{ name: 'Archive' }} />
             <Grid container spacing={2}>
                 <Grid item md={4} xs={12}>
                     <Container>

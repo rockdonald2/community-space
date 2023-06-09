@@ -35,6 +35,7 @@ export type Memo = {
     completed?: boolean;
     dueDate?: Date;
     archived?: boolean;
+    pinned?: boolean;
 };
 
 export type MemoShort = {
@@ -48,6 +49,7 @@ export type MemoShort = {
     hubId: string;
     completed?: boolean;
     archived?: boolean;
+    pinned?: boolean;
 };
 
 export type Hub = {

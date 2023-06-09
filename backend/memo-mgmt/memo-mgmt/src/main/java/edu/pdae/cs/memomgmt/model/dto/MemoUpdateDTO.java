@@ -28,5 +28,7 @@ public class MemoUpdateDTO {
     private Date dueDate;
     @Nullable
     private Boolean archived;
+    @Nullable
+    private Boolean pinned;
 
 }

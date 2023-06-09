@@ -27,5 +27,6 @@ public class MemoDetailsDTO {
     private boolean completed;
     private Date dueDate;
     private boolean archived;
+    private boolean pinned;
 
 }

@@ -1,4 +1,4 @@
-import { IconButton } from '@mui/material';
+import { IconButton, Slide } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { SnackbarProvider as SnackbarProviderInternal, MaterialDesignContent, useSnackbar } from 'notistack';
 import CloseIcon from '@mui/icons-material/Close';
@@ -35,6 +35,8 @@ const SnackbarProvider = ({ children }: { children: JSX.Element }) => {
         <SnackbarProviderInternal
             preventDuplicate
             maxSnack={15}
+            TransitionComponent={Slide}
+            TransitionProps={{ direction: 'up' }}
             anchorOrigin={{ vertical: 'bottom', horizontal: 'left' }}
             transitionDuration={{ enter: 300, exit: 300 }}
             autoHideDuration={7000}

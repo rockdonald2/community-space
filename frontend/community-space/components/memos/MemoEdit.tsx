@@ -294,7 +294,7 @@ const MemoEdit = ({
                 <InputBase
                     fullWidth
                     sx={{ ml: 1, mr: 1, mt: 0.5, mb: 2, flex: 1 }}
-                    placeholder='Any thoughts...'
+                    placeholder='Any thoughts'
                     inputProps={{ 'aria-label': 'memo input field' }}
                     multiline
                     value={msg}

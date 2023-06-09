@@ -25,5 +25,6 @@ public class MemoDTO {
     private String hubId;
     private boolean completed;
     private boolean archived;
+    private boolean pinned;
 
 }

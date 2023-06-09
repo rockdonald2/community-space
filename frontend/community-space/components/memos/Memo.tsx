@@ -1,6 +1,7 @@
 import {
     Alert,
     AlertTitle,
+    Badge,
     Button,
     ButtonGroup,
     Chip,
@@ -15,6 +16,8 @@ import {
     Tooltip,
     Typography,
     styled,
+    useMediaQuery,
+    useTheme,
 } from '@mui/material';
 import { Memo as MemoType, MemoShort, Completion } from '@/types/db.types';
 import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward';
@@ -36,6 +39,7 @@ import DoneIcon from '@mui/icons-material/Done';
 import Avatar from '@/components/misc/Avatar';
 import EventIcon from '@mui/icons-material/Event';
 import ArchiveIcon from '@mui/icons-material/Archive';
+import PushPinIcon from '@mui/icons-material/PushPin';
 
 const MemoDialog = styled(Dialog)(({ theme }) => ({
     '& .MuiPaper-root': {
@@ -53,6 +57,9 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
     const { user, signOut } = useAuthContext();
     const { mutate } = useSWRConfig();
     const { enqueueSnackbar } = useSnackbar();
+
+    const theme = useTheme();
+    const fullScreenDialog = useMediaQuery(theme.breakpoints.down('md'));
 
     const [isMemoOpen, setMemoOpen] = useState<boolean>(false);
     const [isMemoModificationError, setUserInputError] = useState<boolean>(false);
@@ -104,8 +111,64 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
         setMemoOpen(true);
     }, [isMemoOpen, setMemoOpen, isUserUpdatingMemo, setUserUpdatingMemo]);
 
+    const handlePatch = useCallback(
+        async (body: any) => {
+            const archiveResponse = await fetch(`${GATEWAY_URL}/api/v1/memos/${memo.id}`, {
+                method: 'PATCH',
+                headers: {
+                    Authorization: `Bearer ${user.token}`,
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify(body),
+            });
+
+            if (!archiveResponse.ok) {
+                throw new Error('Failed to update memo due to bad response', {
+                    cause: {
+                        res: archiveResponse,
+                    },
+                });
+            }
+
+            setMemoOpen(false);
+            await mutate((key) => key['key'] === 'memos' && key['hubId'] === memo.hubId);
+        },
+        [memo.hubId, memo.id, mutate, user.token]
+    );
+
+    const handlePin = useCallback(
+        async (pinned: boolean) => {
+            setUserInputError(false);
+
+            const handleAsync = async () => {
+                try {
+                    await handlePatch({ pinned: pinned });
+                } catch (err) {
+                    console.debug(err.message, err);
+                    setUserInputError(true);
+                    if (err instanceof Error) {
+                        if ('res' in (err.cause as any)) {
+                            const res = (err.cause as any).res;
+                            if (res.status === 401) {
+                                enqueueSnackbar('Your session has expired. Please sign in again', {
+                                    variant: 'warning',
+                                });
+                                signOut();
+                            } else {
+                                enqueueSnackbar('Failed to archive memo', { variant: 'error' });
+                            }
+                        }
+                    }
+                }
+            };
+
+            await handleAsync();
+        },
+        [handlePatch, enqueueSnackbar, signOut]
+    );
+
     const handleArchive = useCallback(
-        (archived: boolean) => {
+        async (archived: boolean) => {
             setUserInputError(false);
 
             const confirmationMsg: string = archived
@@ -115,25 +178,7 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
 
             const handleAsync = async () => {
                 try {
-                    const archiveResponse = await fetch(`${GATEWAY_URL}/api/v1/memos/${memo.id}`, {
-                        method: 'PATCH',
-                        headers: {
-                            Authorization: `Bearer ${user.token}`,
-                            'Content-Type': 'application/json',
-                        },
-                        body: JSON.stringify({ archived: archived }),
-                    });
-
-                    if (!archiveResponse.ok) {
-                        throw new Error('Failed to archive memo due to bad response', {
-                            cause: {
-                                res: archiveResponse,
-                            },
-                        });
-                    }
-
-                    setMemoOpen(false);
-                    await mutate((key) => key['key'] === 'memos' && key['hubId'] === memo.hubId);
+                    await handlePatch({ archived: archived });
                 } catch (err) {
                     console.debug(err.message, err);
                     setUserInputError(true);
@@ -154,13 +199,13 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
             };
 
             if (confirmation) {
-                handleAsync();
+                await handleAsync();
             }
         },
-        [memo, user, enqueueSnackbar, signOut, mutate]
+        [handlePatch, enqueueSnackbar, signOut]
     );
 
-    const handleDelete = useCallback(() => {
+    const handleDelete = useCallback(async () => {
         setUserInputError(false);
 
         const confirmation: boolean = confirm('Are you sure you want to delete this memo?');
@@ -202,11 +247,11 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
         };
 
         if (confirmation) {
-            handleAsync();
+            await handleAsync();
         }
     }, [memo.id, memo.hubId, user.token, mutate, enqueueSnackbar, signOut]);
 
-    const handleCompletion = useCallback(() => {
+    const handleCompletion = useCallback(async () => {
         const handleAsync = async () => {
             try {
                 const completionResponse = await fetch(`${GATEWAY_URL}/api/v1/memos/${memo.id}/completions`, {
@@ -245,62 +290,75 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
             }
         };
 
-        handleAsync();
+        await handleAsync();
     }, [enqueueSnackbar, memo.hubId, memo.id, mutate, signOut, user.email, user.token]);
 
     return (
         <>
-            <Item>
-                <Grid container alignItems={'center'} justifyContent={'center'}>
-                    <Grid item md={11} xs={12}>
-                        <Typography
-                            sx={{ mb: 1, mr: 1 }}
-                            color='text.primary'
-                            display='flex'
-                            alignItems='center'
-                            component={'div'}
-                        >
+            <Badge
+                badgeContent={
+                    memo?.pinned && (
+                        <PushPinIcon sx={{ color: 'text.secondary', transform: 'rotate(45deg) scale(1.1)' }} />
+                    )
+                }
+            >
+                <Item sx={{ width: '100%' }}>
+                    <Grid container alignItems={'center'} justifyContent={'center'}>
+                        <Grid item md={11} xs={12}>
                             <Typography
-                                variant='h6'
-                                component='span'
-                                sx={{ textDecoration: memo.completed ? 'line-through' : 'none' }}
+                                sx={{ mb: 1, mr: 1 }}
+                                color='text.primary'
+                                display='flex'
+                                alignItems='center'
+                                component={'div'}
                             >
-                                {memo.title}
+                                <Typography
+                                    variant='h6'
+                                    component='span'
+                                    sx={{ textDecoration: memo.completed ? 'line-through' : 'none' }}
+                                >
+                                    {memo.title}
+                                </Typography>
+                                <Chip size='small' sx={{ ml: 2 }} label={memo.visibility.toLowerCase()} />
                             </Typography>
-                            <Chip size='small' sx={{ ml: 2 }} label={memo.visibility.toLowerCase()} />
-                        </Typography>
-                        <Stack direction={{ md: 'row', xs: 'column' }} alignItems={{ xs: 'flex-start', md: 'center' }}>
-                            <Typography sx={{ fontSize: 14, mb: 0 }} color='text.secondary' gutterBottom>
-                                Posted by&nbsp;<strong>{memo.authorName}</strong>&nbsp;on{' '}
-                                {longDateShortTimeDateFormatter.format(new Date(memo.createdOn))}
-                            </Typography>
-                            <Divider variant='middle' orientation='vertical' flexItem sx={{ mx: 1, my: 0 }} />
-                            <Typography sx={{ fontSize: 14, mb: 0 }} color='text.secondary' gutterBottom>
-                                Urgency:&nbsp;
-                                <strong style={{ color: 'var(--mui-palette-primary-light)' }}>{memo.urgency}</strong>
-                            </Typography>
-                        </Stack>
+                            <Stack
+                                direction={{ md: 'row', xs: 'column' }}
+                                alignItems={{ xs: 'flex-start', md: 'center' }}
+                            >
+                                <Typography sx={{ fontSize: 14, mb: 0 }} color='text.secondary' gutterBottom>
+                                    Posted by&nbsp;<strong>{memo.authorName}</strong>&nbsp;on{' '}
+                                    {longDateShortTimeDateFormatter.format(new Date(memo.createdOn))}
+                                </Typography>
+                                <Divider variant='middle' orientation='vertical' flexItem sx={{ mx: 1, my: 0 }} />
+                                <Typography sx={{ fontSize: 14, mb: 0 }} color='text.secondary' gutterBottom>
+                                    Urgency:&nbsp;
+                                    <strong style={{ color: 'var(--mui-palette-primary-light)' }}>
+                                        {memo.urgency}
+                                    </strong>
+                                </Typography>
+                            </Stack>
+                        </Grid>
+                        <Grid
+                            item
+                            md={1}
+                            xs={12}
+                            justifySelf={{ md: 'flex-end', xs: 'flex-start' }}
+                            sx={{
+                                mt: { xs: 2, md: 0 },
+                                display: { xs: 'flex', md: 'inline-flex' },
+                                justifyContent: 'flex-end',
+                            }}
+                        >
+                            <Tooltip title='See more' enterTouchDelay={0} arrow>
+                                <IconButton onClick={handleCloseTrigger}>
+                                    <ArrowOutwardIcon />
+                                </IconButton>
+                            </Tooltip>
+                        </Grid>
                     </Grid>
-                    <Grid
-                        item
-                        md={1}
-                        xs={12}
-                        justifySelf={{ md: 'flex-end', xs: 'flex-start' }}
-                        sx={{
-                            mt: { xs: 2, md: 0 },
-                            display: { xs: 'flex', md: 'inline-flex' },
-                            justifyContent: 'flex-end',
-                        }}
-                    >
-                        <Tooltip title='See more' enterTouchDelay={0} arrow>
-                            <IconButton onClick={handleCloseTrigger}>
-                                <ArrowOutwardIcon />
-                            </IconButton>
-                        </Tooltip>
-                    </Grid>
-                </Grid>
-            </Item>
-            <MemoDialog open={isMemoOpen} scroll='paper' maxWidth='xl'>
+                </Item>
+            </Badge>
+            <MemoDialog open={isMemoOpen} scroll='paper' maxWidth='xl' fullScreen={fullScreenDialog}>
                 <DialogTitle sx={{ m: 0, p: 2 }}>
                     <Stack direction={'row'} alignItems={'center'} justifyContent={'space-between'}>
                         <Typography variant={'h6'}>{memo.title}</Typography>
@@ -418,6 +476,16 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                             disableElevation
                             size='small'
                         >
+                            {!memo?.archived && (
+                                <Button
+                                    variant='outlined'
+                                    endIcon={<PushPinIcon />}
+                                    size='small'
+                                    onClick={() => handlePin(!memo?.pinned ?? true)}
+                                >
+                                    {memo?.pinned ? 'Unpin' : 'Pin'}
+                                </Button>
+                            )}
                             <Button
                                 variant='outlined'
                                 endIcon={<ArchiveIcon />}

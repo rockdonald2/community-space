@@ -118,11 +118,11 @@ function CreateHub() {
                 <form className={styles.form} onSubmit={handleSubmit}>
                     <Stack className={styles['form__wrapper']}>
                         <TextField
-                            label='Name'
+                            label='Name of the Hub'
                             handleInput={(e: React.ChangeEvent<HTMLInputElement>) => handleInput(e, setNameInput)}
                         />
                         <TextField
-                            label='Description'
+                            label='Enter the description of your Hub'
                             handleInput={(e: React.ChangeEvent<HTMLInputElement>) =>
                                 handleInput(e, setDescriptionInput)
                             }

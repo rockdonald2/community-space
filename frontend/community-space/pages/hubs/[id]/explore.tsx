@@ -10,8 +10,8 @@ import Head from 'next/head';
 import Link from 'next/link';
 import { useRouter } from 'next/router';
 import useSWR from 'swr';
-import HubsTopbar from "@/components/hubs/HubsTopbar";
-import HubsSidebar from "@/components/hubs/HubsSidebar";
+import HubsTopbar from '@/components/hubs/HubsTopbar';
+import HubsSidebar from '@/components/hubs/HubsSidebar';
 
 const Explore = () => {
     const { query } = useRouter();
@@ -33,11 +33,11 @@ const Explore = () => {
             <Head>
                 <title>Community Space {!hubError ? `| ${hub.name}` : ''}</title>
             </Head>
-            <Breadcrumbs prevRoutes={[{ name: hub?.name, href: `/hubs/${hub?.id}` }]} currRoute={{ name: 'Explore' }}/>
+            <Breadcrumbs prevRoutes={[{ name: hub?.name, href: `/hubs/${hub?.id}` }]} currRoute={{ name: 'Explore' }} />
             <Grid container spacing={2}>
                 <Grid item md={4} xs={12}>
                     <Container>
-                        <HubsSidebar hub={hub}/>
+                        <HubsSidebar hub={hub} />
                         <Typography mb={2} color='text.secondary' variant='h6'>
                             More stuff
                         </Typography>
@@ -69,14 +69,14 @@ const Explore = () => {
                 <Grid item md={8} xs={12}>
                     {!hubIsLoading && !hubIsValidating && !hubError ? (
                         <>
-                            <HubsTopbar hub={hub}/>
+                            <HubsTopbar hub={hub} />
                             <Typography variant='h6' align='left' color='text.secondary' mb={2} mt={2}>
                                 Explore all memos
                             </Typography>
-                            <Memos scope='ALL' hubId={hubId}/>
+                            <Memos scope='ALL' hubId={hubId} />
                         </>
                     ) : (
-                        <Alerter isValidating={hubIsValidating} isLoading={hubIsLoading} data={hub} error={hubError}/>
+                        <Alerter isValidating={hubIsValidating} isLoading={hubIsLoading} data={hub} error={hubError} />
                     )}
                 </Grid>
             </Grid>

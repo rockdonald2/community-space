@@ -24,6 +24,13 @@ export const sortByCreationDate = (m1: MemoShort, m2: MemoShort) => {
     return 0;
 };
 
+export const sortByPinned = (m1: MemoShort, m2: MemoShort) => {
+    if (m1.pinned) return -1;
+    if (m2.pinned) return 1;
+
+    return 0;
+};
+
 /**
  * Create bold style based on the condition that the element is present inside a list.
  * @param elem

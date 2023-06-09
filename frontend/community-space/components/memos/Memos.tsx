@@ -4,6 +4,7 @@ import {
     boldSelectedElementStyle,
     handleMultiSelectChange,
     sortByCreationDate,
+    sortByPinned,
     sortByUrgency,
     swrArchivedMemosFetcher,
     swrMemosFetcherWithAuth,
@@ -45,10 +46,10 @@ const Memos = ({ hubId, scope = 'RECENT' }: { hubId?: string | string[]; scope?:
         scope === 'RECENT'
             ? swrRecentMemosFetcherWithAuth
             : scope === 'ARCHIVED'
-                ? swrArchivedMemosFetcher
-                : swrMemosFetcherWithAuth,
+            ? swrArchivedMemosFetcher
+            : swrMemosFetcherWithAuth,
         {
-            revalidateOnFocus: false
+            revalidateOnFocus: false,
         }
     );
 
@@ -60,10 +61,10 @@ const Memos = ({ hubId, scope = 'RECENT' }: { hubId?: string | string[]; scope?:
     return (
         <Stack spacing={2}>
             <Box sx={{ display: 'flex', alignItems: 'flex-end' }}>
-                <SearchIcon sx={{ mr: 1, my: 0.5 }}/>
+                <SearchIcon sx={{ mr: 1, my: 0.5 }} />
                 <TextField
                     id='input-with-sx'
-                    label='Search by title...'
+                    label='Search by title'
                     variant='standard'
                     fullWidth
                     onChange={(e: ChangeEvent<HTMLTextAreaElement>) => setTitleFilter(e.target.value)}
@@ -95,11 +96,11 @@ const Memos = ({ hubId, scope = 'RECENT' }: { hubId?: string | string[]; scope?:
                             onChange={(e: SelectChangeEvent<typeof urgencyFilter>) =>
                                 handleMultiSelectChange(e, setUrgencyFilter)
                             }
-                            input={<OutlinedInput label='Urgency'/>}
+                            input={<OutlinedInput label='Urgency' />}
                             renderValue={(selected) => (
                                 <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
                                     {selected.map((value) => (
-                                        <Chip key={value} label={value} sx={{ m: 0.5 }}/>
+                                        <Chip key={value} label={value} sx={{ m: 0.5 }} />
                                     ))}
                                 </Box>
                             )}
@@ -121,6 +122,7 @@ const Memos = ({ hubId, scope = 'RECENT' }: { hubId?: string | string[]; scope?:
                 memos.content
                     .sort(sortByCreationDate)
                     .sort(sortByUrgency)
+                    .sort(sortByPinned)
                     .filter((memo) => memo.title.toLowerCase().includes(titleFilter.toLowerCase()))
                     .filter((memo) => {
                         if (privateFilter && publicFilter) return true;
@@ -132,9 +134,9 @@ const Memos = ({ hubId, scope = 'RECENT' }: { hubId?: string | string[]; scope?:
                         if (urgencyFilter.length === 0) return true;
                         return urgencyFilter.includes(memo.urgency);
                     })
-                    .map((memo, idx) => <Memo memo={memo} key={idx}/>)
+                    .map((memo, idx) => <Memo memo={memo} key={idx} />)
             ) : (
-                <Alerter isValidating={isValidating} isLoading={isLoading} data={memos} error={error}/>
+                <Alerter isValidating={isValidating} isLoading={isLoading} data={memos} error={error} />
             )}
             <Pagination
                 count={memos?.totalPages}

@@ -1,4 +1,4 @@
-import { Badge, Divider, Grid, IconButton, Menu, Paper, Stack, Tooltip, Typography, styled } from '@mui/material';
+import { Badge, Collapse, Divider, Grid, IconButton, Menu, Paper, Stack, Tooltip, Typography } from '@mui/material';
 import { useState, useMemo, useCallback } from 'react';
 import NotificationsIcon from '@mui/icons-material/Notifications';
 import { useAuthContext } from '@/utils/AuthContext';
@@ -9,6 +9,7 @@ import { useSnackbar } from 'notistack';
 import { useNotifications } from '@/utils/UseNotifications';
 import { calculateRelativeTimeFromNow } from '@/utils/Utility';
 import Avatar from './Avatar';
+import { TransitionGroup } from 'react-transition-group';
 
 const Notifications = () => {
     const { signOut } = useAuthContext();
@@ -78,10 +79,18 @@ const Notifications = () => {
                         mt: 1.5,
                         maxHeight: '500px',
                         px: 1,
+                        maxWidth: {
+                            xs: '85vw',
+                            md: '25vw',
+                        },
+                        minWidth: {
+                            xs: '85vw',
+                            md: '25vw',
+                        },
                     },
                 }}
-                transformOrigin={{ horizontal: 'right', vertical: 'top' }}
-                anchorOrigin={{ horizontal: 'right', vertical: 'bottom' }}
+                transformOrigin={{ horizontal: 'center', vertical: 'top' }}
+                anchorOrigin={{ horizontal: 'center', vertical: 'bottom' }}
             >
                 <Paper sx={{ position: 'sticky', top: 0, width: '100%', zIndex: 1 }} elevation={0}>
                     <Typography
@@ -94,88 +103,83 @@ const Notifications = () => {
                     <Divider sx={{ mb: 2 }} />
                 </Paper>
                 {!isLoading && !isValidating && !error && notifications?.length > 0 ? (
-                    notifications
-                        ?.filter((notification) => notification.isRead !== true)
-                        .map((notification, idx) => (
-                            <Grid
-                                container
-                                key={idx}
-                                sx={{
-                                    maxWidth: {
-                                        xs: '85vw',
-                                        md: '35vw',
-                                    },
-                                }}
-                                direction='row'
-                                alignItems='center'
-                            >
-                                <Grid item xs={10}>
-                                    <Grid container>
+                    <TransitionGroup>
+                        {notifications
+                            ?.filter((notification) => notification.isRead !== true)
+                            .map((notification, idx) => (
+                                <Collapse key={idx} unmountOnExit mountOnEnter>
+                                    <Grid container key={idx} direction='row' alignItems='center'>
+                                        <Grid item xs={10}>
+                                            <Grid container>
+                                                <Grid
+                                                    item
+                                                    xs={2}
+                                                    alignSelf={'flex-start'}
+                                                    justifySelf={'center'}
+                                                    sx={{ width: '100%', pt: 0.5 }}
+                                                >
+                                                    <div style={{ display: 'flex', justifyContent: 'center' }}>
+                                                        <Avatar
+                                                            generateRandomColor
+                                                            style={{
+                                                                width: '30px',
+                                                                height: '30px',
+                                                                fontSize: '14px',
+                                                            }}
+                                                            user={{ email: notification.taker }}
+                                                        />
+                                                    </div>
+                                                </Grid>
+                                                <Grid item xs={10}>
+                                                    <Stack>
+                                                        <Typography
+                                                            variant='body2'
+                                                            sx={{
+                                                                paddingLeft: 0.5,
+                                                                paddingRight: 0.5,
+                                                                width: '100%',
+                                                            }}
+                                                        >
+                                                            {notification.msg}
+                                                        </Typography>
+                                                        <Typography
+                                                            variant='caption'
+                                                            color='text.secondary'
+                                                            sx={{
+                                                                paddingLeft: 0.5,
+                                                                paddingRight: 0.5,
+                                                                paddingTop: 0.5,
+                                                                textAlign: 'left',
+                                                                mb: 1,
+                                                            }}
+                                                        >
+                                                            {calculateRelativeTimeFromNow(
+                                                                new Date(notification.createdAt)
+                                                            )}
+                                                        </Typography>
+                                                    </Stack>
+                                                </Grid>
+                                            </Grid>
+                                        </Grid>
                                         <Grid
                                             item
                                             xs={2}
-                                            alignSelf={'flex-start'}
-                                            justifySelf={'center'}
-                                            sx={{ width: '100%', pt: 0.5 }}
+                                            sx={{ display: 'flex', alignContent: 'center', justifyContent: 'center' }}
                                         >
-                                            <div style={{ display: 'flex', justifyContent: 'center' }}>
-                                                <Avatar
-                                                    generateRandomColor
-                                                    style={{
-                                                        width: '30px',
-                                                        height: '30px',
-                                                        fontSize: '14px',
-                                                    }}
-                                                    user={{ email: notification.taker }}
-                                                />
-                                            </div>
-                                        </Grid>
-                                        <Grid item xs={10}>
-                                            <Stack>
-                                                <Typography
-                                                    variant='body2'
-                                                    sx={{
-                                                        paddingLeft: 0.5,
-                                                        paddingRight: 0.5,
-                                                        width: '100%',
-                                                    }}
+                                            <Tooltip arrow title='Mark as read' enterTouchDelay={0}>
+                                                <IconButton
+                                                    size='small'
+                                                    color='primary'
+                                                    onClick={async () => await handleRead(notification)}
                                                 >
-                                                    {notification.msg}
-                                                </Typography>
-                                                <Typography
-                                                    variant='caption'
-                                                    color='text.secondary'
-                                                    sx={{
-                                                        paddingLeft: 0.5,
-                                                        paddingRight: 0.5,
-                                                        paddingTop: 0.5,
-                                                        textAlign: 'left',
-                                                        mb: 1,
-                                                    }}
-                                                >
-                                                    {calculateRelativeTimeFromNow(new Date(notification.createdAt))}
-                                                </Typography>
-                                            </Stack>
+                                                    <CheckIcon />
+                                                </IconButton>
+                                            </Tooltip>
                                         </Grid>
                                     </Grid>
-                                </Grid>
-                                <Grid
-                                    item
-                                    xs={2}
-                                    sx={{ display: 'flex', alignContent: 'center', justifyContent: 'center' }}
-                                >
-                                    <Tooltip arrow title='Mark as read' enterTouchDelay={0}>
-                                        <IconButton
-                                            size='small'
-                                            color='primary'
-                                            onClick={async () => await handleRead(notification)}
-                                        >
-                                            <CheckIcon />
-                                        </IconButton>
-                                    </Tooltip>
-                                </Grid>
-                            </Grid>
-                        ))
+                                </Collapse>
+                            ))}
+                    </TransitionGroup>
                 ) : isLoading || isValidating || error ? (
                     <Alerter data={notifications} error={error} isLoading={isLoading} isValidating={isValidating} />
                 ) : (
@@ -184,7 +188,7 @@ const Notifications = () => {
                         variant='body2'
                         color='text.secondary'
                     >
-                        No new notifications...
+                        No new notifications
                     </Typography>
                 )}
             </Menu>

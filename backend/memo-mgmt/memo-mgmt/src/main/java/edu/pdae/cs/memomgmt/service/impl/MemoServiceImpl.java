@@ -126,8 +126,14 @@ public class MemoServiceImpl implements MemoService {
             hasChanged = true;
         }
 
+        if (memoUpdateDTO.getPinned() != null) {
+            memo.setPinned(memoUpdateDTO.getPinned());
+            hasChanged = true;
+        }
+
         if (memoUpdateDTO.getArchived() != null) {
             memo.setArchived(memoUpdateDTO.getArchived());
+            memo.setPinned(false);
             hasChanged = true;
         }
 

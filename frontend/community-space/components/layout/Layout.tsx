@@ -52,10 +52,10 @@ const Layout = ({ children }) => {
                         }}
                     >
                         <PresenceContextProvider>
-                            <Header/>
+                            <Header />
                             <>{children}</>
-                            <QuickActions/>
-                            <Footer/>
+                            <QuickActions />
+                            <Footer />
                         </PresenceContextProvider>
                     </SWRConfig>
                 </>
@@ -65,9 +65,15 @@ const Layout = ({ children }) => {
                         item
                         md={4}
                         xs={12}
+                        sx={{
+                            mb: {
+                                md: 0,
+                                xs: 5,
+                            },
+                        }}
                     >
                         <Typography variant={'h3'}>Community Space 💬</Typography>
-                        <Divider sx={{ mt: 3, mb: 3 }}/>
+                        <Divider sx={{ mt: 3, mb: 3 }} />
                         <Typography variant={'body1'} color='text.secondary' sx={{ fontSize: 20, fontStyle: 'italic' }}>
                             A place for all your memos
                         </Typography>
