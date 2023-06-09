@@ -42,7 +42,7 @@ public class HubChangesListener {
 
         switch (hubMutationDTO.getState()) { // NOSONAR
             case CREATED ->
-                    hubService.createHub(new ObjectId(hubMutationDTO.getHubId()), hubMutationDTO.getHubName(), hubMutationDTO.getOwner());
+                    hubService.createHub(hubMutationDTO);
             case DELETED -> hubService.deleteHub(new ObjectId(hubMutationDTO.getHubId()));
         }
     }

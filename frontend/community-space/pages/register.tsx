@@ -1,12 +1,12 @@
 import { Alert, Avatar, Button, Chip, Divider, Stack, Typography } from '@mui/material';
 import Head from 'next/head';
-import { useState, useCallback, Dispatch, SetStateAction } from 'react';
+import { useCallback, useState } from 'react';
 import { useRouter } from 'next/router';
 import Link from 'next/link';
 import styles from '@/styles/Register.module.scss';
 import { useAuthContext } from '@/utils/AuthContext';
-import PasswordField from '@/components/PasswordField';
-import TextField from '@/components/TextField';
+import PasswordField from '@/components/common/PasswordField';
+import TextField from '@/components/common/TextField';
 import { useSnackbar } from 'notistack';
 import { handleInput } from '@/utils/Utility';
 
@@ -21,6 +21,7 @@ function Register() {
     const [isMalformedEmail, setIsMalformedEmail] = useState<boolean>(false);
     const [isMalformedPassword, setIsMalformedPassword] = useState<boolean>(false);
     const [isError, setIsError] = useState<boolean>(false);
+    const [errMsg, setErrMsg] = useState<string>(null);
     const [passwordsMatch, setPasswordsMatch] = useState<boolean>(true);
     const [namesMissing, setNamesMissing] = useState<boolean>(false);
     const { push } = useRouter();
@@ -53,6 +54,7 @@ function Register() {
 
             if (error) {
                 setIsError(true);
+                setErrMsg(error.msg)
                 enqueueSnackbar('An error occurred, please try again!', { variant: 'error' });
                 return console.debug('Error happened while trying to sign up', error);
             }
@@ -69,14 +71,14 @@ function Register() {
             </Head>
             <Stack className={styles['avatar-wrapper']}>
                 <Avatar className={styles['avatar-wrapper__avatar']}>U</Avatar>
-                <Divider variant='middle' orientation='vertical' flexItem />
+                <Divider variant='middle' orientation='vertical' flexItem/>
                 <Typography variant='h5' component='h5' className={styles['avatar-wrapper__msg']}>
                     Register your account
                 </Typography>
             </Stack>
             {isError && (
                 <Alert severity='error' className={styles.alert}>
-                    Something went wrong!
+                    {errMsg}
                 </Alert>
             )}
             <form className={styles.form} onSubmit={handleSubmit}>
@@ -137,7 +139,7 @@ function Register() {
                 </Alert>
             )}
             <Divider flexItem className={styles['form__divider']}>
-                <Chip label='OR' />
+                <Chip label='OR'/>
             </Divider>
             <Button href='/login' LinkComponent={Link} variant='text' className={styles['register__button']}>
                 Already have an account? Login!

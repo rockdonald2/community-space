@@ -1,7 +1,7 @@
 import { useAuthContext } from '@/utils/AuthContext';
 import { Box, Divider, Stack, Typography } from '@mui/material';
-import Avatar from './Avatar';
-import Notifications from './Notifications';
+import Avatar from '../misc/Avatar';
+import Notifications from '../misc/Notifications';
 
 const Header = () => {
     const { user } = useAuthContext();

@@ -4,7 +4,7 @@ import NotificationsIcon from '@mui/icons-material/Notifications';
 import { useAuthContext } from '@/utils/AuthContext';
 import { Notification } from '@/types/db.types';
 import CheckIcon from '@mui/icons-material/Check';
-import Alerter from './Alerter';
+import Alerter from '../layout/Alerter';
 import { useSnackbar } from 'notistack';
 import { useNotifications } from '@/utils/UseNotifications';
 import { calculateRelativeTimeFromNow } from '@/utils/Utility';

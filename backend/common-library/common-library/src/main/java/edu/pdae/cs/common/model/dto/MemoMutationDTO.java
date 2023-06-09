@@ -26,8 +26,12 @@ public class MemoMutationDTO {
 
     @Nullable
     private Date dueDate;
+
     @Nullable
     private Visibility visibility;
+
+    @Nullable
+    private Boolean isArchived;
 
     private State state;
 

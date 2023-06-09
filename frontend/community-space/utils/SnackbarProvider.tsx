@@ -2,7 +2,7 @@ import { IconButton } from '@mui/material';
 import { styled } from '@mui/material/styles';
 import { SnackbarProvider as SnackbarProviderInternal, MaterialDesignContent, useSnackbar } from 'notistack';
 import CloseIcon from '@mui/icons-material/Close';
-import NotificationSnackbar from '@/components/NotificationSnackbar';
+import NotificationSnackbar from '@/components/misc/NotificationSnackbar';
 import { Notification } from '@/types/db.types';
 
 const SnackbarCloseButton = ({ snackbarKey }) => {

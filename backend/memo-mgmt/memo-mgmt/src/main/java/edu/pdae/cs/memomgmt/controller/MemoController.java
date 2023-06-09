@@ -49,6 +49,7 @@ public class MemoController {
                 .owner(user)
                 .visibility(createdDto.getVisibility())
                 .dueDate(createdDto.getDueDate())
+                .isArchived(createdDto.isArchived())
                 .build());
 
         return createdDto;
@@ -62,27 +63,27 @@ public class MemoController {
     }
 
     @GetMapping
-    public ResponseEntity<List<MemoDTO>> gets(@RequestParam("createdAfter") @DateTimeFormat(pattern = "yyyy-MM-dd") Optional<Date> createdAfter, @RequestParam("visibility") Optional<Visibility> visibility, @RequestParam("hubId") Optional<ObjectId> hubId, @RequestParam("page") Optional<Integer> page, @RequestHeader("X-AUTH-TOKEN-SUBJECT") String user) {
+    public ResponseEntity<List<MemoDTO>> gets(@RequestParam("createdAfter") @DateTimeFormat(pattern = "yyyy-MM-dd") Optional<Date> createdAfter, @RequestParam("visibility") Optional<Visibility> visibility, @RequestParam("hubId") Optional<ObjectId> hubId, @RequestParam("page") Optional<Integer> page, @RequestParam(value = "archived", defaultValue = "false") boolean archived, @RequestHeader("X-AUTH-TOKEN-SUBJECT") String user) {
         log.info("Getting all memos");
         Objects.requireNonNull(user);
 
         PageWrapper<MemoDTO> wrapper;
         if (createdAfter.isPresent() && visibility.isPresent() && hubId.isPresent()) {
-            wrapper = memoService.getAllAfterByHubIdAndByVisibility(createdAfter.get(), visibility.get(), hubId.get(), user, page.orElse(0), PAGE_SIZE);
+            wrapper = memoService.getAllAfterByHubIdAndByVisibility(createdAfter.get(), visibility.get(), hubId.get(), user, page.orElse(0), PAGE_SIZE, archived);
         } else if (createdAfter.isPresent() && hubId.isPresent()) {
-            wrapper = memoService.getAllAfterByHubId(createdAfter.get(), hubId.get(), user, page.orElse(0), PAGE_SIZE);
+            wrapper = memoService.getAllAfterByHubId(createdAfter.get(), hubId.get(), user, page.orElse(0), PAGE_SIZE, archived);
         } else if (visibility.isPresent() && hubId.isPresent()) {
-            wrapper = memoService.getAllByHubIdAndByVisibility(hubId.get(), visibility.get(), user, page.orElse(0), PAGE_SIZE);
+            wrapper = memoService.getAllByHubIdAndByVisibility(hubId.get(), visibility.get(), user, page.orElse(0), PAGE_SIZE, archived);
         } else if (createdAfter.isPresent() && visibility.isPresent()) {
-            wrapper = memoService.getAllAfterAndByVisibility(createdAfter.get(), visibility.get(), user, page.orElse(0), PAGE_SIZE);
+            wrapper = memoService.getAllAfterAndByVisibility(createdAfter.get(), visibility.get(), user, page.orElse(0), PAGE_SIZE, archived);
         } else if (createdAfter.isPresent()) {
-            wrapper = memoService.getAllAfter(createdAfter.get(), user, page.orElse(0), PAGE_SIZE);
+            wrapper = memoService.getAllAfter(createdAfter.get(), user, page.orElse(0), PAGE_SIZE, archived);
         } else if (visibility.isPresent()) {
-            wrapper = memoService.getAllByVisibility(visibility.get(), user, page.orElse(0), PAGE_SIZE);
+            wrapper = memoService.getAllByVisibility(visibility.get(), user, page.orElse(0), PAGE_SIZE, archived);
         } else if (hubId.isPresent()) {
-            wrapper = memoService.getAllByHubId(hubId.get(), user, page.orElse(0), PAGE_SIZE);
+            wrapper = memoService.getAllByHubId(hubId.get(), user, page.orElse(0), PAGE_SIZE, archived);
         } else {
-            wrapper = memoService.getAll(user, page.orElse(0), PAGE_SIZE);
+            wrapper = memoService.getAll(user, page.orElse(0), PAGE_SIZE, archived);
         }
 
         final var headers = new HttpHeaders();
@@ -109,6 +110,7 @@ public class MemoController {
                 .title(memo.getTitle())
                 .visibility(memo.getVisibility())
                 .dueDate(memo.getDueDate())
+                .isArchived(memo.isArchived())
                 .build());
 
         return memo;

@@ -4,6 +4,7 @@ import edu.pdae.cs.activitynotificationsmgmt.model.Hub;
 import edu.pdae.cs.activitynotificationsmgmt.repository.HubRepository;
 import edu.pdae.cs.activitynotificationsmgmt.service.HubService;
 import edu.pdae.cs.activitynotificationsmgmt.service.MemoService;
+import edu.pdae.cs.common.model.dto.HubMutationDTO;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.cache.annotation.CacheEvict;
@@ -11,7 +12,6 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
 import java.util.HashSet;
-import java.util.List;
 import java.util.NoSuchElementException;
 
 @Service
@@ -23,11 +23,11 @@ public class HubServiceImpl implements HubService {
 
     @Override
     @CacheEvict({"hub", "member"})
-    public void createHub(ObjectId hubId, String hubName, String ownerEmail) {
+    public void createHub(HubMutationDTO hubMutationDTO) {
         hubRepository.save(Hub.builder()
-                .id(hubId)
-                .owner(ownerEmail)
-                .name(hubName)
+                .id(new ObjectId(hubMutationDTO.getHubId()))
+                .owner(hubMutationDTO.getOwner())
+                .name(hubMutationDTO.getHubName())
                 .members(new HashSet<>())
                 .build());
     }

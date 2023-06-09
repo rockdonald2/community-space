@@ -34,6 +34,7 @@ public class Memo {
     private Visibility visibility;
     private Date dueDate;
     private Set<String> completions;
+    private boolean archived;
 
     @JsonSerialize(using = ToStringSerializer.class)
     private ObjectId hubId;

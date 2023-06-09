@@ -1,8 +1,8 @@
-import Presence from '@/components/Presence';
+import Presence from '@/components/common/Presence';
 import { Divider, Grid } from '@mui/material';
 import Head from 'next/head';
-import Activity from '@/components/Activity';
-import Hubs from '@/components/Hubs';
+import Activity from '@/components/misc/Activity';
+import Hubs from '@/components/hubs/Hubs';
 
 export default function Home() {
     return (

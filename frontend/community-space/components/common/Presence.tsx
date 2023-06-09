@@ -1,8 +1,8 @@
 import { usePresenceContext } from '@/utils/PresenceContext';
 import { Box, Container, Skeleton, Stack, Tooltip, Typography } from '@mui/material';
-import Avatar from './Avatar';
+import Avatar from '../misc/Avatar';
 import { useAuthContext } from '@/utils/AuthContext';
-import CircularLoading from './CircularLoading';
+import CircularLoading from '../layout/CircularLoading';
 import styles from '@/styles/Presence.module.scss';
 import { green } from '@mui/material/colors';
 import { shortTimeWithNoDateFormatter } from '@/utils/Utility';

@@ -4,7 +4,7 @@ import { swrExploreHubFetcherWithAuth } from '@/utils/Utility';
 import { Grid, Typography } from '@mui/material';
 import useSWR from 'swr';
 import HubExploreCard from './HubExploreCard';
-import Alerter from './Alerter';
+import Alerter from '../layout/Alerter';
 
 interface HubTabPanelProps {
     index: number;

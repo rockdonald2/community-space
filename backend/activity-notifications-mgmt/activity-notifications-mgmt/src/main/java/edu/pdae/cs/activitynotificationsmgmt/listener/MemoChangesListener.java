@@ -25,10 +25,9 @@ public class MemoChangesListener {
         log.info("Caught internal message for memo mutation update for {}", memoMutationDTO);
 
         switch (memoMutationDTO.getState()) { // NOSONAR
-            case CREATED ->
-                    memoService.createMemo(new ObjectId(memoMutationDTO.getMemoId()), memoMutationDTO.getTitle(), memoMutationDTO.getOwner(), new ObjectId(memoMutationDTO.getHubId()), memoMutationDTO.getVisibility(), memoMutationDTO.getDueDate());
+            case CREATED -> memoService.createMemo(memoMutationDTO);
             case DELETED -> memoService.deleteMemo(new ObjectId(memoMutationDTO.getMemoId()));
-            case UPDATED -> memoService.updateMemo(new ObjectId(memoMutationDTO.getMemoId()), memoMutationDTO.getTitle(), memoMutationDTO.getVisibility(), memoMutationDTO.getDueDate());
+            case UPDATED -> memoService.updateMemo(memoMutationDTO);
         }
     }
 

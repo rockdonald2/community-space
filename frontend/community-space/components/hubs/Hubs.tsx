@@ -4,7 +4,7 @@ import { swrHubsFetcherWithAuth } from '@/utils/Utility';
 import useSWR from 'swr';
 import { Grid, Typography, Link as MaterialLink } from '@mui/material';
 import HubCard from './HubCard';
-import Alerter from './Alerter';
+import Alerter from '../layout/Alerter';
 import { useCallback } from 'react';
 import Link from 'next/link';
 

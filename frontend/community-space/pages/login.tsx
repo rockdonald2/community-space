@@ -6,8 +6,8 @@ import Link from 'next/link';
 import { useRouter } from 'next/router';
 import styles from '@/styles/Login.module.scss';
 import { useAuthContext } from '@/utils/AuthContext';
-import PasswordField from '@/components/PasswordField';
-import TextField from '@/components/TextField';
+import PasswordField from '@/components/common/PasswordField';
+import TextField from '@/components/common/TextField';
 import { useSnackbar } from 'notistack';
 import { handleInput } from '@/utils/Utility';
 

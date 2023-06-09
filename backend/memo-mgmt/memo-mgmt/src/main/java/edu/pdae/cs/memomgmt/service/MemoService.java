@@ -21,21 +21,21 @@ public interface MemoService {
 
     MemoDetailsDTO getById(ObjectId id, String asUser);
 
-    PageWrapper<MemoDTO> getAllByVisibility(Visibility visibility, String asUser, int currPage, int pageSize);
+    PageWrapper<MemoDTO> getAllByVisibility(Visibility visibility, String asUser, int currPage, int pageSize, boolean archived);
 
-    PageWrapper<MemoDTO> getAllAfter(Date after, String asUser, int currPage, int pageSize);
+    PageWrapper<MemoDTO> getAllAfter(Date after, String asUser, int currPage, int pageSize, boolean archived);
 
-    PageWrapper<MemoDTO> getAllAfterAndByVisibility(Date after, Visibility visibility, String asUser, int currPage, int pageSize);
+    PageWrapper<MemoDTO> getAllAfterAndByVisibility(Date after, Visibility visibility, String asUser, int currPage, int pageSize, boolean archived);
 
-    PageWrapper<MemoDTO> getAll(String asUser, int currPage, int pageSize);
+    PageWrapper<MemoDTO> getAll(String asUser, int currPage, int pageSize, boolean archived);
 
-    PageWrapper<MemoDTO> getAllAfterByHubIdAndByVisibility(Date after, Visibility visibility, ObjectId hubId, String asUser, int currPage, int pageSize);
+    PageWrapper<MemoDTO> getAllAfterByHubIdAndByVisibility(Date after, Visibility visibility, ObjectId hubId, String asUser, int currPage, int pageSize, boolean archived);
 
-    PageWrapper<MemoDTO> getAllAfterByHubId(Date after, ObjectId hubId, String asUser, int currPage, int pageSize);
+    PageWrapper<MemoDTO> getAllAfterByHubId(Date after, ObjectId hubId, String asUser, int currPage, int pageSize, boolean archived);
 
-    PageWrapper<MemoDTO> getAllByHubIdAndByVisibility(ObjectId hubId, Visibility visibility, String asUser, int currPage, int pageSize);
+    PageWrapper<MemoDTO> getAllByHubIdAndByVisibility(ObjectId hubId, Visibility visibility, String asUser, int currPage, int pageSize, boolean archived);
 
-    PageWrapper<MemoDTO> getAllByHubId(ObjectId hubId, String asUser, int currPage, int pageSize);
+    PageWrapper<MemoDTO> getAllByHubId(ObjectId hubId, String asUser, int currPage, int pageSize, boolean archived);
 
     MemoCompletionResponseDTO completeMemo(ObjectId memoId, String user, UserWrapper userWrapper);
 

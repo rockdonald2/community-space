@@ -6,7 +6,7 @@ import { Avatar as MaterialAvatar, Box, Button, Card, CardContent, Chip, Divider
 import Link from 'next/link';
 import { useSnackbar } from 'notistack';
 import { useCallback } from 'react';
-import Avatar from './Avatar';
+import Avatar from '../misc/Avatar';
 
 const HubCard = ({ hub, mutateCallback }: { hub: HubType; mutateCallback: (hub: Hub) => void }) => {
     const { user, signOut } = useAuthContext();
@@ -57,7 +57,7 @@ const HubCard = ({ hub, mutateCallback }: { hub: HubType; mutateCallback: (hub: 
                     <Typography variant='h5' component='div' align='center'>
                         {hub.name}
                     </Typography>
-                    <Typography color='text.secondary' align='center'>
+                    <Typography color='text.secondary' align='center' component={'div'}>
                         <Chip
                             avatar={
                                 <Avatar

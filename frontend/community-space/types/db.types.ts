@@ -34,6 +34,7 @@ export type Memo = {
     hubId: string;
     completed?: boolean;
     dueDate?: Date;
+    archived?: boolean;
 };
 
 export type MemoShort = {
@@ -46,6 +47,7 @@ export type MemoShort = {
     urgency: Urgency;
     hubId: string;
     completed?: boolean;
+    archived?: boolean;
 };
 
 export type Hub = {

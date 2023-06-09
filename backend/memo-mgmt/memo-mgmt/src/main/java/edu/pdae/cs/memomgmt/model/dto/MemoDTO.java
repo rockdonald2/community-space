@@ -24,5 +24,6 @@ public class MemoDTO {
     private Memo.Urgency urgency;
     private String hubId;
     private boolean completed;
+    private boolean archived;
 
 }

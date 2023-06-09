@@ -1,5 +1,6 @@
 package edu.pdae.cs.memomgmt.service.impl;
 
+import edu.pdae.cs.common.model.dto.HubMutationDTO;
 import edu.pdae.cs.memomgmt.model.Hub;
 import edu.pdae.cs.memomgmt.repository.HubRepository;
 import edu.pdae.cs.memomgmt.service.HubService;
@@ -27,11 +28,11 @@ public class HubServiceImpl implements HubService {
 
     @Override
     @CacheEvict({"hub", "memo", "memos", "member"})
-    public void createHub(ObjectId hubId, String hubName, String ownerEmail) {
+    public void createHub(HubMutationDTO hubMutationDTO) {
         hubRepository.save(Hub.builder()
-                .id(hubId)
-                .owner(ownerEmail)
-                .name(hubName)
+                .id(new ObjectId(hubMutationDTO.getHubId()))
+                .owner(hubMutationDTO.getOwner())
+                .name(hubMutationDTO.getHubName())
                 .members(new HashSet<>())
                 .build());
     }

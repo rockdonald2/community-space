@@ -14,7 +14,7 @@ import {
     Tooltip,
     Grid,
 } from '@mui/material';
-import Item from './Item';
+import Item from '../layout/Item';
 import { ChangeEvent, Dispatch, SetStateAction, useCallback, useMemo, useState } from 'react';
 import SendIcon from '@mui/icons-material/Send';
 import { Visibility, Urgency } from '@/types/db.types';

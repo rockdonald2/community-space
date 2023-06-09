@@ -7,7 +7,7 @@ import {
     experimental_extendTheme as extendTheme,
 } from '@mui/material/styles';
 import CssBaseline from '@mui/material/CssBaseline';
-import Layout from '@/components/Layout';
+import Layout from '@/components/layout/Layout';
 import AuthContextProvider from '@/utils/AuthContext';
 import { RouteGuard } from '@/utils/RouteGuard';
 import CrossContextProvider from '@/utils/CrossContext';

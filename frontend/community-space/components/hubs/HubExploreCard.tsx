@@ -10,9 +10,9 @@ import {
 import { Card, CardContent, Typography, Box, Avatar as MaterialAvatar, Divider, Chip, Button } from '@mui/material';
 import Link from 'next/link';
 import useSWR from 'swr';
-import Alerter from './Alerter';
+import Alerter from '../layout/Alerter';
 import { usePresenceContext } from '@/utils/PresenceContext';
-import Avatar from './Avatar';
+import Avatar from '../misc/Avatar';
 
 const HubExploreCard = ({ hub }: { hub: Hub }) => {
     const { user } = useAuthContext();

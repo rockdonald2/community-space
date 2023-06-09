@@ -1,5 +1,5 @@
-import Breadcrumbs from '@/components/Breadcrumbs';
-import HubTabPanel, { a11yProps } from '@/components/HubTabPanel';
+import Breadcrumbs from '@/components/layout/Breadcrumbs';
+import HubTabPanel, { a11yProps } from '@/components/hubs/HubTabPanel';
 import { Box, Tab, Tabs } from '@mui/material';
 import Head from 'next/head';
 import { useState } from 'react';

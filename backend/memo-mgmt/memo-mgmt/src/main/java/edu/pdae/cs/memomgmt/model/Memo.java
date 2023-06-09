@@ -38,6 +38,7 @@ public class Memo {
     private Urgency urgency;
     private Set<String> completions;
     private Date dueDate;
+    private boolean archived;
 
     @JsonSerialize(using = ToStringSerializer.class)
     private ObjectId hubId;

@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import { useAuthContext } from './AuthContext';
-import CircularLoading from '@/components/CircularLoading';
+import CircularLoading from '@/components/layout/CircularLoading';
 import { isBrowser } from './Constants';
 import { useMemo } from 'react';
 

@@ -84,7 +84,7 @@ const AuthContextProvider = ({ children }) => {
                     setIsAuthenticated(true);
                     enqueueSnackbar('Welcome back', { variant: 'success' });
                 } else {
-                    enqueueSnackbar('Session has expired, please sign in', { variant: 'warning' });
+                    enqueueSnackbar('Your session has expired, please sign in', { variant: 'warning' });
                     signOut();
                 }
             } catch (err) {
@@ -180,11 +180,19 @@ const AuthContextProvider = ({ children }) => {
                 });
 
                 if (!signUpRes.ok) {
-                    throw new Error('Failed to sign up due to bad response', {
-                        cause: {
-                            res: signUpRes,
-                        },
-                    });
+                    if (signUpRes.status === 409) {
+                        throw new Error('User with the same e-mail address already exists', {
+                            cause: {
+                                res: signUpRes,
+                            },
+                        });
+                    } else {
+                        throw new Error('Failed to sign up due to bad response', {
+                            cause: {
+                                res: signUpRes,
+                            },
+                        });
+                    }
                 }
 
                 const resBody = (await signUpRes.json()) as UserSignUpResponse;

@@ -3,13 +3,13 @@ import { Activity } from '@/types/db.types';
 import { useAuthContext } from '@/utils/AuthContext';
 import { longDateShortTimeDateFormatter, swrActivitiesFetcherWithAuth } from '@/utils/Utility';
 import Head from 'next/head';
-import Item from '@/components/Item';
-import Alerter from '@/components/Alerter';
+import Item from '@/components/layout/Item';
+import Alerter from '@/components/layout/Alerter';
 import { Chip, Typography, Link as MaterialLink, Pagination, Stack } from '@mui/material';
 import Link from 'next/link';
 import { useEffect, useState } from 'react';
-import Breadcrumbs from '@/components/Breadcrumbs';
-import Avatar from '@/components/Avatar';
+import Breadcrumbs from '@/components/layout/Breadcrumbs';
+import Avatar from '@/components/misc/Avatar';
 import {
     Timeline,
     TimelineConnector,
@@ -45,7 +45,6 @@ const Activity = () => {
 
             if (newMapping.has(currDateString)) {
                 newMapping.get(currDateString).push(activity);
-                return;
             } else {
                 newMapping.set(currDateString, [activity]);
             }
@@ -71,7 +70,7 @@ const Activity = () => {
                             [`& .${timelineContentClasses.root}`]: {
                                 flex: 0.2,
                             },
-                            p: 0
+                            p: 0,
                         }}
                     >
                         {Object.keys(Object.fromEntries(activitiesTimeMapped?.entries()))

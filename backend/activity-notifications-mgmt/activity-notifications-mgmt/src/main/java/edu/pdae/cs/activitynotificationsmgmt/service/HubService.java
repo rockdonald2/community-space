@@ -1,11 +1,12 @@
 package edu.pdae.cs.activitynotificationsmgmt.service;
 
 import edu.pdae.cs.activitynotificationsmgmt.model.Hub;
+import edu.pdae.cs.common.model.dto.HubMutationDTO;
 import org.bson.types.ObjectId;
 
 public interface HubService {
 
-    void createHub(ObjectId hubId, String hubName, String ownerEmail);
+    void createHub(HubMutationDTO hubMutationDTO);
 
     void deleteHub(ObjectId hubId);
 

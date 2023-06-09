@@ -1,5 +1,5 @@
 import { Alert, AlertTitle, Avatar, Button, Chip, Divider, Stack, Typography } from '@mui/material';
-import TextField from '@/components/TextField';
+import TextField from '@/components/common/TextField';
 import Head from 'next/head';
 import styles from '@/styles/CreateHub.module.scss';
 import { useCallback, useState } from 'react';
@@ -8,7 +8,7 @@ import { useAuthContext } from '@/utils/AuthContext';
 import { useRouter } from 'next/router';
 import { useSnackbar } from 'notistack';
 import { handleInput } from '@/utils/Utility';
-import Breadcrumbs from '@/components/Breadcrumbs';
+import Breadcrumbs from '@/components/layout/Breadcrumbs';
 import Link from 'next/link';
 
 function CreateHub() {
@@ -45,11 +45,19 @@ function CreateHub() {
                 });
 
                 if (!res.ok) {
-                    throw new Error('Failed to create hub due to bad response', {
-                        cause: {
-                            res,
-                        },
-                    });
+                    if (res.status === 409) {
+                        throw new Error('Hub with the same name already exists', {
+                            cause: {
+                                res,
+                            },
+                        });
+                    } else {
+                        throw new Error('Failed to create hub due to bad response', {
+                            cause: {
+                                res,
+                            },
+                        });
+                    }
                 }
 
                 setError(null);
@@ -80,11 +88,11 @@ function CreateHub() {
             <Head>
                 <title>Community Space | Create Hub</title>
             </Head>
-            <Breadcrumbs currRoute={{ name: 'Create' }} />
+            <Breadcrumbs currRoute={{ name: 'Create' }}/>
             <Stack className={styles.wrapper}>
                 <Stack className={styles['avatar-wrapper']}>
                     <Avatar className={styles['avatar-wrapper__avatar']}>H</Avatar>
-                    <Divider variant='middle' orientation='vertical' flexItem />
+                    <Divider variant='middle' orientation='vertical' flexItem/>
                     <Typography variant='h5' component='h5' className={styles['avatar-wrapper__msg']}>
                         Create your own Hub
                     </Typography>
@@ -132,7 +140,7 @@ function CreateHub() {
                     </Stack>
                 </form>
                 <Divider flexItem className={styles['form__divider']}>
-                    <Chip label='OR' />
+                    <Chip label='OR'/>
                 </Divider>
                 <Button href='/' LinkComponent={Link} variant='text' className={styles['create__button']}>
                     See the list of existing Hubs

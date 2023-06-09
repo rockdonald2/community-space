@@ -1,12 +1,15 @@
-import useSWR from 'swr';
+import { Memo as MemoType, urgencies } from '@/types/db.types';
+import { useAuthContext } from '@/utils/AuthContext';
 import {
     boldSelectedElementStyle,
     handleMultiSelectChange,
     sortByCreationDate,
     sortByUrgency,
+    swrArchivedMemosFetcher,
     swrMemosFetcherWithAuth,
     swrRecentMemosFetcherWithAuth,
 } from '@/utils/Utility';
+import SearchIcon from '@mui/icons-material/Search';
 import {
     Box,
     Chip,
@@ -21,14 +24,12 @@ import {
     TextField,
     useTheme,
 } from '@mui/material';
-import { Memo as MemoType, urgencies } from '@/types/db.types';
-import { useAuthContext } from '@/utils/AuthContext';
-import Memo from './Memo';
-import SearchIcon from '@mui/icons-material/Search';
 import { ChangeEvent, useState } from 'react';
-import Alerter from './Alerter';
+import useSWR from 'swr';
+import Alerter from '../layout/Alerter';
+import Memo from './Memo';
 
-const Memos = ({ hubId, scope = 'RECENT' }: { hubId?: string | string[]; scope?: 'RECENT' | 'ALL' }) => {
+const Memos = ({ hubId, scope = 'RECENT' }: { hubId?: string | string[]; scope?: 'RECENT' | 'ALL' | 'ARCHIVED' }) => {
     const theme = useTheme();
     const { user } = useAuthContext();
 
@@ -40,10 +41,14 @@ const Memos = ({ hubId, scope = 'RECENT' }: { hubId?: string | string[]; scope?:
         isLoading,
         isValidating,
     } = useSWR<{ totalCount: number; totalPages: number; content: MemoType[] }>(
-        { key: 'memos', token: user.token, hubId: hubId, page: currPage - 1 },
-        scope === 'RECENT' ? swrRecentMemosFetcherWithAuth : swrMemosFetcherWithAuth,
+        { key: 'memos', token: user.token, hubId: hubId, page: currPage - 1, scope: scope },
+        scope === 'RECENT'
+            ? swrRecentMemosFetcherWithAuth
+            : scope === 'ARCHIVED'
+                ? swrArchivedMemosFetcher
+                : swrMemosFetcherWithAuth,
         {
-            revalidateOnFocus: false,
+            revalidateOnFocus: false
         }
     );
 
@@ -55,7 +60,7 @@ const Memos = ({ hubId, scope = 'RECENT' }: { hubId?: string | string[]; scope?:
     return (
         <Stack spacing={2}>
             <Box sx={{ display: 'flex', alignItems: 'flex-end' }}>
-                <SearchIcon sx={{ mr: 1, my: 0.5 }} />
+                <SearchIcon sx={{ mr: 1, my: 0.5 }}/>
                 <TextField
                     id='input-with-sx'
                     label='Search by title...'
@@ -90,11 +95,11 @@ const Memos = ({ hubId, scope = 'RECENT' }: { hubId?: string | string[]; scope?:
                             onChange={(e: SelectChangeEvent<typeof urgencyFilter>) =>
                                 handleMultiSelectChange(e, setUrgencyFilter)
                             }
-                            input={<OutlinedInput label='Urgency' />}
+                            input={<OutlinedInput label='Urgency'/>}
                             renderValue={(selected) => (
                                 <Box sx={{ display: 'flex', flexWrap: 'wrap' }}>
                                     {selected.map((value) => (
-                                        <Chip key={value} label={value} sx={{ m: 0.5 }} />
+                                        <Chip key={value} label={value} sx={{ m: 0.5 }}/>
                                     ))}
                                 </Box>
                             )}
@@ -127,9 +132,9 @@ const Memos = ({ hubId, scope = 'RECENT' }: { hubId?: string | string[]; scope?:
                         if (urgencyFilter.length === 0) return true;
                         return urgencyFilter.includes(memo.urgency);
                     })
-                    .map((memo, idx) => <Memo memo={memo} key={idx} />)
+                    .map((memo, idx) => <Memo memo={memo} key={idx}/>)
             ) : (
-                <Alerter isValidating={isValidating} isLoading={isLoading} data={memos} error={error} />
+                <Alerter isValidating={isValidating} isLoading={isLoading} data={memos} error={error}/>
             )}
             <Pagination
                 count={memos?.totalPages}

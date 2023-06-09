@@ -56,6 +56,7 @@ public class MemoServiceImpl implements MemoService {
         reqMemo.setAuthor(userWrapper.getEmail());
         reqMemo.setAuthorName(userWrapper.getName());
         reqMemo.setCompletions(new HashSet<>());
+        reqMemo.setArchived(false);
 
         if (memoCreationDTO.getDueDate() != null) {
             reqMemo.setDueDate(memoCreationDTO.getDueDate());
@@ -125,6 +126,11 @@ public class MemoServiceImpl implements MemoService {
             hasChanged = true;
         }
 
+        if (memoUpdateDTO.getArchived() != null) {
+            memo.setArchived(memoUpdateDTO.getArchived());
+            hasChanged = true;
+        }
+
         if (hasChanged) {
             memoRepository.save(memo);
         }
@@ -175,50 +181,50 @@ public class MemoServiceImpl implements MemoService {
 
     @Override
     @Cacheable("memos")
-    public PageWrapper<MemoDTO> getAllByVisibility(Visibility visibility, String asUser, int currPage, int pageSize) {
-        return constructPageWrapper(memoRepository.getMemosByVisibility(visibility, PageRequest.of(currPage, pageSize)), asUser);
+    public PageWrapper<MemoDTO> getAllByVisibility(Visibility visibility, String asUser, int currPage, int pageSize, boolean archived) {
+        return constructPageWrapper(memoRepository.getMemosByVisibilityAndArchived(visibility, archived, PageRequest.of(currPage, pageSize)), asUser);
     }
 
     @Override
     @Cacheable("memos")
-    public PageWrapper<MemoDTO> getAllAfter(Date after, String asUser, int currPage, int pageSize) {
-        return constructPageWrapper(memoRepository.getMemosByCreatedOnAfter(after, PageRequest.of(currPage, pageSize)), asUser);
+    public PageWrapper<MemoDTO> getAllAfter(Date after, String asUser, int currPage, int pageSize, boolean archived) {
+        return constructPageWrapper(memoRepository.getMemosByCreatedOnAfterAndArchived(after, archived, PageRequest.of(currPage, pageSize)), asUser);
     }
 
     @Override
     @Cacheable("memos")
-    public PageWrapper<MemoDTO> getAllAfterAndByVisibility(Date after, Visibility visibility, String asUser, int currPage, int pageSize) {
-        return constructPageWrapper(memoRepository.getMemosByCreatedOnAfterAndVisibility(after, visibility, PageRequest.of(currPage, pageSize)), asUser);
+    public PageWrapper<MemoDTO> getAllAfterAndByVisibility(Date after, Visibility visibility, String asUser, int currPage, int pageSize, boolean archived) {
+        return constructPageWrapper(memoRepository.getMemosByCreatedOnAfterAndVisibilityAndArchived(after, visibility, archived, PageRequest.of(currPage, pageSize)), asUser);
     }
 
     @Override
     @Cacheable("memos")
-    public PageWrapper<MemoDTO> getAll(String asUser, int currPage, int pageSize) {
-        return constructPageWrapper(memoRepository.findAll(PageRequest.of(currPage, pageSize)), asUser);
+    public PageWrapper<MemoDTO> getAll(String asUser, int currPage, int pageSize, boolean archived) {
+        return constructPageWrapper(memoRepository.getMemosByArchived(archived, PageRequest.of(currPage, pageSize)), asUser);
     }
 
     @Override
     @Cacheable("memos")
-    public PageWrapper<MemoDTO> getAllAfterByHubIdAndByVisibility(Date after, Visibility visibility, ObjectId hubId, String asUser, int currPage, int pageSize) {
-        return constructPageWrapper(memoRepository.getMemosByCreatedOnAfterAndHubIdAndVisibility(after, hubId, visibility, PageRequest.of(currPage, pageSize)), asUser);
+    public PageWrapper<MemoDTO> getAllAfterByHubIdAndByVisibility(Date after, Visibility visibility, ObjectId hubId, String asUser, int currPage, int pageSize, boolean archived) {
+        return constructPageWrapper(memoRepository.getMemosByCreatedOnAfterAndHubIdAndVisibilityAndArchived(after, hubId, visibility, archived, PageRequest.of(currPage, pageSize)), asUser);
     }
 
     @Override
     @Cacheable("memos")
-    public PageWrapper<MemoDTO> getAllAfterByHubId(Date after, ObjectId hubId, String asUser, int currPage, int pageSize) {
-        return constructPageWrapper(memoRepository.getMemosByCreatedOnAfterAndHubId(after, hubId, PageRequest.of(currPage, pageSize)), asUser);
+    public PageWrapper<MemoDTO> getAllAfterByHubId(Date after, ObjectId hubId, String asUser, int currPage, int pageSize, boolean archived) {
+        return constructPageWrapper(memoRepository.getMemosByCreatedOnAfterAndHubIdAndArchived(after, hubId, archived, PageRequest.of(currPage, pageSize)), asUser);
     }
 
     @Override
     @Cacheable("memos")
-    public PageWrapper<MemoDTO> getAllByHubIdAndByVisibility(ObjectId hubId, Visibility visibility, String asUser, int currPage, int pageSize) {
-        return constructPageWrapper(memoRepository.getMemosByHubIdAndVisibility(hubId, visibility, PageRequest.of(currPage, pageSize)), asUser);
+    public PageWrapper<MemoDTO> getAllByHubIdAndByVisibility(ObjectId hubId, Visibility visibility, String asUser, int currPage, int pageSize, boolean archived) {
+        return constructPageWrapper(memoRepository.getMemosByHubIdAndVisibilityAndArchived(hubId, visibility, archived, PageRequest.of(currPage, pageSize)), asUser);
     }
 
     @Override
     @Cacheable("memos")
-    public PageWrapper<MemoDTO> getAllByHubId(ObjectId hubId, String asUser, int currPage, int pageSize) {
-        return constructPageWrapper(memoRepository.getMemosByHubId(hubId, PageRequest.of(currPage, pageSize)), asUser);
+    public PageWrapper<MemoDTO> getAllByHubId(ObjectId hubId, String asUser, int currPage, int pageSize, boolean archived) {
+        return constructPageWrapper(memoRepository.getMemosByHubIdAndArchived(hubId, archived, PageRequest.of(currPage, pageSize)), asUser);
     }
 
     @Override
@@ -236,6 +242,10 @@ public class MemoServiceImpl implements MemoService {
 
         if (memo.getDueDate() != null && memo.getDueDate().before(new Date())) {
             throw new ConflictingOperationException("The memo is overdue");
+        }
+
+        if (memo.isArchived()) {
+            throw new ConflictingOperationException("The memo is archived");
         }
 
         final Hub hub = hubService.getHub(memo.getHubId());
@@ -342,6 +352,7 @@ public class MemoServiceImpl implements MemoService {
                 .map(memo -> {
                     final var m = modelMapper.map(memo, MemoDTO.class);
                     m.setCompleted(memo.getCompletions().contains(asUser));
+                    m.setArchived(memo.isArchived());
                     return m;
                 })
                 .toList();

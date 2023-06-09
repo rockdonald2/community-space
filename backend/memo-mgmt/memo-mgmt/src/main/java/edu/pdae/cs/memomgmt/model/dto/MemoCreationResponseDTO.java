@@ -21,5 +21,6 @@ public class MemoCreationResponseDTO {
     private String hubId;
     private Date dueDate;
     private Visibility visibility;
+    private boolean isArchived;
 
 }

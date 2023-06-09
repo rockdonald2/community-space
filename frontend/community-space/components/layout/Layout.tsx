@@ -3,7 +3,6 @@ import Header from './Header';
 import { Divider, Grid, Typography, useColorScheme, useMediaQuery } from '@mui/material';
 import { useEffect } from 'react';
 import QuickActions from './QuickActions';
-import Blob from './Blob';
 import { SWRConfig } from 'swr';
 import { useSnackbar } from 'notistack';
 import PresenceContextProvider from '@/utils/PresenceContext';
@@ -53,10 +52,10 @@ const Layout = ({ children }) => {
                         }}
                     >
                         <PresenceContextProvider>
-                            <Header />
+                            <Header/>
                             <>{children}</>
-                            <QuickActions />
-                            <Footer />
+                            <QuickActions/>
+                            <Footer/>
                         </PresenceContextProvider>
                     </SWRConfig>
                 </>
@@ -66,19 +65,9 @@ const Layout = ({ children }) => {
                         item
                         md={4}
                         xs={12}
-                        sx={{
-                            pt: {
-                                md: 10,
-                                xs: 0,
-                            },
-                            mb: {
-                                md: 0,
-                                xs: 5,
-                            },
-                        }}
                     >
                         <Typography variant={'h3'}>Community Space 💬</Typography>
-                        <Divider sx={{ mt: 3, mb: 3 }} />
+                        <Divider sx={{ mt: 3, mb: 3 }}/>
                         <Typography variant={'body1'} color='text.secondary' sx={{ fontSize: 20, fontStyle: 'italic' }}>
                             A place for all your memos
                         </Typography>

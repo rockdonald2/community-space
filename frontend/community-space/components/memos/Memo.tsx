@@ -2,6 +2,7 @@ import {
     Alert,
     AlertTitle,
     Button,
+    ButtonGroup,
     Chip,
     Dialog,
     DialogActions,
@@ -23,17 +24,18 @@ import { GATEWAY_URL } from '@/utils/Constants';
 import { useAuthContext } from '@/utils/AuthContext';
 import DeleteForeverIcon from '@mui/icons-material/DeleteForever';
 import EditIcon from '@mui/icons-material/Edit';
-import Item from './Item';
+import Item from '../layout/Item';
 import MemoEdit from './MemoEdit';
 import useSWR, { useSWRConfig } from 'swr';
-import SkeletonLoader from './SkeletonLoader';
+import SkeletonLoader from '../layout/SkeletonLoader';
 import { ReactMarkdown } from 'react-markdown/lib/react-markdown';
 import remarkGfm from 'remark-gfm';
 import { longDateShortTimeDateFormatter, swrCompletionsFetcherWithAuth, swrMemoFetcherWithAuth } from '@/utils/Utility';
 import { useSnackbar } from 'notistack';
 import DoneIcon from '@mui/icons-material/Done';
-import Avatar from '@/components/Avatar';
+import Avatar from '@/components/misc/Avatar';
 import EventIcon from '@mui/icons-material/Event';
+import ArchiveIcon from '@mui/icons-material/Archive';
 
 const MemoDialog = styled(Dialog)(({ theme }) => ({
     '& .MuiPaper-root': {
@@ -102,8 +104,66 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
         setMemoOpen(true);
     }, [isMemoOpen, setMemoOpen, isUserUpdatingMemo, setUserUpdatingMemo]);
 
+    const handleArchive = useCallback(
+        (archived: boolean) => {
+            setUserInputError(false);
+
+            const confirmationMsg: string = archived
+                ? 'Are you sure you want to archive this memo?'
+                : 'Are you sure you want to unarchive this memo?';
+            const confirmation: boolean = confirm(confirmationMsg);
+
+            const handleAsync = async () => {
+                try {
+                    const archiveResponse = await fetch(`${GATEWAY_URL}/api/v1/memos/${memo.id}`, {
+                        method: 'PATCH',
+                        headers: {
+                            Authorization: `Bearer ${user.token}`,
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ archived: archived }),
+                    });
+
+                    if (!archiveResponse.ok) {
+                        throw new Error('Failed to archive memo due to bad response', {
+                            cause: {
+                                res: archiveResponse,
+                            },
+                        });
+                    }
+
+                    setMemoOpen(false);
+                    await mutate((key) => key['key'] === 'memos' && key['hubId'] === memo.hubId);
+                } catch (err) {
+                    console.debug(err.message, err);
+                    setUserInputError(true);
+                    if (err instanceof Error) {
+                        if ('res' in (err.cause as any)) {
+                            const res = (err.cause as any).res;
+                            if (res.status === 401) {
+                                enqueueSnackbar('Your session has expired. Please sign in again', {
+                                    variant: 'warning',
+                                });
+                                signOut();
+                            } else {
+                                enqueueSnackbar('Failed to archive memo', { variant: 'error' });
+                            }
+                        }
+                    }
+                }
+            };
+
+            if (confirmation) {
+                handleAsync();
+            }
+        },
+        [memo, user, enqueueSnackbar, signOut, mutate]
+    );
+
     const handleDelete = useCallback(() => {
         setUserInputError(false);
+
+        const confirmation: boolean = confirm('Are you sure you want to delete this memo?');
 
         const handleAsync = async () => {
             try {
@@ -141,7 +201,9 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
             }
         };
 
-        handleAsync();
+        if (confirmation) {
+            handleAsync();
+        }
     }, [memo.id, memo.hubId, user.token, mutate, enqueueSnackbar, signOut]);
 
     const handleCompletion = useCallback(() => {
@@ -267,6 +329,7 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                     </Typography>
                     <Chip size='small' label={memo.urgency.toLowerCase()} variant='filled' sx={{ mt: 1, mr: 1 }} />
                     <Chip size='small' label={memo.visibility.toLowerCase()} variant='filled' sx={{ mt: 1 }} />
+                    {memo?.archived && <Chip size='small' label='archived' variant='filled' sx={{ mt: 1, ml: 1 }} />}
                     {prevMemoData?.dueDate && (
                         <Typography sx={{ mb: 0, mt: 2, display: 'flex', alignContent: 'center' }}>
                             <Chip
@@ -349,34 +412,51 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                 )}
                 {user.email === memo.author && !isUserUpdatingMemo && (
                     <DialogActions>
-                        <Button
+                        <ButtonGroup
                             variant='outlined'
-                            color='primary'
-                            endIcon={<EditIcon />}
-                            onClick={() => setUserUpdatingMemo(true)}
+                            aria-label='Memo action button group'
+                            disableElevation
+                            size='small'
                         >
-                            Modify
-                        </Button>
-                        <Button variant='outlined' color='error' endIcon={<DeleteForeverIcon />} onClick={handleDelete}>
-                            Delete
-                        </Button>
+                            <Button
+                                variant='outlined'
+                                endIcon={<ArchiveIcon />}
+                                size='small'
+                                onClick={() => handleArchive(!memo?.archived ?? true)}
+                            >
+                                {memo?.archived ? 'Unarchive' : 'Archive'}
+                            </Button>
+                            <Button
+                                variant='outlined'
+                                endIcon={<EditIcon />}
+                                onClick={() => setUserUpdatingMemo(true)}
+                                size='small'
+                            >
+                                Modify
+                            </Button>
+                            <Button variant='outlined' color='error' onClick={handleDelete} size='small'>
+                                <DeleteForeverIcon />
+                            </Button>
+                        </ButtonGroup>
                     </DialogActions>
                 )}
                 {user.email !== memo.author && !prevMemoData?.completed ? (
                     <DialogActions>
-                        <Button
-                            variant='outlined'
-                            color='primary'
-                            endIcon={<DoneIcon />}
-                            onClick={handleCompletion}
-                            disabled={prevMemoData?.dueDate && new Date(prevMemoData?.dueDate) <= new Date()}
-                        >
-                            {!prevMemoData?.dueDate
-                                ? 'Mark as completed'
-                                : new Date(prevMemoData?.dueDate) > new Date()
-                                ? 'Mark as completed'
-                                : 'Due is over'}
-                        </Button>
+                        {!memo?.archived && (
+                            <Button
+                                variant='outlined'
+                                color='primary'
+                                endIcon={<DoneIcon />}
+                                onClick={handleCompletion}
+                                disabled={prevMemoData?.dueDate && new Date(prevMemoData?.dueDate) <= new Date()}
+                            >
+                                {!prevMemoData?.dueDate
+                                    ? 'Mark as completed'
+                                    : new Date(prevMemoData?.dueDate) > new Date()
+                                    ? 'Mark as completed'
+                                    : 'Due is over'}
+                            </Button>
+                        )}
                     </DialogActions>
                 ) : (
                     user.email !== memo.author && (

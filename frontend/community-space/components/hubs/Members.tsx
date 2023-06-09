@@ -1,9 +1,9 @@
 import { UserShortCombined } from '@/types/db.types';
 import { swrMembersFetcherWithAuth } from '@/utils/Utility';
 import { Typography, IconButton, Menu, Divider, MenuItem, ListItemIcon } from '@mui/material';
-import Alerter from './Alerter';
-import SkeletonLoader from './SkeletonLoader';
-import Avatar from './Avatar';
+import Alerter from '../layout/Alerter';
+import SkeletonLoader from '../layout/SkeletonLoader';
+import Avatar from '../misc/Avatar';
 import { useCallback, useMemo, useState } from 'react';
 import { useAuthContext } from '@/utils/AuthContext';
 import PersonRemoveIcon from '@mui/icons-material/PersonRemove';

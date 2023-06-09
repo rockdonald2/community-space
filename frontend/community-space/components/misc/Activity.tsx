@@ -9,7 +9,7 @@ import styles from '@/styles/Activity.module.scss';
 import { useAuthContext } from '@/utils/AuthContext';
 import useSWR from 'swr';
 import { ActivityGrouped } from '@/types/db.types';
-import Alerter from './Alerter';
+import Alerter from '../layout/Alerter';
 import { useEffect, useState } from 'react';
 
 const currDaysInMonth = getDaysInCurrentMonth();

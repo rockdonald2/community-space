@@ -1,8 +1,8 @@
 import { MemoShort } from '@/types/db.types';
-import { SelectChangeEvent, Theme } from '@mui/material';
-import { GATEWAY_URL } from './Constants';
 import { ErrorResponse } from '@/types/types';
+import { SelectChangeEvent, Theme } from '@mui/material';
 import { Dispatch, SetStateAction } from 'react';
+import { GATEWAY_URL } from './Constants';
 
 export const sortByUrgency = (m1: MemoShort, m2: MemoShort) => {
     if (m1.urgency === 'URGENT') return -1; // if any of them is urgent, be it first
@@ -91,6 +91,46 @@ export const swrRecentMemosFetcherWithAuth = async (args: {
 
 export const swrMemosFetcherWithAuth = async (args: { key: string; token: string; hubId?: string; page: number }) => {
     let url = `${GATEWAY_URL}/api/v1/memos?page=${args.page}`;
+
+    if (args.hubId) {
+        url = url.concat(`&hubId=${args.hubId}`);
+    }
+
+    const res = await fetch(url, {
+        headers: { Authorization: `Bearer ${args.token}` },
+    });
+
+    if (!res.ok) {
+        throw {
+            status: res.status,
+            path: res.url,
+            message: res.statusText,
+            error: 'error',
+        } satisfies ErrorResponse;
+    }
+
+    let totalCount = -1;
+    let totalPages = -1;
+
+    if (res.headers.get('X-TOTAL-COUNT')) {
+        totalCount = parseInt(res.headers.get('X-TOTAL-COUNT'));
+    }
+
+    if (res.headers.get('X-TOTAL-PAGES')) {
+        totalPages = parseInt(res.headers.get('X-TOTAL-PAGES'));
+    }
+
+    const content = await res.json();
+
+    return {
+        content,
+        totalCount,
+        totalPages,
+    };
+};
+
+export const swrArchivedMemosFetcher = async (args: { key: string; token: string; hubId?: string; page: number }) => {
+    let url = `${GATEWAY_URL}/api/v1/memos?page=${args.page}&archived=true`;
 
     if (args.hubId) {
         url = url.concat(`&hubId=${args.hubId}`);

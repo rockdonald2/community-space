@@ -5,13 +5,14 @@ import { Hub as HubType } from '@/types/db.types';
 import { swrHubFetcherWithAuth } from '@/utils/Utility';
 import { Button, Container, Divider, Grid, Typography } from '@mui/material';
 import Head from 'next/head';
-import Memos from '@/components/Memos';
-import Alerter from '@/components/Alerter';
-import Members from '@/components/Members';
-import Pendings from '@/components/Pendings';
+import Memos from '@/components/memos/Memos';
+import Alerter from '@/components/layout/Alerter';
+import Pendings from '@/components/hubs/Pendings';
 import Link from 'next/link';
-import MemoEdit from '@/components/MemoEdit';
-import Breadcrumbs from '@/components/Breadcrumbs';
+import MemoEdit from '@/components/memos/MemoEdit';
+import Breadcrumbs from '@/components/layout/Breadcrumbs';
+import HubsTopbar from "@/components/hubs/HubsTopbar";
+import HubsSidebar from "@/components/hubs/HubsSidebar";
 
 const Hub = () => {
     const { query } = useRouter();
@@ -33,18 +34,17 @@ const Hub = () => {
             <Head>
                 <title>Community Space {!hubError ? `| ${hub?.name}` : ''}</title>
             </Head>
-            <Breadcrumbs currRoute={{name: hub?.name ?? ''}} />
+            <Breadcrumbs currRoute={{ name: hub?.name ?? '' }}/>
             <Grid container spacing={2}>
                 <Grid item md={4} xs={12}>
                     <Container>
                         {hub?.role === 'OWNER' && (
                             <>
-                                <Pendings hubId={hub?.id} hubRole={hub?.role} />
-                                <Divider sx={{ mt: 2, mb: 2 }} />
+                                <Pendings hubId={hub?.id} hubRole={hub?.role}/>
+                                <Divider sx={{ mt: 2, mb: 2 }}/>
                             </>
                         )}
-                        <Members hubId={hub?.id} hubRole={hub?.role} />
-                        <Divider sx={{ mt: 2, mb: 2 }} />
+                        <HubsSidebar hub={hub}/>
                         <Typography mb={2} color='text.secondary' variant='h6'>
                             More stuff
                         </Typography>
@@ -56,8 +56,19 @@ const Hub = () => {
                                 variant='text'
                                 href={`/hubs/${hub?.id}/explore`}
                                 LinkComponent={Link}
+                                sx={{ mb: 1.5 }}
                             >
                                 Explore older memos
+                            </Button>
+                            <Button
+                                size='small'
+                                fullWidth
+                                type='button'
+                                variant='text'
+                                href={`/hubs/${hub?.id}/archive`}
+                                LinkComponent={Link}
+                            >
+                                Explore archived memos
                             </Button>
                         </Container>
                     </Container>
@@ -65,23 +76,15 @@ const Hub = () => {
                 <Grid item md={8} xs={12}>
                     {!hubIsLoading && !hubIsValidating && !hubError ? (
                         <>
-                            <Container sx={{ marginBottom: '1rem' }}>
-                                <Typography variant='h5' align='center' color='text.secondary' mb={2}>
-                                    Welcome to {hub.name} Hub!
-                                </Typography>
-                                <Typography variant='body1' align='left' color='text.secondary'>
-                                    {hub.description}
-                                </Typography>
-                            </Container>
-                            <Divider sx={{ mb: 1.5 }} />
-                            <MemoEdit hubId={hubId} />
+                            <HubsTopbar hub={hub}/>
+                            <MemoEdit hubId={hubId}/>
                             <Typography variant='h6' align='left' color='text.secondary' mb={2} mt={2}>
                                 Browse recent memos
                             </Typography>
-                            <Memos hubId={hubId} />
+                            <Memos hubId={hubId}/>
                         </>
                     ) : (
-                        <Alerter isValidating={hubIsValidating} isLoading={hubIsLoading} data={hub} error={hubError} />
+                        <Alerter isValidating={hubIsValidating} isLoading={hubIsLoading} data={hub} error={hubError}/>
                     )}
                 </Grid>
             </Grid>

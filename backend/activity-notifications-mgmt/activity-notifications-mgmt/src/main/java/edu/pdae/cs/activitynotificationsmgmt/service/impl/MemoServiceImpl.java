@@ -4,6 +4,7 @@ import edu.pdae.cs.activitynotificationsmgmt.model.Memo;
 import edu.pdae.cs.activitynotificationsmgmt.repository.MemoRepository;
 import edu.pdae.cs.activitynotificationsmgmt.service.MemoService;
 import edu.pdae.cs.common.model.Visibility;
+import edu.pdae.cs.common.model.dto.MemoMutationDTO;
 import lombok.RequiredArgsConstructor;
 import org.bson.types.ObjectId;
 import org.springframework.cache.annotation.CacheEvict;
@@ -25,15 +26,16 @@ public class MemoServiceImpl implements MemoService {
 
     @Override
     @CacheEvict("memo")
-    public void createMemo(ObjectId memoId, String memoTitle, String ownerEmail, ObjectId hubId, Visibility visibility, Date dueDate) {
+    public void createMemo(MemoMutationDTO memoMutationDTO) {
         final Memo memo = Memo.builder()
-                .id(memoId)
-                .title(memoTitle)
-                .owner(ownerEmail)
-                .hubId(hubId)
-                .visibility(visibility)
-                .dueDate(dueDate)
+                .id(new ObjectId(memoMutationDTO.getMemoId()))
+                .title(memoMutationDTO.getTitle())
+                .owner(memoMutationDTO.getOwner())
+                .hubId(new ObjectId(memoMutationDTO.getHubId()))
+                .visibility(memoMutationDTO.getVisibility())
+                .dueDate(memoMutationDTO.getDueDate())
                 .completions(new HashSet<>())
+                .archived(memoMutationDTO.getIsArchived())
                 .build();
         memoRepository.save(memo);
     }
@@ -66,19 +68,20 @@ public class MemoServiceImpl implements MemoService {
     }
 
     @Override
-    public void updateMemo(ObjectId memoId, String memoTitle, Visibility visibility, Date dueDate) {
-        final Memo memo = memoRepository.findById(memoId).orElseThrow();
+    public void updateMemo(MemoMutationDTO memoMutationDTO) {
+        final Memo memo = memoRepository.findById(new ObjectId(memoMutationDTO.getMemoId())).orElseThrow();
 
-        memo.setTitle(memoTitle);
-        memo.setVisibility(visibility);
-        memo.setDueDate(dueDate);
+        memo.setTitle(memoMutationDTO.getTitle());
+        memo.setVisibility(memoMutationDTO.getVisibility());
+        memo.setDueDate(memoMutationDTO.getDueDate());
+        memo.setArchived(memoMutationDTO.getIsArchived());
 
         memoRepository.save(memo);
     }
 
     @Override
     public List<Memo> getDueMemos() {
-        return memoRepository.findAllByDueDateBetweenAndVisibility(new Date(), new Date(Instant.now().plus(3, ChronoUnit.HOURS).toEpochMilli()), Visibility.PUBLIC);
+        return memoRepository.findAllByDueDateBetweenAndVisibilityAndArchived(new Date(), new Date(Instant.now().plus(3, ChronoUnit.HOURS).toEpochMilli()), Visibility.PUBLIC, false);
     }
 
 }

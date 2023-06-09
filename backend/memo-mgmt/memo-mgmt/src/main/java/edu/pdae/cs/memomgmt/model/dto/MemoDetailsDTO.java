@@ -26,5 +26,6 @@ public class MemoDetailsDTO {
     private String hubId;
     private boolean completed;
     private Date dueDate;
+    private boolean archived;
 
 }

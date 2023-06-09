@@ -1,15 +1,14 @@
 package edu.pdae.cs.activitynotificationsmgmt.service;
 
 import edu.pdae.cs.activitynotificationsmgmt.model.Memo;
-import edu.pdae.cs.common.model.Visibility;
+import edu.pdae.cs.common.model.dto.MemoMutationDTO;
 import org.bson.types.ObjectId;
 
-import java.util.Date;
 import java.util.List;
 
 public interface MemoService {
 
-    void createMemo(ObjectId memoId, String memoTitle, String ownerEmail, ObjectId hubId, Visibility visibility, Date dueDate);
+    void createMemo(MemoMutationDTO memoMutationDTO);
 
     void deleteMemo(ObjectId memoId);
 
@@ -19,7 +18,7 @@ public interface MemoService {
 
     void addCompletion(ObjectId memoId, String userEmail);
 
-    void updateMemo(ObjectId memoId, String memoTitle, Visibility visibility, Date dueDate);
+    void updateMemo(MemoMutationDTO memoMutationDTO);
 
     List<Memo> getDueMemos();
 

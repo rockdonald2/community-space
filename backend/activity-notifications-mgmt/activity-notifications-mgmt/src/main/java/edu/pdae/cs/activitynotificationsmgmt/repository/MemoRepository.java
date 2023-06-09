@@ -14,6 +14,6 @@ public interface MemoRepository extends MongoRepository<Memo, ObjectId> {
 
     void deleteAllByHubId(ObjectId hubId);
 
-    List<Memo> findAllByDueDateBetweenAndVisibility(Date from, Date to, Visibility visibility);
+    List<Memo> findAllByDueDateBetweenAndVisibilityAndArchived(Date from, Date to, Visibility visibility, boolean archived);
 
 }
