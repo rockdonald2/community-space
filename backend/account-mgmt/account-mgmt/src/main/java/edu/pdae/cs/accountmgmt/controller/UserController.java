@@ -1,6 +1,6 @@
 package edu.pdae.cs.accountmgmt.controller;
 
-import com.mongodb.DuplicateKeyException;
+import com.mongodb.ErrorCategory;
 import com.mongodb.MongoWriteException;
 import edu.pdae.cs.accountmgmt.model.dto.UserCreationDTO;
 import edu.pdae.cs.accountmgmt.model.dto.UserCreationResponseDTO;
@@ -63,10 +63,10 @@ public class UserController {
 
     @ExceptionHandler(MongoWriteException.class)
     public ResponseEntity<String> mongoHandler(MongoWriteException e) {
-        if (e.getMessage().contains("duplicate key")) {
-            return new ResponseEntity<>("User with this email already exists", HttpStatus.CONFLICT);
+        if (e.getError().getCategory().equals(ErrorCategory.DUPLICATE_KEY)) {
+            return new ResponseEntity<>("User with the same e-mail address already exists", HttpStatus.CONFLICT);
         } else {
-            return new ResponseEntity<>("Unknown persistence error occurred", HttpStatus.INTERNAL_SERVER_ERROR);
+            return new ResponseEntity<>("Error occurred while processing request", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

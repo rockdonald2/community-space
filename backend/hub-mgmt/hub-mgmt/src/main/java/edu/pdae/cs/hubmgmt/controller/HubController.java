@@ -1,5 +1,6 @@
 package edu.pdae.cs.hubmgmt.controller;
 
+import com.mongodb.ErrorCategory;
 import com.mongodb.MongoWriteException;
 import edu.pdae.cs.common.util.UserWrapper;
 import edu.pdae.cs.hubmgmt.controller.exception.ConflictingOperationException;
@@ -122,9 +123,18 @@ public class HubController {
         return new ResponseEntity<>("Requested hub cannot be found", HttpStatus.NOT_FOUND);
     }
 
-    @ExceptionHandler({MongoWriteException.class, ConflictingOperationException.class})
-    public ResponseEntity<String> conflictHandler() {
+    @ExceptionHandler(ConflictingOperationException.class)
+    public ResponseEntity<String> conflictingOperationHandler() {
         return new ResponseEntity<>("Conflicting operation attempted", HttpStatus.CONFLICT);
+    }
+
+    @ExceptionHandler(MongoWriteException.class)
+    public ResponseEntity<String> mongoHandler(MongoWriteException e) {
+        if (e.getError().getCategory().equals(ErrorCategory.DUPLICATE_KEY)) {
+            return new ResponseEntity<>("Hub with the same name already exists", HttpStatus.CONFLICT);
+        } else {
+            return new ResponseEntity<>("Error occurred while processing request", HttpStatus.INTERNAL_SERVER_ERROR);
+        }
     }
 
     @ExceptionHandler(ForbiddenOperationException.class)
