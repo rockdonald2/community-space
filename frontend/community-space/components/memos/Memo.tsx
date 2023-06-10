@@ -19,7 +19,7 @@ import {
     useMediaQuery,
     useTheme,
 } from '@mui/material';
-import { Memo as MemoType, MemoShort, Completion } from '@/types/db.types';
+import { Memo as MemoType, MemoShort, Completion, HubShort } from '@/types/db.types';
 import ArrowOutwardIcon from '@mui/icons-material/ArrowOutward';
 import CloseIcon from '@mui/icons-material/Close';
 import { useCallback, useState, useEffect } from 'react';
@@ -53,7 +53,7 @@ const MemoDialog = styled(Dialog)(({ theme }) => ({
     },
 }));
 
-const Memo = ({ memo }: { memo: MemoShort }) => {
+const Memo = ({ memo, hub }: { memo: MemoShort, hub: HubShort }) => {
     const { user, signOut } = useAuthContext();
     const { mutate } = useSWRConfig();
     const { enqueueSnackbar } = useSnackbar();
@@ -388,6 +388,7 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                     <Chip size='small' label={memo.urgency.toLowerCase()} variant='filled' sx={{ mt: 1, mr: 1 }} />
                     <Chip size='small' label={memo.visibility.toLowerCase()} variant='filled' sx={{ mt: 1 }} />
                     {memo?.archived && <Chip size='small' label='archived' variant='filled' sx={{ mt: 1, ml: 1 }} />}
+                    {memo?.completed && <Chip size='small' label='completed' variant='filled' sx={{ mt: 1, ml: 1 }} />}
                     {prevMemoData?.dueDate && (
                         <Typography sx={{ mb: 0, mt: 2, display: 'flex', alignContent: 'center' }}>
                             <Chip
@@ -468,7 +469,7 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                         )}
                     </DialogContent>
                 )}
-                {user.email === memo.author && !isUserUpdatingMemo && (
+                {(user.email === memo.author || user.email === hub?.owner) && !isUserUpdatingMemo && (
                     <DialogActions>
                         <ButtonGroup
                             variant='outlined'
@@ -502,9 +503,11 @@ const Memo = ({ memo }: { memo: MemoShort }) => {
                             >
                                 Modify
                             </Button>
-                            <Button variant='outlined' color='error' onClick={handleDelete} size='small'>
-                                <DeleteForeverIcon />
-                            </Button>
+                            <Tooltip arrow title='Delete Memo'>
+                                <Button variant='outlined' color='error' onClick={handleDelete} size='small'>
+                                    <DeleteForeverIcon />
+                                </Button>
+                            </Tooltip>
                         </ButtonGroup>
                     </DialogActions>
                 )}

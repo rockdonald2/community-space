@@ -81,7 +81,7 @@ const Hub = () => {
                             <Typography variant='h6' align='left' color='text.secondary' mb={2} mt={2}>
                                 Browse recent memos
                             </Typography>
-                            <Memos hubId={hubId}/>
+                            <Memos hub={hub}/>
                         </>
                     ) : (
                         <Alerter isValidating={hubIsValidating} isLoading={hubIsLoading} data={hub} error={hubError}/>

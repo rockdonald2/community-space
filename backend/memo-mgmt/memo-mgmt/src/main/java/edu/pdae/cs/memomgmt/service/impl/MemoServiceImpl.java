@@ -65,15 +65,14 @@ public class MemoServiceImpl implements MemoService {
         final Memo createdMemo = memoRepository.save(reqMemo);
         // send message to activity topic
         activityFiredDTOKafkaTemplate.send(MessagingConfiguration.ACTIVITY_TOPIC, ActivityFiredDTO.builder()
-                .user(userWrapper.getEmail())
-                .userName(userWrapper.getName())
+                .takerUser(userWrapper)
                 .hubId(memoCreationDTO.getHubId().toHexString())
                 .hubName(hub.getName())
                 .date(new Date())
-                .type(Type.MEMO_CREATED)
+                .activityType(Type.MEMO_CREATED)
                 .memoId(createdMemo.getId().toHexString())
                 .memoTitle(createdMemo.getTitle())
-                .visibility(createdMemo.getVisibility())
+                .activityVisibility(createdMemo.getVisibility())
                 .build());
 
         return modelMapper.map(createdMemo, MemoCreationResponseDTO.class);
@@ -83,13 +82,14 @@ public class MemoServiceImpl implements MemoService {
     @CacheEvict(value = {"memo", "memos"}, allEntries = true)
     public MemoCreationResponseDTO update(ObjectId id, @Valid MemoUpdateDTO memoUpdateDTO, String asUser) throws ForbiddenOperationException {
         final Memo memo = memoRepository.findById(id).orElseThrow();
+        final Hub hub = hubService.getHub(memo.getHubId());
 
         if (!hubService.isMember(memo.getHubId(), asUser)) {
             throw new ForbiddenOperationException("You are not a member of this hub");
         }
 
-        if (!asUser.equals(memo.getAuthor())) {
-            throw new ForbiddenOperationException("The requester is not the author");
+        if (!asUser.equals(memo.getAuthor()) && !asUser.equals(hub.getOwner())) {
+            throw new ForbiddenOperationException("The requester is not the author or the owner of the hub");
         }
 
         if (memoUpdateDTO.getDueDate() != null && memoUpdateDTO.getDueDate().before(new Date())) {
@@ -148,13 +148,14 @@ public class MemoServiceImpl implements MemoService {
     @CacheEvict(value = {"memo", "memos"}, allEntries = true)
     public void delete(ObjectId id, String asUser) throws ForbiddenOperationException {
         final Memo memo = memoRepository.findById(id).orElseThrow();
+        final Hub hub = hubService.getHub(memo.getHubId());
 
         if (!hubService.isMember(memo.getHubId(), asUser)) {
             throw new ForbiddenOperationException("You are not a member of this hub");
         }
 
-        if (!asUser.equals(memo.getAuthor())) {
-            throw new ForbiddenOperationException("The requester is not the author");
+        if (!asUser.equals(memo.getAuthor()) && !asUser.equals(hub.getOwner())) {
+            throw new ForbiddenOperationException("The requester is not the author or the owner of the hub");
         }
 
         memoRepository.deleteById(id);
@@ -272,15 +273,14 @@ public class MemoServiceImpl implements MemoService {
         memoRepository.save(memo);
 
         activityFiredDTOKafkaTemplate.send(MessagingConfiguration.ACTIVITY_TOPIC, ActivityFiredDTO.builder()
-                .user(actionTakerUserWrapper.getEmail())
-                .userName(actionTakerUserWrapper.getName())
+                .takerUser(actionTakerUserWrapper)
                 .date(new Date())
-                .type(Type.MEMO_COMPLETED)
+                .activityType(Type.MEMO_COMPLETED)
                 .hubId(memo.getHubId().toHexString())
                 .hubName(hub.getName())
                 .memoId(memoId.toHexString())
                 .memoTitle(memo.getTitle())
-                .visibility(memo.getVisibility())
+                .activityVisibility(memo.getVisibility())
                 .build());
 
         return MemoCompletionResponseDTO.builder()

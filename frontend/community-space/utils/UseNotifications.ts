@@ -44,6 +44,7 @@ export function useNotifications() {
                 enqueueSnackbar('You have a new notification!', {
                     variant: 'notification',
                     notification: notification,
+                    autoHideDuration: 15000,
                 });
             }
         },

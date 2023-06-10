@@ -1,4 +1,4 @@
-import { Memo as MemoType, urgencies } from '@/types/db.types';
+import { HubShort, Memo as MemoType, urgencies } from '@/types/db.types';
 import { useAuthContext } from '@/utils/AuthContext';
 import {
     boldSelectedElementStyle,
@@ -30,7 +30,7 @@ import useSWR from 'swr';
 import Alerter from '../layout/Alerter';
 import Memo from './Memo';
 
-const Memos = ({ hubId, scope = 'RECENT' }: { hubId?: string | string[]; scope?: 'RECENT' | 'ALL' | 'ARCHIVED' }) => {
+const Memos = ({ hub, scope = 'RECENT' }: { hub?: HubShort; scope?: 'RECENT' | 'ALL' | 'ARCHIVED' }) => {
     const theme = useTheme();
     const { user } = useAuthContext();
 
@@ -42,7 +42,7 @@ const Memos = ({ hubId, scope = 'RECENT' }: { hubId?: string | string[]; scope?:
         isLoading,
         isValidating,
     } = useSWR<{ totalCount: number; totalPages: number; content: MemoType[] }>(
-        { key: 'memos', token: user.token, hubId: hubId, page: currPage - 1, scope: scope },
+        { key: 'memos', token: user.token, hubId: hub?.id, page: currPage - 1, scope: scope },
         scope === 'RECENT'
             ? swrRecentMemosFetcherWithAuth
             : scope === 'ARCHIVED'
@@ -134,7 +134,7 @@ const Memos = ({ hubId, scope = 'RECENT' }: { hubId?: string | string[]; scope?:
                         if (urgencyFilter.length === 0) return true;
                         return urgencyFilter.includes(memo.urgency);
                     })
-                    .map((memo, idx) => <Memo memo={memo} key={idx} />)
+                    .map((memo, idx) => <Memo memo={memo} key={idx} hub={hub} />)
             ) : (
                 <Alerter isValidating={isValidating} isLoading={isLoading} data={memos} error={error} />
             )}

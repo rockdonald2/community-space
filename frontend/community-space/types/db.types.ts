@@ -80,8 +80,14 @@ export type Activity = {
     hubName: string;
     memoId?: string;
     memoTitle?: string;
-    user: string;
-    userName: string;
+    takerUser: {
+        email: string;
+        name: string;
+    };
+    affectedUsers: {
+        email: string;
+        name: string;
+    }[];
     date: Date;
 };
 

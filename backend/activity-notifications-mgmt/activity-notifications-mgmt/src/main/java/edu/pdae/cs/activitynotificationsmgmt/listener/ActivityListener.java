@@ -31,25 +31,21 @@ public class ActivityListener {
     public void activityListener(@Payload ActivityFiredDTO activityFiredDTO) {
         log.info("Caught internal message for activity update: {}", activityFiredDTO);
 
-        if (activityFiredDTO.getMemoId() == null) {
-            activityService.addActivity(activityFiredDTO.getUser(), activityFiredDTO.getUserName(), new ObjectId(activityFiredDTO.getHubId()), activityFiredDTO.getHubName(), activityFiredDTO.getDate(), activityFiredDTO.getType(), activityFiredDTO.getVisibility());
-        } else {
-            activityService.addActivity(activityFiredDTO.getUser(), activityFiredDTO.getUserName(), new ObjectId(activityFiredDTO.getHubId()), activityFiredDTO.getHubName(), new ObjectId(activityFiredDTO.getMemoId()), activityFiredDTO.getMemoTitle(), activityFiredDTO.getDate(), activityFiredDTO.getType(), activityFiredDTO.getVisibility());
+        activityService.addActivity(activityFiredDTO);
+
+        if (activityFiredDTO.getActivityType().equals(Type.MEMO_COMPLETED)) {
+            memoService.addCompletion(new ObjectId(activityFiredDTO.getMemoId()), activityFiredDTO.getTakerUser().getEmail());
         }
 
-        if (activityFiredDTO.getType().equals(Type.MEMO_COMPLETED)) {
-            memoService.addCompletion(new ObjectId(activityFiredDTO.getMemoId()), activityFiredDTO.getUser());
-        }
-
-        if (activityFiredDTO.getVisibility().equals(Visibility.PUBLIC)) {
+        if (activityFiredDTO.getActivityVisibility().equals(Visibility.PUBLIC)) {
             notificationDTOKafkaTemplate.send(MessagingConfiguration.NOTIFICATIONS_TOPIC, NotificationMessageDTO.builder()
-                    .user(activityFiredDTO.getUser())
-                    .userName(activityFiredDTO.getUserName())
+                    .takerUser(activityFiredDTO.getTakerUser())
+                    .affectedUsers(activityFiredDTO.getAffectedUsers())
                     .hubId(activityFiredDTO.getHubId())
                     .hubName(activityFiredDTO.getHubName())
                     .memoId(activityFiredDTO.getMemoId())
                     .memoTitle(activityFiredDTO.getMemoTitle())
-                    .type(activityFiredDTO.getType())
+                    .type(activityFiredDTO.getActivityType())
                     .build());
         }
     }

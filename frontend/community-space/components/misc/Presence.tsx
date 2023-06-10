@@ -1,6 +1,6 @@
 import { usePresenceContext } from '@/utils/PresenceContext';
 import { Box, Container, Skeleton, Stack, Tooltip, Typography } from '@mui/material';
-import Avatar from '../misc/Avatar';
+import Avatar from './Avatar';
 import { useAuthContext } from '@/utils/AuthContext';
 import CircularLoading from '../layout/CircularLoading';
 import styles from '@/styles/Presence.module.scss';
@@ -30,11 +30,12 @@ const Presence = () => {
                                             generateRandomColor
                                             innerBody={
                                                 <>
-                                                    <Typography fontSize={12}>{present.email}</Typography>
                                                     <Typography
-                                                        fontSize={11}
-                                                        sx={{ mb: 0.5 }}
-                                                    >{`${present.firstName} ${present.lastName}`}</Typography>
+                                                        fontSize={12}
+                                                    ><strong>{`${present.firstName} ${present.lastName}`}</strong></Typography>
+                                                    <Typography fontSize={11} sx={{ mb: 1 }}>
+                                                        {present.email}
+                                                    </Typography>
                                                     <Stack direction={'row'} alignItems={'center'}>
                                                         <Box
                                                             sx={{
@@ -45,7 +46,7 @@ const Presence = () => {
                                                                 mr: 1,
                                                             }}
                                                         />
-                                                        Last seen at {' '}
+                                                        Last seen at{' '}
                                                         {shortTimeWithNoDateFormatter.format(
                                                             new Date(present?.lastSeen ?? new Date())
                                                         )}

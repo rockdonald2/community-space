@@ -73,7 +73,7 @@ const Explore = () => {
                             <Typography variant='h6' align='left' color='text.secondary' mb={2} mt={2}>
                                 Explore all memos
                             </Typography>
-                            <Memos scope='ALL' hubId={hubId} />
+                            <Memos scope='ALL' hub={hub} />
                         </>
                     ) : (
                         <Alerter isValidating={hubIsValidating} isLoading={hubIsLoading} data={hub} error={hubError} />

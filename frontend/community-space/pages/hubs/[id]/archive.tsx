@@ -73,7 +73,7 @@ const Archive = () => {
                             <Typography variant='h6' align='left' color='text.secondary' mb={2} mt={2}>
                                 Explore archived memos
                             </Typography>
-                            <Memos scope='ARCHIVED' hubId={hubId} />
+                            <Memos scope='ARCHIVED' hub={hub} />
                         </>
                     ) : (
                         <Alerter isValidating={hubIsValidating} isLoading={hubIsLoading} data={hub} error={hubError} />

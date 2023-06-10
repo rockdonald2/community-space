@@ -95,24 +95,28 @@ const Activity = () => {
                                                     key={idx}
                                                 >
                                                     <Stack>
-                                                        <Typography variant='body1' sx={{ mb: 1.5 }}>
+                                                        <Typography variant='body1' sx={{ mb: 1.5 }} component={'div'}>
                                                             <Avatar
-                                                                user={{ email: activity.user }}
+                                                                user={{ email: activity.takerUser.email }}
                                                                 generateRandomColor
                                                             />
                                                             <strong style={{ marginLeft: '.5rem' }}>
-                                                                {activity.userName}
+                                                                {activity.takerUser.name}
                                                             </strong>
                                                         </Typography>
-                                                        <Typography>
+                                                        <Typography component={'div'}>
                                                             {activity.type
                                                                 .toLocaleLowerCase()
                                                                 .split('_')
                                                                 .reverse()
                                                                 .join(' a ')}{' '}
-                                                            (
-                                                            {activity.type.includes('MEMO') &&
-                                                                `${activity.memoTitle} in `}
+                                                            {activity.affectedUsers?.map((user, idx) => (
+                                                                <>
+                                                                    <span key={idx}>{user.name}</span>{' '}
+                                                                </>
+                                                            ))}
+                                                            {activity.type.includes('MEMO') && `${activity.memoTitle} `}
+                                                            in
                                                             <MaterialLink
                                                                 component={Link}
                                                                 href={`/hubs/${activity.hubId}`}
@@ -120,7 +124,6 @@ const Activity = () => {
                                                             >
                                                                 {activity.hubName}
                                                             </MaterialLink>
-                                                            )
                                                         </Typography>
                                                     </Stack>
                                                     <Chip

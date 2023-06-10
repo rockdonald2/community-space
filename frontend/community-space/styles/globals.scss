@@ -27,7 +27,7 @@
 
 @include responsive($screen-xl-min) {
     #__next {
-        max-width: 70vw;
+        max-width: 1500px;
         padding: 6rem;
     }
 }

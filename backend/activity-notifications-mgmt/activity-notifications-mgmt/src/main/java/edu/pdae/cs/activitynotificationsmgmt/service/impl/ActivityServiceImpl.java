@@ -6,8 +6,8 @@ import edu.pdae.cs.activitynotificationsmgmt.model.dto.ActivityDTO;
 import edu.pdae.cs.activitynotificationsmgmt.model.dto.ActivityGroupedDTO;
 import edu.pdae.cs.activitynotificationsmgmt.repository.ActivityRepository;
 import edu.pdae.cs.activitynotificationsmgmt.service.ActivityService;
-import edu.pdae.cs.common.model.Type;
 import edu.pdae.cs.common.model.Visibility;
+import edu.pdae.cs.common.model.dto.ActivityFiredDTO;
 import edu.pdae.cs.common.util.PageWrapper;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -36,14 +36,22 @@ public class ActivityServiceImpl implements ActivityService {
 
     @Override
     @CacheEvict(value = {"activities", "activities-grouped"}, allEntries = true)
-    public void addActivity(String user, String userName, ObjectId hubId, String hubName, Date date, Type type, Visibility visibility) {
-        activityRepository.save(Activity.builder().user(user).userName(userName).visibility(visibility).hubId(hubId).date(date).type(type).hubName(hubName).build());
-    }
+    public void addActivity(ActivityFiredDTO activityFiredDTO) {
+        final var builder = Activity.builder()
+                .takerUser(activityFiredDTO.getTakerUser())
+                .activityVisibility(activityFiredDTO.getActivityVisibility())
+                .hubId(new ObjectId(activityFiredDTO.getHubId()))
+                .hubName(activityFiredDTO.getHubName())
+                .date(activityFiredDTO.getDate())
+                .activityType(activityFiredDTO.getActivityType())
+                .affectedUsers(activityFiredDTO.getAffectedUsers());
 
-    @Override
-    @CacheEvict(value = {"activities", "activities-grouped"}, allEntries = true)
-    public void addActivity(String user, String userName, ObjectId hubId, String hubName, ObjectId memoId, String memoTitle, Date date, Type type, Visibility visibility) {
-        activityRepository.save(Activity.builder().user(user).userName(userName).hubId(hubId).visibility(visibility).date(date).type(type).hubName(hubName).memoId(memoId).memoTitle(memoTitle).build());
+        if (activityFiredDTO.getMemoId() != null) {
+            builder.memoId(new ObjectId(activityFiredDTO.getMemoId()))
+                    .memoTitle(activityFiredDTO.getMemoTitle());
+        }
+
+        activityRepository.save(builder.build());
     }
 
     @Override
@@ -51,7 +59,12 @@ public class ActivityServiceImpl implements ActivityService {
     public PageWrapper<ActivityDTO> getActivities(Date from, Date to, String asUser, int page, int pageSize) {
         final var activityPage = activityRepository.findActivitiesByDateBetween(from, to, PageRequest.of(page, pageSize));
         final List<Activity> activityList = activityPage.getContent();
-        final List<ActivityDTO> activityDTOList = activityList.stream().filter(activity -> activity.getVisibility().equals(Visibility.PUBLIC) || activity.getUser().equals(asUser)).map(activity -> modelMapper.map(activity, ActivityDTO.class)).toList();
+        final List<ActivityDTO> activityDTOList = activityList.stream()
+                .filter(activity ->
+                        activity.getActivityVisibility().equals(Visibility.PUBLIC)
+                                ||
+                                activity.getTakerUser().getEmail().equals(asUser))
+                .map(activity -> modelMapper.map(activity, ActivityDTO.class)).toList();
 
         return PageWrapper.<ActivityDTO>builder()
                 .pageSize(pageSize)

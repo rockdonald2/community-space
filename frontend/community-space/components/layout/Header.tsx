@@ -1,7 +1,7 @@
 import { useAuthContext } from '@/utils/AuthContext';
 import { Box, Divider, Stack, Typography } from '@mui/material';
 import Avatar from '../misc/Avatar';
-import Notifications from '../misc/Notifications';
+import Notifications from '../notifications/Notifications';
 
 const Header = () => {
     const { user } = useAuthContext();
@@ -28,8 +28,8 @@ const Header = () => {
                         },
                         ml: {
                             xs: 0,
-                            md: 2
-                        }
+                            md: 2,
+                        },
                     }}
                 >
                     logged in as <strong>{`${user.firstName} ${user.lastName}`}</strong>

@@ -60,13 +60,12 @@ public class HubServiceImpl implements HubService {
                 .build());
         // send message to activity
         activityFiredDTOKafkaTemplate.send(MessagingConfiguration.ACTIVITY_TOPIC, ActivityFiredDTO.builder()
-                .user(userWrapper.getEmail())
-                .userName(userWrapper.getName())
+                .takerUser(userWrapper)
                 .hubId(createdHub.getId().toHexString())
                 .hubName(createdHub.getName())
                 .date(new Date())
-                .type(Type.HUB_CREATED)
-                .visibility(Visibility.PUBLIC)
+                .activityType(Type.HUB_CREATED)
+                .activityVisibility(Visibility.PUBLIC)
                 .build());
 
         return modelMapper.map(createdHub, HubCreationResponseDTO.class);
@@ -195,11 +194,11 @@ public class HubServiceImpl implements HubService {
 
     @Override
     @CacheEvict(value = {"waiters", "members", "member", "hubs", "hub"}, allEntries = true)
-    public void addMember(ObjectId hubId, MemberDTO memberDTO, String asUser) throws ForbiddenOperationException {
+    public void addMember(ObjectId hubId, MemberDTO memberDTO, UserWrapper asUser) throws ForbiddenOperationException {
         Objects.requireNonNull(memberDTO.getEmail(), "Email must not be null");
         final Hub hub = hubRepository.findById(hubId).orElseThrow();
 
-        if (!hub.getOwner().equals(asUser)) {
+        if (!hub.getOwner().equals(asUser.getEmail())) {
             log.warn("User {} is not the owner of hub {}", asUser, hubId);
             throw new ForbiddenOperationException("You are not the owner of this hub");
         }
@@ -209,17 +208,32 @@ public class HubServiceImpl implements HubService {
             throw new ConflictingOperationException("This user is already a member of this hub");
         }
 
-        hub.getMembers().add(UserWrapper.builder().email(memberDTO.getEmail()).name(memberDTO.getName()).build());
+        final UserWrapper newUser = UserWrapper.builder().email(memberDTO.getEmail()).name(memberDTO.getName()).build();
+        hub.getMembers().add(newUser);
         hubRepository.save(hub);
-        memberMutationDTOKafkaTemplate.send(MessagingConfiguration.MEMBER_MUTATION_TOPIC, HubMemberMutationDTO.builder().hubId(hubId.toHexString()).email(memberDTO.getEmail()).state(HubMemberMutationDTO.State.ADDED).build());
+
+        memberMutationDTOKafkaTemplate.send(MessagingConfiguration.MEMBER_MUTATION_TOPIC, HubMemberMutationDTO.builder()
+                .hubId(hubId.toHexString())
+                .email(memberDTO.getEmail())
+                .state(HubMemberMutationDTO.State.ADDED)
+                .build());
+        activityFiredDTOKafkaTemplate.send(MessagingConfiguration.ACTIVITY_TOPIC, ActivityFiredDTO.builder()
+                .hubId(hubId.toHexString())
+                .hubName(hub.getName())
+                .date(new Date())
+                .takerUser(asUser)
+                .affectedUsers(Set.of(newUser))
+                .activityType(Type.MEMBER_JOINED)
+                .activityVisibility(Visibility.PUBLIC)
+                .build());
     }
 
     @Override
     @CacheEvict(value = {"members", "member", "hubs", "hub"}, allEntries = true)
-    public void deleteMember(ObjectId hubId, String email, String asUser) throws ForbiddenOperationException {
+    public void deleteMember(ObjectId hubId, String email, UserWrapper asUser) throws ForbiddenOperationException {
         final Hub hub = hubRepository.findById(hubId).orElseThrow();
 
-        if (!hub.getOwner().equals(asUser)) {
+        if (!hub.getOwner().equals(asUser.getEmail())) {
             log.warn("User {} is not the owner of hub {}", asUser, hubId);
             throw new ForbiddenOperationException("You are not the owner of this hub");
         }
@@ -234,9 +248,25 @@ public class HubServiceImpl implements HubService {
             throw new ConflictingOperationException("You cannot remove the owner of this hub");
         }
 
-        hub.getMembers().removeIf(member -> member.getEmail().equals(email));
+        final var member = hub.getMembers().stream().filter(m -> m.getEmail().equals(email)).findFirst();
+        hub.getMembers().remove(member.orElseThrow());
+
         hubRepository.save(hub);
-        memberMutationDTOKafkaTemplate.send(MessagingConfiguration.MEMBER_MUTATION_TOPIC, HubMemberMutationDTO.builder().hubId(hubId.toHexString()).email(email).state(HubMemberMutationDTO.State.REMOVED).build());
+
+        memberMutationDTOKafkaTemplate.send(MessagingConfiguration.MEMBER_MUTATION_TOPIC, HubMemberMutationDTO.builder()
+                .hubId(hubId.toHexString())
+                .email(email)
+                .state(HubMemberMutationDTO.State.REMOVED)
+                .build());
+        activityFiredDTOKafkaTemplate.send(MessagingConfiguration.ACTIVITY_TOPIC, ActivityFiredDTO.builder()
+                .hubId(hubId.toHexString())
+                .hubName(hub.getName())
+                .date(new Date())
+                .takerUser(asUser)
+                .affectedUsers(Set.of(member.get()))
+                .activityType(Type.MEMBER_REMOVED)
+                .activityVisibility(Visibility.PUBLIC)
+                .build());
     }
 
     @Override

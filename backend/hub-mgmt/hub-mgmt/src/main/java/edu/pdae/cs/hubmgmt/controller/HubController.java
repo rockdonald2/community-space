@@ -77,17 +77,17 @@ public class HubController {
 
     @PostMapping("/{id}/members")
     @ResponseStatus(HttpStatus.CREATED)
-    public ResponseEntity<Void> addMember(@PathVariable("id") ObjectId id, @RequestBody MemberDTO memberDTO, @RequestHeader("X-AUTH-TOKEN-SUBJECT") String user) {
+    public ResponseEntity<Void> addMember(@PathVariable("id") ObjectId id, @RequestBody MemberDTO memberDTO, @RequestHeader("X-AUTH-TOKEN-SUBJECT") String userEmail, @RequestHeader("X-USER-NAME") String userName) {
         log.info("Adding member {} to hub {}", memberDTO.getEmail(), id);
-        hubService.addMember(id, memberDTO, user);
+        hubService.addMember(id, memberDTO, UserWrapper.builder().email(userEmail).name(userName).build());
         return new ResponseEntity<>(HttpStatus.CREATED);
     }
 
     @DeleteMapping("/{id}/members/{email}")
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public ResponseEntity<Void> deleteMember(@PathVariable("id") ObjectId id, @PathVariable("email") String email, @RequestHeader("X-AUTH-TOKEN-SUBJECT") String user) {
+    public ResponseEntity<Void> deleteMember(@PathVariable("id") ObjectId id, @PathVariable("email") String email, @RequestHeader("X-AUTH-TOKEN-SUBJECT") String userEmail, @RequestHeader("X-USER-NAME") String userName) {
         log.info("Deleting member {} from hub {}", email, id);
-        hubService.deleteMember(id, email, user);
+        hubService.deleteMember(id, email, UserWrapper.builder().email(userEmail).name(userName).build());
         return new ResponseEntity<>(HttpStatus.NO_CONTENT);
     }
 

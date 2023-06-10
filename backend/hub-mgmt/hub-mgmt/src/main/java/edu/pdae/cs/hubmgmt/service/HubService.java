@@ -24,9 +24,9 @@ public interface HubService {
 
     MemberDTO getMember(ObjectId hubId, String email, String asUser);
 
-    void addMember(ObjectId hubId, MemberDTO memberDTO, String asUser);
+    void addMember(ObjectId hubId, MemberDTO memberDTO, UserWrapper asUser);
 
-    void deleteMember(ObjectId hubId, String email, String asUser);
+    void deleteMember(ObjectId hubId, String email, UserWrapper asUser);
 
     List<MemberDTO> getWaiters(ObjectId hubId, String asUser);
 

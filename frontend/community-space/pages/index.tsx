@@ -1,4 +1,4 @@
-import Presence from '@/components/common/Presence';
+import Presence from '@/components/misc/Presence';
 import { Divider, Grid } from '@mui/material';
 import Head from 'next/head';
 import Activity from '@/components/misc/Activity';

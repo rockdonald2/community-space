@@ -8,7 +8,7 @@ import Alerter from '../layout/Alerter';
 import { useSnackbar } from 'notistack';
 import { useNotifications } from '@/utils/UseNotifications';
 import { calculateRelativeTimeFromNow } from '@/utils/Utility';
-import Avatar from './Avatar';
+import Avatar from '../misc/Avatar';
 import { TransitionGroup } from 'react-transition-group';
 
 const Notifications = () => {
@@ -50,7 +50,7 @@ const Notifications = () => {
 
     return (
         <>
-            <Tooltip title='Notifications' enterTouchDelay={0}>
+            <Tooltip title='Notifications' enterTouchDelay={0} arrow>
                 <IconButton
                     aria-controls={open ? 'notifications-menu' : undefined}
                     aria-haspopup='true'
