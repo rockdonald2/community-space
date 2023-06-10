@@ -9,6 +9,7 @@
 \usepackage{hyperref}
 \usepackage{graphicx}   
 \usepackage{amsmath,amssymb}
+\usepackage[magyar]{babel}
 
 \usetheme{realtimeweb}
 
@@ -36,14 +37,40 @@
   keywordstyle=\color{blue}
 }
 
+\captionsetup[figure]{labelformat=original}
+\setlength{\belowcaptionskip}{0.25cm}
+\setlength{\abovecaptionskip}{0.25cm}
+
+\definecolor{graycolor}{gray}{0.96}
+
+\setbeamerfont{section number projected}{family=\rmfamily,series=\bfseries,size=\normalsize}
+\setbeamercolor{section number projected}{bg=graycolor,fg=Blue}
+\setbeamercolor*{item}{fg=Blue}
+\setbeamercolor{block title}{fg=Blue,bg=graycolor}
+\setbeamercolor{caption name}{fg=Blue}
+\setbeamercolor{bibliography entry author}{fg=Blue}
+\setbeamercolor{bibliography entry location}{fg=Blue} 
+\setbeamercolor{bibliography entry note}{fg=Blue}  
 \setbeamertemplate{footline}[frame number]
+\setbeamertemplate{caption}[numbered]
+\setbeamertemplate{navigation symbols} {} 
+\setbeamertemplate{bibliography item}{\insertbiblabel}
+\setbeamertemplate{footline}[frame number]
+\setbeamertemplate{caption}[numbered]
+\setbeamertemplate{frametitle continuation}{}
 
 \title{Projekt Bemutató}
-\subtitle{Community Space - a közösségért}
+\subtitle{Community Space - A place for all your memos}
 \author{Lukács Zsolt}
 
 \begin{document}
 
 \frame{\titlepage}
+
+\input{sections/intro.tex}
+\input{sections/arch.tex}
+\input{sections/tech.tex}
+\input{sections/expl.tex}
+\input{sections/end.tex}
 
 \end{document}

@@ -1,0 +1,36 @@
+\section{CS Architektúra Magyarázat}
+
+\begin{frame}
+    \frametitle{CS Architektúra Magyarázat}
+
+    \begin{itemize}
+        \item Back-end egyetlen belépési pontja a \texttt{Gateway} szolgáltatás (HTTP/WebSocket), általános routing a többi szolgáltatáshoz; egyetlen \texttt{K8S Ingress}-t kitéve.
+        \item Minden szolgáltatás külön \texttt{Mongo} adatbázissal rendelkezik és a legtöbb hívásukat cache-lik \texttt{Redis}-ben.
+        \item A szolgáltatások soha nem kommunikálnak HTTP-n keresztül, kizárólag Kafka consumer-producer topic-okon keresztül, amelyeknek több szerepe is van:
+              \begin{enumerate}
+                  \item Amennyiben egyik szolgáltatás működése függ a másik szolgáltatásban tárolt adatoktól, a második szolgáltatásnak kötelessége egy topic-on keresztül közzé tenni ezeket a változásokat (i.e., legtöbb adatbázisváltozás valamilyen formában egy topic-ra közzé lesz téve, hogy a többi szolgáltatás erre hallgasson és a saját adatbázisába mentse el az adatokat), így függetlenné téve őket egymástól.
+                  \item Az \texttt{Activity-Notifications-Mgmt.} a platformbéli aktivitásokat üzenetsoron keresztül fogadja a többi szolgáltatástól, ezeket értesítésekké üzenetsoron keresztül teszi (az aktivitási üzenet fogadása után egy újabb üzenetet küld önmagának az értesítést kiküldésére/kezelésére).
+                  \item A memo teljesítési értesítők üzenetsoron keresztül kerülnek load-balance-lésre az \texttt{Activity-Notifications-Mgmt.} példányok között (periodikusan megnézi melyek a még nem teljesített, de sürgős memo-k és üzenetet tesz közzé, amiben értesíti azokat a felhasználókat, akik még nem teljesítették az adott memo-t).
+              \end{enumerate}
+    \end{itemize}
+\end{frame}
+
+\begin{frame}
+    \frametitle{CS Valósidejűség}
+
+    (Jelenleg) Két \texttt{WebSocket}-en (valójában \texttt{Socket.IO}-n, Netty bázisú szerverrel) alapuló valósidejű folyamat:
+    \begin{enumerate}
+        \item online státusz, értsd. aktív felhasználók;
+        \item értesítések (egyéni vagy csoportos).
+    \end{enumerate}
+
+    Megvalósítások:
+    \begin{enumerate}
+        \item Az online státuszért az \texttt{Account-Mgmt.} (\textit{StatusListener.java}) felel, fogadja a \texttt{Socket.IO} egy adott endpoint-jára érkező csatlakozásokat/kilépéseket karbantartva az aktív listát, amit \texttt{Redis}-ben tárol, minden változásra közölve az új listát a felhasználóknak; minden csatlakozott kliensnek periodikusan felelőssége közölni jelenlétét egy üzenet formájában (\textit{PresenceContext.tsx}); minden 1 percben újraértékeli az aktív listát, törölve azokat, akik 1 perce nem közöltek magukról semmit.
+        \item Az értesítésekért az \texttt{Activity-Notifications-Mgmt.} felel (\textit{NotificationListener.java}), minden felhasználó belépéskor \texttt{RestAPI}-val lekéri az adatbázisba mentett értesítéseit, és \texttt{WS}-n keresztül fogadja az újakat; az egyéni/csoportos izoláció \texttt{Socket.IO room}-okon keresztül van megoldva.
+    \end{enumerate}
+
+    \begin{block}{Megjegyzés}
+        Minden \texttt{Socket.IO} interakció token-t igényel.
+    \end{block}
+\end{frame}

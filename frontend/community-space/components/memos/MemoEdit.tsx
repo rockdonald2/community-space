@@ -402,7 +402,7 @@ const MemoEdit = ({
                         </Grid>
                     )}
                 </Grid>
-                <Tooltip title='Submit your memo'>
+                <Tooltip title='Submit your memo' arrow>
                     <Button
                         variant='outlined'
                         size='large'

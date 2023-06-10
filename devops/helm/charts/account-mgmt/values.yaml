@@ -36,6 +36,7 @@ env:
   SPRING_DATA_MONGODB_DATABASE: account-mgmt
   SPRING_DATA_MONGODB_HOST: mongodb-community-space-service.community-space.svc.cluster.local
   SPRING_DATA_REDIS_HOST: community-space-redis-master
+  SPRING_KAFKA_BOOTSTRAP-SERVERS: "community-space-kafka-headless.community-space.svc.cluster.local:9092"
   MANAGEMENT_ENDPOINT_HEALTH_SHOW-DETAILS: always
   MANAGEMENT_ENDPOINT_HEALTH_PROBES_ENABLED: "true"
   MANAGEMENT_ENDPOINT_HEALTH_GROUP_READINESS_INCLUDE: "redis, diskSpace, mongo, ping"
