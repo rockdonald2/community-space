@@ -1,6 +1,7 @@
 package edu.pdae.cs.memomgmt.model.dto;
 
 import edu.pdae.cs.common.model.Visibility;
+import edu.pdae.cs.common.util.UserWrapper;
 import edu.pdae.cs.memomgmt.model.Memo;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,8 +18,7 @@ public class MemoDTO {
 
     private String id;
     private String title;
-    private String author;
-    private String authorName;
+    private UserWrapper author;
     private Date createdOn;
     private Visibility visibility;
     private Memo.Urgency urgency;

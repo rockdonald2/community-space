@@ -37,8 +37,7 @@ public class Hub {
     private String description;
     private Date createdOn;
 
-    private String owner;
-    private String ownerName;
+    private UserWrapper owner;
 
     @Builder.Default
     private Set<UserWrapper> members = new HashSet<>();

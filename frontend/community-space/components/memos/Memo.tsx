@@ -53,7 +53,7 @@ const MemoDialog = styled(Dialog)(({ theme }) => ({
     },
 }));
 
-const Memo = ({ memo, hub }: { memo: MemoShort, hub: HubShort }) => {
+const Memo = ({ memo, hub }: { memo: MemoShort; hub: HubShort }) => {
     const { user, signOut } = useAuthContext();
     const { mutate } = useSWRConfig();
     const { enqueueSnackbar } = useSnackbar();
@@ -87,7 +87,7 @@ const Memo = ({ memo, hub }: { memo: MemoShort, hub: HubShort }) => {
         isValidating: completionsIsValidating,
         isLoading: completionsIsLoading,
     } = useSWR<Completion[]>(
-        isMemoOpen && memo.author === user.email
+        isMemoOpen && memo.author.email === user.email
             ? {
                   key: 'completions',
                   token: user.token,
@@ -326,7 +326,7 @@ const Memo = ({ memo, hub }: { memo: MemoShort, hub: HubShort }) => {
                                 alignItems={{ xs: 'flex-start', md: 'center' }}
                             >
                                 <Typography sx={{ fontSize: 14, mb: 0 }} color='text.secondary' gutterBottom>
-                                    Posted by&nbsp;<strong>{memo.authorName}</strong>&nbsp;on{' '}
+                                    Posted by&nbsp;<strong>{memo.author.name}</strong>&nbsp;on{' '}
                                     {longDateShortTimeDateFormatter.format(new Date(memo.createdOn))}
                                 </Typography>
                                 <Divider variant='middle' orientation='vertical' flexItem sx={{ mx: 1, my: 0 }} />
@@ -376,11 +376,11 @@ const Memo = ({ memo, hub }: { memo: MemoShort, hub: HubShort }) => {
                 <DialogContent sx={{ overflow: 'initial' }}>
                     <Typography sx={{ mb: 1 }} color='text.primary' component={'div'}>
                         <Avatar
-                            user={{ email: memo.author }}
+                            user={{ email: memo.author.email }}
                             generateRandomColor
                             style={{ width: '36px', height: '36px', fontSize: '16px', marginRight: '.5rem' }}
                         />
-                        {memo.authorName}
+                        {memo.author.name}
                     </Typography>
                     <Typography sx={{ mb: 0 }} color='text.secondary'>
                         Memo posted on {longDateShortTimeDateFormatter.format(memo.createdOn)}
@@ -437,7 +437,7 @@ const Memo = ({ memo, hub }: { memo: MemoShort, hub: HubShort }) => {
                         </>
                     )}
                 </DialogContent>
-                {user.email === memo.author && (
+                {user.email === memo.author.email && (
                     <DialogContent sx={{ maxWidth: '90%' }}>
                         {completionsError ? (
                             <Alert severity='error'>
@@ -469,7 +469,7 @@ const Memo = ({ memo, hub }: { memo: MemoShort, hub: HubShort }) => {
                         )}
                     </DialogContent>
                 )}
-                {(user.email === memo.author || user.email === hub?.owner) && !isUserUpdatingMemo && (
+                {(user.email === memo.author.email || user.email === hub?.owner.email) && !isUserUpdatingMemo && (
                     <DialogActions>
                         <ButtonGroup
                             variant='outlined'
@@ -511,7 +511,7 @@ const Memo = ({ memo, hub }: { memo: MemoShort, hub: HubShort }) => {
                         </ButtonGroup>
                     </DialogActions>
                 )}
-                {user.email !== memo.author && !prevMemoData?.completed ? (
+                {user.email !== memo.author.email && !prevMemoData?.completed ? (
                     <DialogActions>
                         {!memo?.archived && (
                             <Button
@@ -530,7 +530,7 @@ const Memo = ({ memo, hub }: { memo: MemoShort, hub: HubShort }) => {
                         )}
                     </DialogActions>
                 ) : (
-                    user.email !== memo.author && (
+                    user.email !== memo.author.email && (
                         <DialogActions>
                             <Typography color='text.secondary' variant='caption'>
                                 Already completed

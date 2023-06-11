@@ -141,7 +141,7 @@ const Pendings = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBE
                                     data-user={user.name}
                                     data-email={user.email}
                                 >
-                                    <Avatar user={user} generateRandomColor cursor='pointer'/>
+                                    <Avatar user={user} generateRandomColor cursor='pointer' />
                                 </IconButton>
                             ))}
                         </Container>
@@ -179,7 +179,7 @@ const Pendings = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBE
                 anchorOrigin={{ horizontal: 'center', vertical: 'bottom' }}
             >
                 <Typography sx={{ padding: 1, textAlign: 'left', pb: 0 }} variant='subtitle1' color='text.secondary'>
-                    {menuAnchorEl?.dataset.user || <SkeletonLoader nrOfLayers={1}/>}
+                    {menuAnchorEl?.dataset.user || <SkeletonLoader nrOfLayers={1} />}
                 </Typography>
                 <Typography
                     sx={{ padding: 1, textAlign: 'left', mb: 0.5 }}
@@ -187,7 +187,7 @@ const Pendings = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBE
                     color='text.secondary'
                     component={'p'}
                 >
-                    {menuAnchorEl?.dataset.email || <SkeletonLoader nrOfLayers={1}/>}
+                    {menuAnchorEl?.dataset.email || <SkeletonLoader nrOfLayers={1} />}
                 </Typography>
                 {menuAnchorEl?.dataset.user && menuAnchorEl?.dataset.user !== user.email && hubRole === 'OWNER' ? (
                     <div>
@@ -203,7 +203,7 @@ const Pendings = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBE
                             }}
                         >
                             <ListItemIcon>
-                                <PersonAddIcon fontSize='small'/>
+                                <PersonAddIcon fontSize='small' />
                             </ListItemIcon>
                             <Typography variant='body2'>Accept member</Typography>
                         </MenuItem>
@@ -219,7 +219,7 @@ const Pendings = ({ hubId, hubRole }: { hubId: string; hubRole: 'OWNER' | 'MEMBE
                             }}
                         >
                             <ListItemIcon>
-                                <PersonRemoveIcon fontSize='small'/>
+                                <PersonRemoveIcon fontSize='small' />
                             </ListItemIcon>
                             <Typography variant='body2'>Decline member</Typography>
                         </MenuItem>

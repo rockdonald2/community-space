@@ -1,6 +1,7 @@
 package edu.pdae.cs.memomgmt.model.dto;
 
 import edu.pdae.cs.common.model.Visibility;
+import edu.pdae.cs.common.util.UserWrapper;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,7 +17,7 @@ public class MemoCreationResponseDTO {
 
     private String id;
     private String title;
-    private String author;
+    private UserWrapper author;
     private Date createdOn;
     private String hubId;
     private Date dueDate;

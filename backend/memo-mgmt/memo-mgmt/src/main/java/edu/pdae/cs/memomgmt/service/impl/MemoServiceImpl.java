@@ -53,8 +53,7 @@ public class MemoServiceImpl implements MemoService {
         final Memo reqMemo = modelMapper.map(memoCreationDTO, Memo.class);
         reqMemo.setCreatedOn(new Date());
         reqMemo.setId(null);
-        reqMemo.setAuthor(userWrapper.getEmail());
-        reqMemo.setAuthorName(userWrapper.getName());
+        reqMemo.setAuthor(userWrapper);
         reqMemo.setCompletions(new HashSet<>());
         reqMemo.setArchived(false);
 
@@ -88,7 +87,7 @@ public class MemoServiceImpl implements MemoService {
             throw new ForbiddenOperationException("You are not a member of this hub");
         }
 
-        if (!asUser.equals(memo.getAuthor()) && !asUser.equals(hub.getOwner())) {
+        if (!asUser.equals(memo.getAuthor().getEmail()) && !asUser.equals(hub.getOwner())) {
             throw new ForbiddenOperationException("The requester is not the author or the owner of the hub");
         }
 
@@ -154,7 +153,7 @@ public class MemoServiceImpl implements MemoService {
             throw new ForbiddenOperationException("You are not a member of this hub");
         }
 
-        if (!asUser.equals(memo.getAuthor()) && !asUser.equals(hub.getOwner())) {
+        if (!asUser.equals(memo.getAuthor().getEmail()) && !asUser.equals(hub.getOwner())) {
             throw new ForbiddenOperationException("The requester is not the author or the owner of the hub");
         }
 
@@ -176,7 +175,7 @@ public class MemoServiceImpl implements MemoService {
             throw new ForbiddenOperationException("You are not a member of this hub");
         }
 
-        if (Visibility.PRIVATE.equals(memo.getVisibility()) && !asUser.equals(memo.getAuthor())) {
+        if (Visibility.PRIVATE.equals(memo.getVisibility()) && !asUser.equals(memo.getAuthor().getEmail())) {
             throw new ForbiddenOperationException("Memo is private and the requester is not the author");
         }
 
@@ -257,7 +256,7 @@ public class MemoServiceImpl implements MemoService {
 
         final Hub hub = hubService.getHub(memo.getHubId());
 
-        if (actionTakerUserWrapper.getEmail().equals(memo.getAuthor())) {
+        if (actionTakerUserWrapper.getEmail().equals(memo.getAuthor().getEmail())) {
             throw new ConflictingOperationException("The author cannot complete its own memo");
         }
 
@@ -296,7 +295,7 @@ public class MemoServiceImpl implements MemoService {
     public List<MemoCompletionResponseDTO> getCompletions(ObjectId memoId, String asUser) throws NoSuchElementException, ForbiddenOperationException {
         final Memo memo = memoRepository.findById(memoId).orElseThrow();
 
-        if (!asUser.equals(memo.getAuthor())) {
+        if (!asUser.equals(memo.getAuthor().getEmail())) {
             throw new ForbiddenOperationException("The requester is not the author");
         }
 
@@ -315,7 +314,7 @@ public class MemoServiceImpl implements MemoService {
     public MemoCompletionResponseDTO verifyCompletion(ObjectId memoId, String userToVerify, String asUser) throws NoSuchElementException, ForbiddenOperationException {
         final Memo memo = memoRepository.findById(memoId).orElseThrow();
 
-        if (!asUser.equals(memo.getAuthor()) && !asUser.equals(userToVerify)) {
+        if (!asUser.equals(memo.getAuthor().getEmail()) && !asUser.equals(userToVerify)) {
             throw new ForbiddenOperationException("The requester is not the author or you can't verify another user's completion");
         }
 
@@ -339,7 +338,7 @@ public class MemoServiceImpl implements MemoService {
                 .filter(memo ->
                         hubService.isMember(memo.getHubId(), asUser)
                                 &&
-                                (Visibility.PUBLIC.equals(memo.getVisibility()) || asUser.equals(memo.getAuthor())))
+                                (Visibility.PUBLIC.equals(memo.getVisibility()) || asUser.equals(memo.getAuthor().getEmail())))
                 .toList();
     }
 

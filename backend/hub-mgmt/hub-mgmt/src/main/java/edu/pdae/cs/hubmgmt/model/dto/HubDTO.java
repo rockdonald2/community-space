@@ -1,5 +1,6 @@
 package edu.pdae.cs.hubmgmt.model.dto;
 
+import edu.pdae.cs.common.util.UserWrapper;
 import edu.pdae.cs.hubmgmt.model.Role;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -17,8 +18,7 @@ public class HubDTO {
     private String id;
     private String name;
     private Date createdOn;
-    private String owner;
-    private String ownerName;
+    private UserWrapper owner;
     private Role role;
 
 }

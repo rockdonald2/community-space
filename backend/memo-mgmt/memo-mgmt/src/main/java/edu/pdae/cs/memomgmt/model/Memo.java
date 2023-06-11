@@ -4,6 +4,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.databind.annotation.JsonSerialize;
 import com.fasterxml.jackson.databind.ser.std.ToStringSerializer;
 import edu.pdae.cs.common.model.Visibility;
+import edu.pdae.cs.common.util.UserWrapper;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -30,8 +31,7 @@ public class Memo {
     private ObjectId id;
 
     private String title;
-    private String author;
-    private String authorName;
+    private UserWrapper author;
     private String content;
     private Date createdOn;
     private Visibility visibility;

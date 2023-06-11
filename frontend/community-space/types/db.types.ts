@@ -25,8 +25,10 @@ export const urgencies: Urgency[] = ['URGENT', 'HIGH', 'MEDIUM', 'LOW'];
 export type Memo = {
     id?: string;
     title: string;
-    author: string;
-    authorName: string;
+    author: {
+        name: string;
+        email: string;
+    };
     content?: string;
     createdOn: Date;
     visibility: Visibility;
@@ -41,8 +43,10 @@ export type Memo = {
 export type MemoShort = {
     id?: string;
     title: string;
-    author: string;
-    authorName: string;
+    author: {
+        name: string;
+        email: string;
+    };
     createdOn: Date;
     visibility: Visibility;
     urgency: Urgency;
@@ -57,8 +61,10 @@ export type Hub = {
     name: string;
     description: string;
     createdOn: Date;
-    owner: string;
-    ownerName: string;
+    owner: {
+        name: string;
+        email: string;
+    };
     members?: string[];
     waiters?: string[];
     role?: 'OWNER' | 'MEMBER' | 'PENDING' | 'NONE';
@@ -69,8 +75,10 @@ export type HubShort = {
     name: string;
     description: string;
     createdOn: Date;
-    owner: string;
-    ownerName: string;
+    owner: {
+        name: string;
+        email: string;
+    };
 };
 
 export type Activity = {

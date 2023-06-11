@@ -63,10 +63,10 @@ const HubCard = ({ hub, mutateCallback }: { hub: HubType; mutateCallback: (hub: 
                                 <Avatar
                                     generateRandomColor
                                     style={{ width: '26px', height: '26px', margin: '.25rem', fontSize: '14px' }}
-                                    user={{ email: hub.owner }}
+                                    user={{ email: hub.owner.email }}
                                 />
                             }
-                            label={hub.ownerName}
+                            label={hub.owner.name}
                             sx={{ my: 1.5 }}
                         />
                     </Typography>
