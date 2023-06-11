@@ -1,0 +1,74 @@
+\documentclass[aspectratio=43,11pt]{beamer}
+\usepackage[utf8]{inputenc}
+\usepackage{caption}
+\usepackage{makecell}
+\usepackage{framed}
+\usepackage{listings}
+\usepackage{csquotes}
+\usepackage{mathtools}
+\usepackage{hyperref}
+\usepackage{graphicx}   
+\usepackage{amsmath,amssymb}
+\usepackage[magyar]{babel}
+
+\usetheme{realtimeweb}
+
+\makeindex
+\graphicspath{ {figs/} }
+
+\lstdefinelanguage{JavaScript}{
+  keywords={typeof, new, true, false, catch, function, return, null, catch, switch, var, if, in, while, do, else, case, break, await, async, const, let},
+  keywordstyle=\color{blue}\bfseries,
+  ndkeywords={class, export, boolean, throw, implements, import, this},
+  ndkeywordstyle=\color{darkgray}\bfseries,
+  identifierstyle=\color{black},
+  sensitive=false,
+  comment=[l]{//},
+  morecomment=[s]{/*}{*/},
+  commentstyle=\color{purple}\ttfamily,
+  stringstyle=\color{red}\ttfamily,
+  morestring=[b]',
+  morestring=[b]"
+}
+
+\lstset{basicstyle=\ttfamily,
+  showstringspaces=false,
+  commentstyle=\color{red},
+  keywordstyle=\color{blue}
+}
+
+\captionsetup[figure]{labelformat=original}
+\setlength{\belowcaptionskip}{0.25cm}
+\setlength{\abovecaptionskip}{0.25cm}
+
+\definecolor{graycolor}{gray}{0.96}
+
+\setbeamerfont{section number projected}{family=\rmfamily,series=\bfseries,size=\normalsize}
+\setbeamercolor{section number projected}{bg=graycolor,fg=Blue}
+\setbeamercolor*{item}{fg=Blue}
+\setbeamercolor{block title}{fg=Blue,bg=graycolor}
+\setbeamercolor{caption name}{fg=Blue}
+\setbeamercolor{bibliography entry author}{fg=Blue}
+\setbeamercolor{bibliography entry location}{fg=Blue} 
+\setbeamercolor{bibliography entry note}{fg=Blue}  
+\setbeamertemplate{footline}[frame number]
+\setbeamertemplate{caption}[numbered]
+\setbeamertemplate{navigation symbols} {} 
+\setbeamertemplate{bibliography item}{\insertbiblabel}
+\setbeamertemplate{footline}[frame number]
+\setbeamertemplate{caption}[numbered]
+\setbeamertemplate{frametitle continuation}{}
+
+\title{Projekt Bemutató}
+\subtitle{Community Space - A place for all your memos}
+\author{Lukács Zsolt}
+
+\begin{document}
+
+\frame{\titlepage}
+
+\input{sections/collaborative.tex}
+\input{sections/strategic.tex}
+\input{sections/tactical.tex}
+
+\end{document}
