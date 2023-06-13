@@ -179,6 +179,7 @@ public class MessagingConfiguration {
         return TopicBuilder.name(ACTIVITY_TOPIC).build();
     }
 
+    @Bean
     public NewTopic dueMemoTopic() {
         return TopicBuilder.name(DUE_MEMO_TOPIC).build();
     }

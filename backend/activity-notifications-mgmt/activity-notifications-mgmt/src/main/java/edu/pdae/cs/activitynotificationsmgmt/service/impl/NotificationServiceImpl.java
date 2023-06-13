@@ -194,6 +194,19 @@ public class NotificationServiceImpl implements NotificationService {
                         .taker(notificationMessageDTO.getTakerUser().getEmail())
                         .build());
             }
+        } else if (Type.MEMBER_JOINED.equals(notificationType) || Type.MEMBER_REMOVED.equals(notificationType)) {
+            Objects.requireNonNull(notificationMessageDTO.getHubId());
+            final var hub = hubService.getHub(new ObjectId(notificationMessageDTO.getHubId()));
+            final var notificationMessage = String.format("You have been %s hub %s", Type.MEMBER_JOINED.equals(notificationType) ? "accepted to" : "removed from", hub.getName());
+            final var affectedUser = notificationMessageDTO.getAffectedUsers().stream().findFirst().orElseThrow();
+
+            final var notification = addNotification(affectedUser.getEmail(), Notification.TargetType.USER, notificationMessage, notificationMessageDTO.getTakerUser().getEmail());
+            broadcastNotification(affectedUser.getEmail(), NotificationDTO.builder()
+                    .id(notification.getId().toHexString())
+                    .msg(notificationMessage)
+                    .createdAt(notification.getCreatedAt())
+                    .taker(notificationMessageDTO.getTakerUser().getEmail())
+                    .build());
         }
     }
 
