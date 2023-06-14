@@ -1,4 +1,4 @@
-import {Notification, User} from './db.types';
+import { Notification, User } from './db.types';
 
 export type UserSignUp = {
     email: string;

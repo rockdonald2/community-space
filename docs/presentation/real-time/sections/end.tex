@@ -9,9 +9,22 @@
 
     Ahol a kód 3 részben van szétbontva:
     \begin{itemize}
+        \small
         \item \texttt{backend/} mappa tartalmazza a projekt micro-service-einek kódját, jelenleg 5 (+ 1) ilyen projekt van ezen belül (5 service + 1 library, mind \texttt{Java Spring}-ben);
         \item \texttt{frontend/} mappa tartalmazza a \texttt{NextJS} front-end kódot;
         \item \texttt{devops/} mappa tartalmazza a \texttt{Terraform}, \texttt{Helm}, és \texttt{CI/CD} kódrészleteket, amelyek megvalósítják a folyamatos fejlesztést és kitelepítést (minden commit után automatikus build és Docker deploy folyamatok a projekt \texttt{Gitlab Registry}-jére), infrastructure-as-code a K8S cluster létrehozásához és \texttt{Helm Chart} a könnyű K8S kitelepítésért.
+    \end{itemize}
+
+    \medbreak
+
+    What's missing? És mit lehetne még hozzáadni a jövőben:
+    \begin{itemize}
+        \small
+        \item Hub-ok manipulációja (kliens oldalon csak létrehozni lehet, külön oldal);
+        \item Konfigurálható emlékeztetők memo-kra;
+        \item Chat funkcionalitás?
+        \item Adminisztrátor szerepkörök (a hub owner-ek fölött álló szerepkör);
+        \item \dots
     \end{itemize}
 
 \end{frame}

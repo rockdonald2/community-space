@@ -28,7 +28,6 @@ public class MemoServiceImpl implements MemoService {
     @CacheEvict("memo")
     public void createMemo(MemoMutationDTO memoMutationDTO) {
         final Memo memo = Memo.builder()
-                .id(new ObjectId(memoMutationDTO.getMemoId()))
                 .title(memoMutationDTO.getTitle())
                 .owner(memoMutationDTO.getOwner())
                 .hubId(new ObjectId(memoMutationDTO.getHubId()))
@@ -37,6 +36,9 @@ public class MemoServiceImpl implements MemoService {
                 .completions(new HashSet<>())
                 .archived(memoMutationDTO.getIsArchived())
                 .build();
+
+        memo.setId(new ObjectId(memoMutationDTO.getMemoId()));
+
         memoRepository.save(memo);
     }
 

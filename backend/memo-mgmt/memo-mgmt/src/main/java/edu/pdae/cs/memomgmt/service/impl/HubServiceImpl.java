@@ -29,12 +29,15 @@ public class HubServiceImpl implements HubService {
     @Override
     @CacheEvict({"hub", "memo", "memos", "member"})
     public void createHub(HubMutationDTO hubMutationDTO) {
-        hubRepository.save(Hub.builder()
-                .id(new ObjectId(hubMutationDTO.getHubId()))
+        final Hub hub = Hub.builder()
                 .owner(hubMutationDTO.getOwner())
                 .name(hubMutationDTO.getHubName())
                 .members(new HashSet<>())
-                .build());
+                .build();
+
+        hub.setId(new ObjectId(hubMutationDTO.getHubId()));
+
+        hubRepository.save(hub);
     }
 
     @Override
