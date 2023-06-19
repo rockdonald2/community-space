@@ -98,7 +98,7 @@ const Notifications = () => {
                         variant='subtitle1'
                         color='text.secondary'
                     >
-                        Notifications
+                        Notifications ({notifications?.length})
                     </Typography>
                     <Divider sx={{ mb: 2 }} />
                 </Paper>

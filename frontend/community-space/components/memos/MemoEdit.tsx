@@ -381,7 +381,7 @@ const MemoEdit = ({
                                     label='Due date'
                                     disablePast
                                     slotProps={{
-                                        textField: { size: 'small', sx: { fontSize: 'medium' } },
+                                        textField: { size: 'small', sx: { fontSize: 'medium' }, error: isError },
                                         actionBar: {
                                             actions: ['clear', 'cancel', 'accept'],
                                         },
