@@ -1,7 +1,5 @@
 # Community Space
 
-[![pipeline status](https://gitlab.com/rockdonald2/community-space/badges/main/pipeline.svg)](https://gitlab.com/rockdonald2/community-space/-/commits/main)
-
 Ez a projekt tartalmazza a `Community Space` nevű projekt forráskódját minden platformra nézve.
 
 ## Kódszerkezet
