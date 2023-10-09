@@ -22,8 +22,11 @@ jobs:
       - name: Build with internal script
         run: |
           chmod +x devops/ci/build.sh
-          cd devops/ci
-          bash build.sh
+          bash devops/ci/build.sh
+      - name: Test with internal script
+        run: |
+          chmod +x devops/ci/test.sh
+          bash devops/ci/test.sh
       - name: Upload build artifacts
         uses: actions/upload-artifact@v3
         with:
