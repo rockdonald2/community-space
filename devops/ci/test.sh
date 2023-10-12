@@ -60,7 +60,7 @@ echo
 
 cd ../frontend/community-space || exit 1
 npm i
-npm test
+npm test -- --maxWorkers 1 --coverage
 # shellcheck disable=SC2103
 cd ..
 
