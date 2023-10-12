@@ -24,6 +24,7 @@ jobs:
         with:
           node-version: 18.x
           cache: 'npm'
+          cache-dependency-path: frontend/community-space/package-lock.json
       - name: Add git safe.directory for container
         run: |
           mkdir -p /home/runner/work/_temp/_github_home
