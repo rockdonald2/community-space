@@ -9,3 +9,10 @@ name = "javascript"
 
 [[analyzers]]
 name = "docker"
+
+[[analyzers]]
+name = "secrets"
+
+[[analyzers]]
+name = "test-coverage"
+enabled = true

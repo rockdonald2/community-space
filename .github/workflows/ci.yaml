@@ -19,6 +19,11 @@ jobs:
         with:
           java-version: '17'
           distribution: 'adopt'
+      - name: Setup Node.js 18.x
+        uses: actions/setup-node@v3
+        with:
+          node-version: 18.x
+          cache: 'npm'
       - name: Add git safe.directory for container
         run: |
           mkdir -p /home/runner/work/_temp/_github_home
@@ -65,3 +70,9 @@ jobs:
           key: java
           coverage-file: backend/account-mgmt/account-mgmt/build/reports/jacoco/test/jacocoTestReport.xml
           dsn: ${{ secrets.ACCOUNT_MGMT_DEEPSOURCE_DSN }}
+      - name: Send front-end code coverage to DeepSource
+        uses: deepsourcelabs/test-coverage-action@master
+        with:
+          key: javascript
+          coverage-file: frontend/community-space/coverage/lcov.info
+          dsn: ${{ secrets.FRONTEND_DEEPSOURCE_DSN }}

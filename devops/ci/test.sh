@@ -53,4 +53,15 @@ chmod +x gradlew
 ./gradlew test
 cd ../..
 
+# Deploy front-end
+echo
+echo "===> Testing front-end"
+echo
+
+cd ../frontend/community-space || exit 1
+npm i
+npm test
+# shellcheck disable=SC2103
+cd ..
+
 cd ../devops/ci || exit 1 # change back to ci directory
