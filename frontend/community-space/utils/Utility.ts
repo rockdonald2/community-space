@@ -487,7 +487,7 @@ export const getCurrentDay = (): number => {
 };
 
 export const calculateRelativeTimeFromNow = (date: Date): string => {
-    const formatter = new Intl.RelativeTimeFormat(`en`, { style: `narrow` });
+    const formatter = new Intl.RelativeTimeFormat('en', { style: 'narrow' });
 
     const currDate: Date = new Date();
     const diff: number = currDate.getTime() - date.getTime();
