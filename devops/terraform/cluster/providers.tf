@@ -29,10 +29,10 @@ variable "do_token" {
 
 provider "kubernetes" {
   host                   = digitalocean_kubernetes_cluster.cs-dev.endpoint
-  client_certificate     = base64decode(digitalocean_kubernetes_cluster.cs-dev.kube_config.0.client_certificate)
-  client_key             = base64decode(digitalocean_kubernetes_cluster.cs-dev.kube_config.0.client_key)
-  cluster_ca_certificate = base64decode(digitalocean_kubernetes_cluster.cs-dev.kube_config.0.cluster_ca_certificate)
-  token                  = digitalocean_kubernetes_cluster.cs-dev.kube_config.0.token
+  client_certificate     = base64decode(digitalocean_kubernetes_cluster.cs-dev.kube_config[0].client_certificate)
+  client_key             = base64decode(digitalocean_kubernetes_cluster.cs-dev.kube_config[0].client_key)
+  cluster_ca_certificate = base64decode(digitalocean_kubernetes_cluster.cs-dev.kube_config[0].cluster_ca_certificate)
+  token                  = digitalocean_kubernetes_cluster.cs-dev.kube_config[0].token
 
   exec {
     api_version = "client.authentication.k8s.io/v1beta1"
@@ -45,18 +45,18 @@ provider "kubernetes" {
 provider "kubectl" {
   load_config_file       = true
   host                   = digitalocean_kubernetes_cluster.cs-dev.endpoint
-  token                  = digitalocean_kubernetes_cluster.cs-dev.kube_config.0.token
-  cluster_ca_certificate = base64decode(digitalocean_kubernetes_cluster.cs-dev.kube_config.0.cluster_ca_certificate)
+  token                  = digitalocean_kubernetes_cluster.cs-dev.kube_config[0].token
+  cluster_ca_certificate = base64decode(digitalocean_kubernetes_cluster.cs-dev.kube_config[0].cluster_ca_certificate)
   config_path            = "~/.kube/config"
 }
 
 provider "helm" {
   kubernetes {
     host                   = digitalocean_kubernetes_cluster.cs-dev.endpoint
-    client_certificate     = base64decode(digitalocean_kubernetes_cluster.cs-dev.kube_config.0.client_certificate)
-    client_key             = base64decode(digitalocean_kubernetes_cluster.cs-dev.kube_config.0.client_key)
-    cluster_ca_certificate = base64decode(digitalocean_kubernetes_cluster.cs-dev.kube_config.0.cluster_ca_certificate)
-    token                  = digitalocean_kubernetes_cluster.cs-dev.kube_config.0.token
+    client_certificate     = base64decode(digitalocean_kubernetes_cluster.cs-dev.kube_config[0].client_certificate)
+    client_key             = base64decode(digitalocean_kubernetes_cluster.cs-dev.kube_config[0].client_key)
+    cluster_ca_certificate = base64decode(digitalocean_kubernetes_cluster.cs-dev.kube_config[0].cluster_ca_certificate)
+    token                  = digitalocean_kubernetes_cluster.cs-dev.kube_config[0].token
     config_path            = "~/.kube/config"
   }
 }
