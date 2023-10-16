@@ -97,7 +97,7 @@ const AuthContextProvider = ({ children }) => {
         };
 
         // if there is any captured user
-        if (rawUser && rawUser.token) {
+        if (rawUser?.token) {
             handleAsync();
         } else {
             setInitialized(true);
